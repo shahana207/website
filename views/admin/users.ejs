@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="/style/css/adminheader.css" />
+    <link rel="stylesheet" href="\style\css\adminuser.css" />
+    <style>
+      .pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.pagination-container a,
+.pagination-container span {
+  padding: 8px 12px;
+  margin: 2px;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.pagination-container a:hover {
+  background-color: #000000;
+  color: #fff;
+  border-color: #000000;
+}
+
+.pagination-container .current-page {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-color: #000000;
+  cursor: default;
+}
+
+    </style>
+  </head>
+  <body>
+    <%-include("../partials/admin/header")%>
+    <!-- Placeholder for Header -->
+    <header
+      style="background: #333; color: white; padding: 20px; text-align: center"
+    >
+      <h1>Admin Dashboard</h1>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="page-title">
+        <h1>User Management</h1>
+      </div>
+
+      <!-- Search Section -->
+      <div class="search-container">
+        <form class="search-form" action="#">
+          <input
+            type="text"
+            name="search"
+            class="search-input"
+            placeholder="Search by name, email or phone..."
+          />
+          <button type="submit" class="search-btn">Search</button>
+        </form>
+      </div>
+
+      <!-- Users Table -->
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Mobile</th>
+              <th>Registered On</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%if(users && users.length > 0){%> <%users.forEach(user=>{%>>
+
+            <tr>
+              <td>
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <img
+                    src="/style/img/about/profile1.jpg"
+                    alt="John Doe"
+                    class="user-img"
+                  />
+                  <div>
+                    <span class="user-name"><%= user.name %></span>
+                    <span class="user-email"><%= user.email %></span>
+                  </div>
+                </div>
+              </td>
+              <td class="user-address"><%= user.phone %></td>
+              <td class="date-cell"><%= user.createdOn.toLocaleString() %></td>
+              <td>
+                <%if(user.isBlocked){%>
+                <span class="status-badge status-inactive">Blocked</span>
+                <%}else{%>
+                <span class="status-badge status-active">Active</span>
+                <%}%>
+              </td>
+
+              <td class="action-cell">
+                <%if(user.isBlocked){%>
+                <button class="btn btn-unblock" onclick="unblockUser('<%=user._id %>')">Unblock</button>
+                <%}else{%>
+                <button class="btn btn-block" onclick="blockUser('<%= user._id %>')">Block</button>
+               <%}%>
+              </td>
+            </tr>
+            <%})%> <%}%>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+       
+     <div class="pagination-container">
+      <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined') { %>
+        <% if (currentPage > 1) { %>
+          <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %>
+    
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="current-page"><%= i %></span>
+          <% } else { %>
+            <a href="?page=<%= i %>"><%= i %></a>
+          <% } %>
+        <% } %>
+    
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+      <% } %>
+</div>
+
+
+    <script>
+      function blockUser(userId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "This user will be blocked from accessing the platform!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#e53e3e",
+          cancelButtonColor: "#718096",
+          confirmButtonText: "Yes, block user!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/admin/blockUser/${userId}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    icon: "success",
+                    title:
+                      data.message || "User has been blocked successfully.",
+                    timer: 1500,
+                    showConfirmButton: false,
+                  }).then(() => {
+                    location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message || "Failed to block user.",
+                  });
+                }
+              })
+              .catch((err) => {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: "Something went wrong. Please try again later.",
+                });
+                console.error("Fetch error:", err);
+              });
+          }
+        });
+    }
+
+
+    function unblockUser(userId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This user will be unblocked from accessing the platform!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#38a169", // greenish for unblocking
+        cancelButtonColor: "#718096",
+        confirmButtonText: "Yes, unblock user!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/unblockUser/${userId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: data.message || "User has been unblocked successfully.",
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.message || "Failed to unblock user.",
+                    });
+                }
+            })
+            .catch((err) => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Something went wrong. Please try again later.",
+                });
+                console.error("Fetch error:", err);
+            });
+        }
+    });
+}
+
+    
+    </script>
+  </body>
+</html>

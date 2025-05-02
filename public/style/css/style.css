@@ -76,7 +76,8 @@ h6 {
 p {
 	font-size: 15px;
 	font-family: "Nunito Sans", sans-serif;
-	color: #ffffff;
+	color: #060606;
+	
 	font-weight: 400;
 	line-height: 25px;
 	margin: 0 0 15px 0;
@@ -130,6 +131,8 @@ ol {
 	font-weight: 700;
 	line-height: 46px;
 }
+
+
 
 .set-bg {
 	background-repeat: no-repeat;
@@ -535,6 +538,77 @@ ol {
 	position: relative;
 	top: 3px;
 }
+
+.header__top__links.sign-in-link:hover{
+	color:#ff7f50;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px; /* Fixed typo: 'min: width' to 'min-width' */
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    right: 0;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* .dropdown{
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content{
+display: none;
+position:absolute;
+background-color: white;
+min: width 160px;
+box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 1000;
+right: 0;
+} */
+/* 
+.dropdown-content a{
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+	width: 100%;
+}
+
+.dropdown-content a:hover{
+	background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+} */
+
+.header{
+	position: relative;
+	z-index: 500;
+}
+
 
 .offcanvas-menu-wrapper {
 	display: none;
