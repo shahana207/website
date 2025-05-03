@@ -1,4 +1,5 @@
 const User = require("../../models/userSchema");
+const Address=require("../../models/addressSchema");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv").config();
@@ -173,6 +174,345 @@ const postNewPassword = async (req, res) => {
     }
 };
 
+const userProfile = async(req, res) => {
+    try {
+        const userId = req.session.user;
+        console.log(userId);
+        
+        const userData = await User.findById(userId).select('name gender email phone profilePicture');
+        const addressData = await Address.findOne({userId : userId})
+        console.log('User Data:', userData);
+
+        if (!userData) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.render('profile', {
+            user:userData,
+            userAddress:addressData,
+            name: userData.name,
+             email: userData.email,
+            phone: userData.phone,
+            profilePicture: userData.profilePicture || null
+        });
+    } catch (error) {
+        console.error('Error while retrieving user profile data:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+const getEditProfile = async(req,res)=>{
+    try {
+        const userId = req.session.user;
+        const userData = await User.findById(userId).select('name gender email phone');
+        
+        if (!userData) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.render('edit-profile', {
+            name: userData.name,
+            gender: userData.gender,
+            email: userData.email,
+            phone: userData.phone,
+            profilePicture: userData.profilePicture || null
+        });
+    } catch (error) {
+        console.error('Error while retrieving user data for edit:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { name, phone } = req.body;
+        const updateData = { name, phone };
+
+        let oldProfilePicture = null;
+
+        if (req.file) {
+            // Get the current user's profile picture to delete later
+            const user = await User.findById(userId).select('profilePicture');
+            oldProfilePicture = user.profilePicture;
+
+            const tempPath = req.file.path;
+            const fileName = `${Date.now()}-${req.file.originalname.replace(/\s+/g, '_')}`;
+            const permanentPath = path.join(__dirname, '..', '..', 'public', 'Uploads', 'profile-pictures', fileName);
+
+            await fs.mkdir(path.dirname(permanentPath), { recursive: true });
+            await fs.rename(tempPath, permanentPath);
+
+            updateData.profilePicture = `/Uploads/profile-pictures/${fileName}`;
+        }
+
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Delete old profile picture if it exists
+        if (oldProfilePicture && req.file) {
+            const oldPicturePath = path.join(__dirname, '..', '..', 'public', oldProfilePicture);
+            try {
+                await fs.unlink(oldPicturePath);
+            } catch (err) {
+                console.warn(`Failed to delete old profile picture: ${oldPicturePath}`, err);
+            }
+        }
+
+        res.redirect('/profile');
+    } catch (error) {
+        console.error('Error while updating user profile:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+const changeEmail = async(req,res)=>{
+    try {
+        res.render('change-email');
+    } catch (error) {
+        res.redirect('/pageNotFound');
+        
+    }
+}
+
+const changeEmailValid = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        const otp = generateOtp();
+        const emailSent = await sendVerificationEmail(email, otp);
+        if (emailSent) {
+          req.session.userotp = otp;
+          req.session.userData = req.body;
+          req.session.email = email;
+          res.render('verify-email-otp'); 
+          console.log('OTP:', otp);
+        } else {
+          res.json('email-error');
+        }
+      } else {
+        res.render('change-email', {
+          message: 'User with this email not exists',
+        });
+      }
+    } catch (error) {
+      res.redirect('pageNotFound');
+    }
+  };
+
+  const verifyEmailOtp = async(req,res)=>{
+    try {
+        const enteredOtp= req.body.otp;
+        if(enteredOtp===req.session.userotp){
+            req.session.userData=req.body.userData;
+            res.render('new-email',{
+                userData:req.session.userData,
+
+            })
+        }else{
+            res.render('/verify-email-otp',{
+                message:"OTP is not matching"
+            })
+        }
+    } catch (error) {
+        res.redirect('/pageNotFound');
+        
+    }
+}
+
+const updateEmail = async(req,res)=>{
+    try {
+        const newEmail = req.body.newEmail;
+        const userId = req.session.user;
+        await User.findByIdAndUpdate(userId,{email:newEmail})
+        res.redirect('/profile')
+    } catch (error) {
+        res.redirect('/pageNotFound');
+        
+    }
+}
+
+const changePassword = async(req,res)=>{
+    try {
+        res.render('change-password')
+    } catch (error) {
+        res.redirect('/pageNotFound');
+    }
+}
+
+const changePasswordValid = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            const otp = generateOtp();
+            req.session.userotp = otp;
+            console.log('Generated OTP:', otp);
+
+            const emailSent = await sendVerificationEmail(email, otp);
+            if (emailSent) {
+                req.session.userData = req.body;
+                req.session.email = email;
+                res.render('change-pass-otp');
+                console.log('OTP sent to email:', otp);
+            } else {
+                res.json({
+                    success: false,
+                    message: 'Failed to send OTP, please try again.'
+                });
+            }
+        } else {
+            res.render('change-password', {
+                message: 'User with this email does not exist.'
+            });
+        }
+    } catch (error) {
+        console.error('Error in password change validation:', error);
+        res.redirect('/pageNotFound');
+    }
+};
+
+const verifyChangePassOtp = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        console.log('Entered OTP:', otp);
+        console.log('Session OTP:', req.session.userotp);
+
+        if (otp === req.session.userotp) {
+            res.json({ success: true, redirectUrl: '/reset-password' });
+        } else {
+            res.json({ success: false, message: 'OTP not matching.' });
+        }
+    } catch (error) {
+        console.error('Error verifying OTP:', error);
+        res.status(500).json({ success: false, message: 'An error occurred, please try again later.' });
+    }
+};
+
+
+const userAddress = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const userData = await User.findById(userId);
+        const addressDocs = await Address.find({ userId });
+
+        // Flatten the nested address arrays
+        const address = addressDocs.flatMap(doc => doc.address);
+
+        res.render('address', {
+            active: 'address',
+            profilePicture: userData.profilePicture,
+            address // now this is a flat array of individual address objects
+        });
+    } catch (error) {
+        console.error(error);
+        res.redirect('/pageNotFound');
+    }
+};
+
+
+
+
+
+const addAddress = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        console.log('addAddress - User ID from session:', userId);
+        if (!userId) {
+            throw new Error('User ID not found in session');
+        }
+
+        const userData = await User.findById(userId);
+        console.log('addAddress - User Data:', userData);
+        console.log('Views directory:', res.app.get('views'));
+
+        res.render('add-new-address', {
+            user: userId,
+            active: 'addresses',
+            profilePicture: userData.profilePicture,
+            successMessage: req.session.successMessage,
+            errorMessage: req.session.errorMessage
+        });
+
+        // Clear session messages after rendering
+        req.session.successMessage = null;
+        req.session.errorMessage = null;
+    } catch (error) {
+        console.log('addAddress - Error:', error);
+        res.redirect('/pageNotFound');
+    }
+};
+
+const postAddAddress = async (req, res) => {
+    try {
+        const userId = req.session.user;
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'User not authenticated' });
+        }
+
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const {
+            addressType, name, city, landMark, state,
+            pincode, phone, altPhone, isDefault
+        } = req.body;
+
+        if (!addressType || !name || !city || !landMark || !state || !pincode || !phone || !altPhone) {
+            return res.status(400).json({ success: false, message: 'Missing required address fields' });
+        }
+
+        const userAddress = await Address.findOne({ userId });
+
+        const newAddress = {
+            addressType,
+            name,
+            city,
+            landMark,
+            state,
+            pincode,
+            phone,
+            altPhone,
+            isDefault: isDefault === 'true'
+        };
+
+        if (!userAddress) {
+            const addressDoc = new Address({
+                userId,
+                address: [newAddress]
+            });
+            await addressDoc.save();
+        } else {
+            if (newAddress.isDefault) {
+                userAddress.address.forEach(addr => addr.isDefault = false);
+            }
+            userAddress.address.push(newAddress);
+            await userAddress.save();
+          
+            
+        }
+
+        return res.status(200).json({ success: true, message: 'Address saved successfully' });
+       
+
+    } catch (error) {
+        console.error('Error in postAddAddress:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred while saving the address' });
+    }
+};
 
 
 module.exports = {
@@ -182,4 +522,18 @@ module.exports = {
     getResetPassPage,
     resendOtp,
     postNewPassword,
+    userProfile,
+    getEditProfile,
+    updateProfile,
+    changeEmail,
+    changeEmailValid,
+    verifyEmailOtp,
+    updateEmail,
+    changePassword,
+    changePasswordValid,
+    verifyChangePassOtp,
+    addAddress,
+    userAddress,
+    postAddAddress,
+   
 };

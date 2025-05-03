@@ -1,5 +1,5 @@
 const mongoose=require("mongoose");
-const{schema}=mongoose;
+const Schema=mongoose.Schema;
 
 
 const addressSchema= new Schema({
@@ -45,6 +45,6 @@ const addressSchema= new Schema({
     }]
 })
 
+const address = mongoose.model("Address", addressSchema);
 
-const address=mongoose.model("Address".addressSchema);
 module.exports = address;

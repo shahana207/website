@@ -156,7 +156,7 @@ const addProducts = async (req, res) => {
             salePrice: parseFloat(salePrice),
             quantity: parseInt(quantity),
             color: colors,
-            sizes: sizeArray, // Add sizes to the product
+            sizes: sizeArray, 
             productImage: images,
             status: 'Available'
         });

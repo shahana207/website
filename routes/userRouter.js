@@ -6,6 +6,7 @@ const passport = require("passport");
 const { userAuth } = require("../middlewares/auth");
 const productController = require('../controllers/user/productController');
 const profileController = require("../controllers/user/profileController");
+const { route } = require("./adminRouter");
 
 
 //Error management
@@ -61,7 +62,7 @@ router.get("/shop",userAuth,userController.loadShoppingPage);
 router.get("/productDetails",userAuth,productController.productDetails);
 
 
-//password
+//password management
 router.get("/forgot-password",profileController.getforgotPasspage);
 
 router.post("/forgot-email-valid",profileController.forgotEmailValid);
@@ -73,6 +74,35 @@ router.get("/reset-password",profileController.getResetPassPage);
 router.post("/resend-forgot-otp",profileController.resendOtp);
 
 router.post("/reset-password",profileController.postNewPassword);
+
+//profile management
+router.get("/userProfile",userAuth,profileController.userProfile);
+
+router.get("/getEditProfile",userAuth,profileController.getEditProfile);
+
+router.post('/updateProfile', uploadProfilePicture.single('profilePicture'), profileController.updateProfile);
+
+router.get("/change-email",userAuth,profileController.changeEmail);
+
+router.post("/change-email", userAuth, profileController.changeEmailValid);
+
+router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp);
+
+router.post("/update-email",userAuth,profileController.updateEmail);
+
+router.get("/change-password",userAuth,profileController.changePassword);
+
+router.post("/change-password",userAuth,profileController.changePasswordValid);
+
+router.post("/verify-changepassword-otp",userAuth,profileController.verifyChangePassOtp);
+
+// Address Management
+router.get("/address",userAuth,profileController.userAddress);
+
+router.get("/add-address",userAuth,profileController.addAddress);
+
+router.post("/add-address", userAuth, profileController.postAddAddress);
+
 
 
 module.exports=router;
