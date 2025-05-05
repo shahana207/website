@@ -2,10 +2,14 @@ const express=require("express");
 const router=express.Router();
 const userController=require("../controllers/user/userController");
 const passport = require("passport");
+
+const {uploadProfilePicture}=require("../helpers/multer");
+
 // const { route } = require("../app");
 const { userAuth } = require("../middlewares/auth");
 const productController = require('../controllers/user/productController');
 const profileController = require("../controllers/user/profileController");
+const cartController = require("../controllers/user/cartController");
 const { route } = require("./adminRouter");
 
 
@@ -102,6 +106,18 @@ router.get("/address",userAuth,profileController.userAddress);
 router.get("/add-address",userAuth,profileController.addAddress);
 
 router.post("/add-address", userAuth, profileController.postAddAddress);
+
+router.get('/edit-address', userAuth, profileController.editAddress);
+
+router.post('/update-address/:id', userAuth, profileController.postEditAddress);
+
+router.get("/delete-address",userAuth,profileController.deleteAddress);
+
+
+//cart management
+router.get("/cart",userAuth,cartController.loadCartPage);
+
+
 
 
 

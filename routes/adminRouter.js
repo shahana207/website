@@ -1,24 +1,18 @@
 const express = require("express");
+const router = express.Router();
 
-const router=express.Router();
-
-const adminController =require("../controllers/admin/adminController");
-
+const adminController = require("../controllers/admin/adminController");
 const userController = require("../controllers/admin/userController");
-
 const categoryController = require("../controllers/admin/categoryControllers");
-
-const brandController =require("../controllers/admin/brandControllers");
-
+const brandController = require("../controllers/admin/brandControllers");
 const productController = require("../controllers/admin/productController");
 
-const {userAuth,adminAuth}=require("../middlewares/auth");
+const { userAuth, adminAuth } = require("../middlewares/auth");
 
-const multer=require("multer");
+// Destructure to get 'upload' directly
+const { upload } = require("../helpers/multer");  // Don't need to import 'multer' here
 
-const storage =require("../helpers/multer");
-
-const upload = require("../helpers/multer"); 
+// Now you can use 'upload' directly in your routes
 
 
 //error management

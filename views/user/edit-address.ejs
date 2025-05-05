@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Fazion Add New Address">
+    <meta name="description" content="Fazion Edit Address">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Add New Address - Fazion</title>
+    <title>Edit Address - Fazion</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
@@ -240,7 +240,7 @@
         <%- include("../partials/user/sidebar", {active: 'address'}) %>
         
         <div class="content">
-            <div class="greeting">Add New Address</div>
+            <div class="greeting">EDIT ADDRESS</div>
             
             <div style="text-align: right; margin-bottom: 20px;">
                 <a href="/address" class="back-btn">
@@ -251,7 +251,7 @@
             <div class="divider"></div>
             
             <div class="form-container">
-                <form action="/add-address" method="POST" id="addressForm">
+                <form action="/edit-address/<%= address._id %>" method="POST" id="addressForm">
                     <div class="form-section">
                         <div class="section-title">
                             <i class="fa fa-map-marker"></i> Address Type
@@ -259,13 +259,13 @@
                         
                         <div class="address-type-options">
                             <label class="address-type-option">
-                                <input type="radio" name="addressType" value="home" checked> Home
+                                <input type="radio" name="addressType" value="home" <%= address.addressType === 'home' ? 'checked' : '' %>> Home
                             </label>
                             <label class="address-type-option">
-                                <input type="radio" name="addressType" value="work"> Work
+                                <input type="radio" name="addressType" value="work" <%= address.addressType === 'work' ? 'checked' : '' %>> Work
                             </label>
                             <label class="address-type-option">
-                                <input type="radio" name="addressType" value="other"> Other
+                                <input type="radio" name="addressType" value="other" <%= address.addressType === 'other' ? 'checked' : '' %>> Other
                             </label>
                         </div>
                     </div>
@@ -278,7 +278,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Full Name <span class="required">*</span></label>
-                                <input type="text" class="form-control" name="name" >
+                                <input type="text" class="form-control" name="name" value="<%= address.name %>" required>
                                 <div class="error-message" id="nameError"></div>
                             </div>
                         </div>
@@ -286,14 +286,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Phone Number <span class="required">*</span></label>
-                                <input type="tel" class="form-control" name="phone" >
+                                <input type="tel" class="form-control" name="phone" value="<%= address.phone %>" required>
                                 <div class="form-text">We'll use this as the primary contact number</div>
                                 <div class="error-message" id="phoneError"></div>
                             </div>
                             
                             <div class="form-group">
                                 <label class="form-label">Alternative Phone <span class="required">*</span></label>
-                                <input type="tel" class="form-control" name="altPhone" >
+                                <input type="tel" class="form-control" name="altPhone" value="<%= address.altPhone %>" required>
                                 <div class="error-message" id="altPhoneError"></div>
                             </div>
                         </div>
@@ -307,13 +307,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">City <span class="required">*</span></label>
-                                <input type="text" class="form-control" name="city" >
+                                <input type="text" class="form-control" name="city" value="<%= address.city %>" required>
                                 <div class="error-message" id="cityError"></div>
                             </div>
                             
                             <div class="form-group">
                                 <label class="form-label">State <span class="required">*</span></label>
-                                <input type="text" class="form-control" name="state" >
+                                <input type="text" class="form-control" name="state" value="<%= address.state %>" required>
                                 <div class="error-message" id="stateError"></div>
                             </div>
                         </div>
@@ -321,26 +321,26 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Landmark <span class="required">*</span></label>
-                                <input type="text" class="form-control" name="landMark" >
+                                <input type="text" class="form-control" name="landMark" value="<%= address.landMark %>" required>
                                 <div class="form-text">Nearby recognizable location (e.g., mall, school, etc.)</div>
                                 <div class="error-message" id="landmarkError"></div>
                             </div>
                             
                             <div class="form-group">
                                 <label class="form-label">Pincode <span class="required">*</span></label>
-                                <input type="text" class="form-control" name="pincode" >
+                                <input type="text" class="form-control" name="pincode" value="<%= address.pincode %>" required>
                                 <div class="error-message" id="pincodeError"></div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="checkbox-container">
-                        <input type="checkbox" id="defaultAddress" name="isDefault" value="true">
+                        <input type="checkbox" id="defaultAddress" name="isDefault" value="true" <%= address.isDefault ? 'checked' : '' %>>
                         <label for="defaultAddress">Set as default address for delivery</label>
                     </div>
                     
                     <button type="submit" class="save-btn" id="saveBtn">
-                        <i class="fa fa-check-circle" style="margin-right: 5px;"></i> Save Address
+                        <i class="fa fa-check-circle" style="margin-right: 5px;"></i> Update Address
                     </button>
                 </form>
             </div>
@@ -405,13 +405,6 @@
                 return false;
             }
 
-            // Hide error message
-            function hideError($field, errorId) {
-                $field.removeClass('error');
-                $(errorId).hide();
-                return true;
-            }
-
             // Validate field
             function validateField($field) {
                 const name = $field.attr('name');
@@ -419,20 +412,19 @@
                 const validator = validators[name];
                 const $errorField = $(`#${name}Error`);
 
-                if (!value) {
-                    return showError($field, $errorField, 'This field is required');
-                }
-
                 if (!validator.test(value)) {
-                    return showError($field, $errorField, validator.message);
+                    showError($field, $errorField, validator.message);
+                    return false;
                 }
-
-                return hideError($field, $errorField);
+                return true;
             }
 
-            // Real-time validation on input
+            // Real-time validation
             $('.form-control').on('input', function() {
-                validateField($(this));
+                const $this = $(this);
+                $this.removeClass('error');
+                $this.nextAll('.error-message').hide();
+                validateField($this);
             });
 
             // Form submission
@@ -441,6 +433,10 @@
                 let isValid = true;
 
                 // Reset error states
+                $('.form-control').removeClass('error');
+                $('.error-message').hide();
+
+                // Validate all fields
                 $('.form-control').each(function() {
                     if (!validateField($(this))) {
                         isValid = false;
@@ -458,13 +454,13 @@
                 }
 
                 // Disable button during submission
-                $saveBtn.prop('disabled', true).text('Saving...');
+                $saveBtn.prop('disabled', true).text('Updating...');
 
                 try {
                     const formData = new FormData(this);
                     const data = Object.fromEntries(formData.entries());
 
-                    const response = await fetch('/add-address', {
+                    const response = await fetch('/update-address/<%= address._id %>', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -478,23 +474,29 @@
                         await Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'Address added successfully!',
+                            text: 'Address updated successfully!',
                             confirmButtonColor: '#a52a2a'
                         });
                         window.location.href = '/address';
                     } else {
-                        throw new Error(result.message || 'Failed to add address');
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message || 'Failed to update address!',
+                            showConfirmButton:false,
+                            timer:1500
+                        });
                     }
                 } catch (error) {
                     await Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: error.message || 'An error occurred while adding the address',
+                        text: error.message || 'An error occurred while updating the address',
                         confirmButtonColor: '#a52a2a'
                     });
                 } finally {
                     $saveBtn.prop('disabled', false).html(
-                        '<i class="fa fa-check-circle" style="margin-right: 5px;"></i> Save Address'
+                        '<i class="fa fa-check-circle" style="margin-right: 5px;"></i> Update Address'
                     );
                 }
             });

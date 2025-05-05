@@ -4,6 +4,11 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv").config();
 const session = require("express-session");
+const fs = require('fs').promises;
+const path = require('path');
+
+
+
 
 // Generate 6-digit OTP
 function generateOtp() {
@@ -242,8 +247,9 @@ const updateProfile = async (req, res) => {
 
             const tempPath = req.file.path;
             const fileName = `${Date.now()}-${req.file.originalname.replace(/\s+/g, '_')}`;
+            console.log(__dirname,'dirname')
             const permanentPath = path.join(__dirname, '..', '..', 'public', 'Uploads', 'profile-pictures', fileName);
-
+            
             await fs.mkdir(path.dirname(permanentPath), { recursive: true });
             await fs.rename(tempPath, permanentPath);
 
@@ -266,7 +272,7 @@ const updateProfile = async (req, res) => {
             }
         }
 
-        res.redirect('/profile');
+        res.redirect('userProfile');
     } catch (error) {
         console.error('Error while updating user profile:', error);
         res.status(500).json({ message: 'Server error' });
@@ -403,6 +409,11 @@ const verifyChangePassOtp = async (req, res) => {
 const userAddress = async (req, res) => {
     try {
         const userId = req.session.user;
+
+        if(!userId){
+            return res.redirect('/')
+        }
+
         const userData = await User.findById(userId);
         const addressDocs = await Address.find({ userId });
 
@@ -410,6 +421,7 @@ const userAddress = async (req, res) => {
         const address = addressDocs.flatMap(doc => doc.address);
 
         res.render('address', {
+            user: userData,
             active: 'address',
             profilePicture: userData.profilePicture,
             address // now this is a flat array of individual address objects
@@ -438,7 +450,7 @@ const addAddress = async (req, res) => {
 
         res.render('add-new-address', {
             user: userId,
-            active: 'addresses',
+            active: 'address',
             profilePicture: userData.profilePicture,
             successMessage: req.session.successMessage,
             errorMessage: req.session.errorMessage
@@ -514,6 +526,134 @@ const postAddAddress = async (req, res) => {
     }
 };
 
+// Controller for rendering the edit address page
+const editAddress = async (req, res) => {
+    try {
+        const addressId = req.query.id; 
+        const user = req.session.user;
+        const userData = await User.findById(user);
+
+        const currentAddress = await Address.findOne({ address: { $elemMatch: { _id: addressId } } });
+
+        if (!currentAddress) {
+            return res.redirect('/pageNotFound');
+        }
+
+        const addressData = currentAddress.address.find((item) => item._id.toString() === addressId);
+
+        if (!addressData) {
+            console.log('Address not found for ID:', addressId);
+            return res.redirect('/pageNotFound');
+        }
+
+        res.render('edit-address', {
+            address: addressData,
+            user,
+            profilePicture: userData.profilePicture || null,
+        });
+    } catch (error) {
+        console.error('Error in edit address:', error);
+        res.redirect('/pageNotFound');
+    }
+};
+
+const postEditAddress = async (req, res) => {
+    try {
+        const data = req.body;
+        const addressId = req.params.id; 
+        
+        console.log('Received addressId:', addressId);
+        console.log('Form data:', data);
+
+        const user = req.session.user;
+
+      
+        if (!user || !user._id) {
+            return res.json({success:false, message:'User session invalid!'}); 
+        }
+
+        
+        const findAddress = await Address.findOne({
+            userId: user._id,
+            'address._id': addressId,
+        });
+
+        if (!findAddress) {
+            return res.json({success:false, message:'Address not found for ID!'}); 
+        }
+
+        if (data.isDefault === 'on') {
+            await Address.updateMany(
+                { userId: user._id, 'address._id': { $ne: addressId } },
+                { $set: { 'address.$[].isDefault': false } }
+            );
+        }
+
+       
+        await Address.updateOne(
+            { userId: user._id, 'address._id': addressId },
+            {
+                $set: {
+                    'address.$.addressType': data.addressType,
+                    'address.$.name': data.name,
+                    'address.$.city': data.city,
+                    'address.$.landMark': data.landMark,
+                    'address.$.state': data.state,
+                    'address.$.pincode': data.pincode,
+                    'address.$.phone': data.phone,
+                    'address.$.altPhone': data.altPhone,
+                    'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
+                },
+            }
+        );
+
+        return res.json({success:true, message:'Address not found for ID!'}); 
+
+    } catch (error) {
+        console.error('Error in edit address:', error);
+        return res.redirect('/pageNotFound');
+    }
+};
+
+
+const deleteAddress = async (req, res) => {
+    try {
+        const addressId = req.query.id;
+        console.log(addressId,"address");
+        
+        const findAddress=await Address.findOne({'address._id':addressId});
+        if(!findAddress){
+            return res.status(400).send('Address not found');
+        }
+        await Address.updateOne({
+            'address._id':addressId
+        },
+        {
+          $pull :{
+            address :{
+                _id:addressId,
+
+            }
+          }  
+        }
+    )
+    res.redirect('/address')
+    } catch (error) {
+        console.error("Error in deleting the address",error);
+        res.redirect('/pageNotFound');
+        
+    }
+  };
+
+const loadCartPage = async (req,res)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+
 
 module.exports = {
     getforgotPasspage,
@@ -535,5 +675,7 @@ module.exports = {
     addAddress,
     userAddress,
     postAddAddress,
-   
+    editAddress,
+    postEditAddress,
+    deleteAddress,
 };

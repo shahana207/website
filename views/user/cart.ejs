@@ -1,0 +1,451 @@
+<!-- views/cart.ejs -->
+<div class="breadcrumb-container">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="shopping-cart-section">
+    <div class="container">
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8 col-md-12">
+                <div class="cart-container">
+                    <h2 class="cart-title">Shopping Cart</h2>
+                    <hr>
+                    
+                    <div class="cart-headers">
+                        <div class="row">
+                            <div class="col-md-6">Product</div>
+                            <div class="col-md-2 text-center">Price</div>
+                            <div class="col-md-2 text-center">Quantity</div>
+                            <div class="col-md-2 text-center">Total</div>
+                        </div>
+                    </div>
+                    
+                    <% if (cart && cart.items && cart.items.length > 0) { %>
+                        <% cart.items.forEach(item => { %>
+                            <div class="cart-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 col-12">
+                                        <div class="product-info d-flex align-items-center">
+                                            <div class="product-image">
+                                                <img src="<%= item.product.image || '/img/product-placeholder.jpg' %>" alt="<%= item.product.name %>" class="img-fluid">
+                                            </div>
+                                            <div class="product-details">
+                                                <h5><%= item.product.name %></h5>
+                                                <% if (item.product.color) { %>
+                                                    <p class="product-color">Color: <%= item.product.color %></p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-4 text-center">
+                                        <div class="price">₹ <%= item.price.toFixed(2) %></div>
+                                    </div>
+                                    <div class="col-md-2 col-4 text-center">
+                                        <div class="quantity-control">
+                                            <form class="quantity-form" action="/cart/update" method="POST">
+                                                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                                                <div class="quantity-buttons">
+                                                    <button type="button" class="btn-quantity decrease">-</button>
+                                                    <input type="text" name="quantity" value="<%= item.quantity %>" class="quantity-input" readonly>
+                                                    <button type="button" class="btn-quantity increase">+</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-4 text-center">
+                                        <div class="item-total">₹ <%= (item.price * item.quantity).toFixed(2) %></div>
+                                        <a href="/cart/remove/<%= item.product._id %>" class="remove-item"><i class="fa fa-times"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="empty-cart">
+                            <p>Your cart is empty.</p>
+                            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+                        </div>
+                    <% } %>
+                    
+                    <div class="cart-actions">
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <a href="/shop" class="btn btn-outline-dark continue-shopping">
+                                    <i class="fa fa-arrow-left"></i> Continue Shopping
+                                </a>
+                            </div>
+                            <div class="col-md-6 col-12 text-right">
+                                <button id="updateCart" class="btn btn-dark update-cart">Update Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coupon Section -->
+                    <div class="coupon-section">
+                        <h5>Have a coupon?</h5>
+                        <form class="coupon-form" action="/cart/apply-coupon" method="POST">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="couponCode" placeholder="Enter coupon code">
+                                <div class="input-group-append">
+                                    <button class="btn btn-dark" type="submit">Apply</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="col-lg-4 col-md-12">
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Subtotal</span>
+                        <span class="summary-value">₹ <%= cart ? cart.subtotal.toFixed(2) : '0.00' %></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Shipping</span>
+                        <span class="summary-value">₹ <%= cart && cart.shipping ? cart.shipping.toFixed(2) : '0.00' %></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Tax</span>
+                        <span class="summary-value">₹ <%= cart && cart.tax ? cart.tax.toFixed(2) : '0.00' %></span>
+                    </div>
+                    <% if (cart && cart.discount > 0) { %>
+                        <div class="summary-item discount">
+                            <span class="summary-label">Discount</span>
+                            <span class="summary-value">-₹ <%= cart.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    <div class="summary-item total">
+                        <span class="summary-label">Total</span>
+                        <span class="summary-value">₹ <%= cart ? cart.total.toFixed(2) : '0.00' %></span>
+                    </div>
+                    <button class="btn btn-dark btn-block checkout-btn">Proceed to Checkout</button>
+                    
+                    <div class="payment-methods">
+                        <p>We accept the following payment methods</p>
+                        <div class="payment-icons">
+                            <img src="/img/payment/visa.png" alt="Visa">
+                            <img src="/img/payment/mastercard.png" alt="Mastercard">
+                            <img src="/img/payment/paypal.png" alt="PayPal">
+                            <img src="/img/payment/upi.png" alt="UPI">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add this script at the end of your cart.ejs file -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity adjustment
+    const decreaseBtns = document.querySelectorAll('.decrease');
+    const increaseBtns = document.querySelectorAll('.increase');
+    const updateCartBtn = document.getElementById('updateCart');
+    
+    decreaseBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.quantity-input');
+            let value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        });
+    });
+    
+    increaseBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.quantity-input');
+            let value = parseInt(input.value);
+            input.value = value + 1;
+        });
+    });
+    
+    // Update cart functionality
+    updateCartBtn.addEventListener('click', function() {
+        const forms = document.querySelectorAll('.quantity-form');
+        const formData = [];
+        
+        forms.forEach(form => {
+            const productId = form.querySelector('input[name="productId"]').value;
+            const quantity = form.querySelector('input[name="quantity"]').value;
+            formData.push({productId, quantity});
+        });
+        
+        // Send update request via fetch
+        fetch('/cart/update-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({items: formData})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        })
+        .catch(error => console.error('Error updating cart:', error));
+    });
+});
+</script>
+
+<style>
+/* Cart Page Styles */
+.breadcrumb-container {
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    margin-bottom: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #000;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.shopping-cart-section {
+    padding: 40px 0;
+}
+
+.cart-container {
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.cart-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.cart-headers {
+    padding: 15px 0;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .cart-headers {
+        display: block;
+    }
+}
+
+.cart-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 80px;
+    margin-right: 15px;
+}
+
+.product-image img {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.product-details h5 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.product-color {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+.price, .item-total {
+    font-weight: 600;
+}
+
+.quantity-control {
+    display: flex;
+    justify-content: center;
+}
+
+.quantity-buttons {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-quantity {
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.quantity-input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.remove-item {
+    display: block;
+    color: #dc3545;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.cart-actions {
+    margin-top: 30px;
+}
+
+.continue-shopping, .update-cart {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 768px) {
+    .continue-shopping, .update-cart {
+        width: auto;
+        margin-bottom: 0;
+    }
+}
+
+.coupon-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.coupon-form {
+    margin-top: 15px;
+}
+
+.order-summary {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 30px;
+}
+
+.order-summary h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.summary-item.total {
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.summary-item.discount .summary-value {
+    color: #28a745;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.payment-methods {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.payment-methods p {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.payment-icons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.payment-icons img {
+    height: 30px;
+    width: auto;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 30px 0;
+}
+
+.empty-cart p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #6c757d;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .cart-item {
+        padding: 15px 0;
+    }
+    
+    .product-info {
+        margin-bottom: 15px;
+    }
+    
+    .cart-item .col-4 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .cart-item .col-4::before {
+        content: attr(data-title);
+        font-weight: 600;
+    }
+    
+    .text-right {
+        text-align: left !important;
+    }
+}
+</style>

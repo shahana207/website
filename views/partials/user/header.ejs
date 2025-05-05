@@ -62,6 +62,32 @@
             font-size: 24px;
             cursor: pointer;
         }
+        .cart-link {
+  position: relative;
+  display: inline-block;
+  padding: 8px;
+  transition: transform 0.2s ease;
+}
+
+.cart-link:hover {
+  transform: scale(1.1);
+}
+
+.shopping-cart {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #333;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s;
+}
+
+.cart-link:hover .shopping-cart {
+  stroke: #ff6f61; /* Hover color */
+}
+
     </style>
 </head>
 
@@ -78,6 +104,8 @@
             <div class="offcanvas__links">
                 <% if (locals.user) { %>
                     <div class="dropdown">
+                        <img class="header__profile-img" src="<%= (user && user.profilePicture) || '/img/default-profile.png' %>">
+
                         <a href="#" class="sign-in-link"><%= locals.user.name %></a>
                         <div class="dropdown-content">
                             <a href="/userProfile">Profile</a>
@@ -150,12 +178,15 @@
                         </ul>
                     </nav>
                 </div>
+                
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
+                       <a href="/cart" style="color: #333;"><i class="fa fa-shopping-cart"></i></a>
                         <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
                     </div>
                 </div>
             </div>
+            
             <div class="canvas__open"><i class="fa fa-bars"></i></div>
         </div>
     </header>

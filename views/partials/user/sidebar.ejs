@@ -1,5 +1,6 @@
 <!-- Sidebar Partial: views/partials/user/sidebar.ejs -->  
 <!-- Sidebar Styles --> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
     .sidebar {
         width: 250px;
@@ -78,14 +79,14 @@
 
 <!-- Sidebar HTML --> 
 <div class="sidebar">
-    <div class="menu-item <%= active === 'profile' ? 'active' : '' %>" data-route="/profile">
+    <div class="menu-item <%= active === 'profile' ? 'active' : '' %>" data-route="/userProfile">
         <i class="fa fa-user"></i> My Profile
     </div>
     <div class="menu-item <%= active === 'orders' ? 'active' : '' %>" data-route="/orders">
         <i class="fa fa-shopping-bag"></i> My Orders
     </div>
     <div class="menu-item <%= active === 'wallet' ? 'active' : '' %>" data-route="/wallet">
-        <i class="fa-solid fa-wallet"></i> Wallet
+        <i class="fas fa-wallet"></i> Wallet
     </div>
     <a href="/address" class="menu-item <%= active === 'addresses' ? 'active' : '' %>" data-route="/addresses">
         <i class="fa fa-map-marker"></i> My Addresses
