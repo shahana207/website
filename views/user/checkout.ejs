@@ -1,0 +1,1413 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Base Styles */
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        
+        /* Breadcrumb Styles */
+        .zz-breadcrumb-area {
+            background-color: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+        }
+        
+        .zz-breadcrumb {
+            margin-bottom: 0;
+            padding: 0;
+            background: none;
+        }
+        
+        .zz-breadcrumb-item a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .zz-breadcrumb-item a:hover {
+            color: #007bff;
+        }
+        
+        .zz-breadcrumb-item.active {
+            color: #007bff;
+        }
+        
+        /* Checkout Styles */
+        .zz-checkout-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .zz-checkout-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .zz-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        /* Form Styles */
+        .zz-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .zz-form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .zz-form-control {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .zz-form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        .zz-form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .zz-form-col {
+            padding-left: 10px;
+            padding-right: 10px;
+            flex: 1;
+        }
+        
+        /* Payment Method Styles */
+        .zz-payment-methods {
+            margin-top: 20px;
+        }
+        
+        .zz-payment-method {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .zz-payment-method:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .zz-payment-method.active {
+            border-color: #007bff;
+            background-color: #f0f7ff;
+        }
+        
+        .zz-payment-radio {
+            margin-right: 10px;
+        }
+        
+        .zz-payment-label {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .zz-payment-icon {
+            margin-left: auto;
+            font-size: 24px;
+            color: #555;
+        }
+        
+        /* Order Review Styles */
+        .zz-order-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .zz-order-item-image {
+            width: 80px;
+            height: 80px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .zz-order-item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .zz-order-item-info {
+            flex: 1;
+        }
+        
+        .zz-order-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .zz-order-item-meta {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .zz-order-item-price {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* Summary Styles */
+        .zz-checkout-summary {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        
+        .zz-summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .zz-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .zz-summary-label {
+            color: #555;
+        }
+        
+        .zz-summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .zz-summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-total-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .zz-total-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #007bff;
+        }
+        
+        .zz-place-order-btn {
+            display: block;
+            width: 100%;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .zz-place-order-btn:hover {
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .zz-coupon-applied {
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .zz-coupon-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .zz-coupon-icon {
+            color: #27ae60;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .zz-coupon-text {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .zz-coupon-remove {
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .zz-coupon-remove:hover {
+            color: #c0392b;
+        }
+        
+        .zz-payment-info {
+            margin-top: 20px;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-payment-info p {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        .zz-payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .zz-payment-icons i {
+            font-size: 24px;
+            color: #555;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .zz-payment-icons i:hover {
+            opacity: 1;
+        }
+        
+        /* Address Section (Adapted from address.ejs) */
+        .zz-address-section {
+            margin-bottom: 30px;
+        }
+        
+        .address-item {
+            background-color: #f5f7fc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .address-item.active {
+            border-color: #007bff;
+            background-color: #f0f7ff;
+        }
+        
+        .address-details {
+            flex-grow: 1;
+        }
+        
+        .address-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .address-text, .address-phone {
+            color: #666;
+            margin: 3px 0;
+            font-size: 14px;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .edit-btn {
+            background-color: #136a26;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .edit-btn:hover {
+            background-color: #0f4d1c;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .add-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .add-btn:hover {
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .no-address-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px dashed #d4d4d4;
+            margin-bottom: 20px;
+        }
+        
+        .no-address-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .address-checkbox {
+            margin-right: 10px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .zz-checkout-summary {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .zz-form-row {
+                flex-direction: column;
+            }
+            
+            .zz-form-col {
+                margin-bottom: 15px;
+            }
+            
+            .address-item {
+                flex-direction: column;
+            }
+            
+            .button-container {
+                margin-top: 10px;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="hidden" id="currentUserId" value=" <%= user._id %>">
+    <!-- Pass userId to JavaScript -->
+    <script>
+        const userId = '<%= userId %>';
+    </script>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="zz-breadcrumb-area">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb zz-breadcrumb">
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/cart">Shopping Cart</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Checkout</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Checkout Container -->
+    <div class="container">
+        <div class="row">
+            <!-- Checkout Form Section -->
+            <div class="col-lg-8">
+                <div class="zz-checkout-container">
+                    <h2 class="zz-checkout-title">Checkout</h2>
+                    <!-- Customer Information -->
+                    <div class="zz-checkout-section">
+                            <!-- Shipping Address Section -->
+                             <div class="zz-address-section">
+                                <h3 class="zz-section-title">Shipping Address</h3>
+                                 <!-- Display Saved Addresses -->
+                                <div class="address-container">
+                                    <% if (addresses && addresses.length > 0) { %>
+                                        <% addresses.forEach((address, index) => { %>
+                                            <div class="address-item <%= index === 0 ? 'active' : '' %>" data-address-id="<%= address._id %>">
+                                                <div class="address-details">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input address-checkbox" type="radio" name="selectedAddress" id="address-<%= address._id %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                                        <label class="form-check-label address-name" for="address-<%= address._id %>">
+                                                            <%= address.name %>
+                                                        </label>
+                                                    </div>
+                                                    <div class="address-text">
+                                                        <%= address.landMark %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+                                                    </div>
+
+                                                    <div class="address-phone">
+                                                        Phone: <%= address.phone %>
+                                                        <% if (address.altPhone) { %>
+                                                            <br>Alternate: <%= address.altPhone %>
+                                                        <% } %>
+                                                    </div>
+                                                    <!-- <span class="address-type" ><button style="border: #000000; border-radius: 20px; background-color: #ebe8e8; font-size: smaller;">Type: <%= address.addressType %></button></span> -->
+                                                    <div class="address-type "> <%= address.addressType %></div>
+                                                </div>
+                                                <div class="button-container">
+                                                    <button class="edit-btn" data-toggle="modal" data-target="#editAddressModal" data-address-id="<%= address._id %>">Edit</button>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <!-- No Address Message -->
+                                        <div class="no-address-container">
+                                            <div class="no-address-message">You haven't added any address yet.</div>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <!-- Add New Address Button -->
+                                    <div style="text-align: left;">
+                                        <a href="#" class="add-btn" id="add-new-address">Add New Address</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Add New Address Form (Initially Hidden) -->
+                                <div class="zz-new-address-form" id="new-address-form" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                                    <form action="" id="addAdress">
+                                        <div class="zz-form-group">
+                                            <label class="zz-form-label" for="name-new">Full Name*</label>
+                                            <input type="text" class="zz-form-control" id="name-new" name="name">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+
+                                        <div class="zz-form-group">
+                                            <label>Address Type</label><br>
+                                            <label>
+                                                <input type="radio" name="addressType" value="home"> Home
+                                            </label><br>
+                                        
+                                            <label>
+                                                <input type="radio" name="addressType" value="work"> Work
+                                            </label><br>
+                                        
+                                            <label>
+                                                <input type="radio" name="addressType" value="other"> Other
+                                            </label>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                        
+                                        <div class="zz-form-group">
+                                            <label class="zz-form-label" for="landmark-new">Landmark*</label>
+                                            <input type="text" class="zz-form-control" id="landmark-new" name="landMark" >
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                        
+                                        <div class="zz-form-row">
+                                            <div class="zz-form-col">
+                                                <div class="zz-form-group">
+                                                    <label class="zz-form-label" for="city-new">City*</label>
+                                                    <input type="text" class="zz-form-control" id="city-new" name="city" >
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                            </div>
+                                            <div class="zz-form-col">
+                                                <div class="zz-form-group">
+                                                    <label class="zz-form-label" for="state-new">State*</label>
+                                                    <input type="text" class="zz-form-control" id="state-new" name="state" >
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                            </div>
+                                            <div class="zz-form-col">
+                                                <div class="zz-form-group">
+                                                    <label class="zz-form-label" for="pincode-new">Pincode*</label>
+                                                    <input type="text" class="zz-form-control" id="pincode-new" name="pincode">
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="zz-form-row">
+                                            <div class="zz-form-col">
+                                                <div class="zz-form-group">
+                                                    <label class="zz-form-label" for="phone-new">Phone Number*</label>
+                                                    <input type="tel" class="zz-form-control" id="phone-new" name="phone" >
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                            </div>
+                                            <div class="zz-form-col">
+                                                <div class="zz-form-group">
+                                                    <label class="zz-form-label" for="alt-phone-new">Alternate Phone</label>
+                                                    <input type="tel" class="zz-form-control" id="alt-phone-new" name="altPhone">
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="zz-form-group">
+                                            <button type="button" class="btn btn-secondary" id="cancel-new-address">Cancel</button>
+                                            <button type="submit" form="addAdress" class="btn btn-primary" id="save-new-address">Save Address</button>
+                                        </div>
+                                    </form>  
+                                </div>
+                            </div>
+                            <!-- Payment Methods Section -->
+                            <div class="zz-payment-section">
+                                <h3 class="zz-section-title">Payment Method</h3>
+                                
+                                <div class="zz-payment-methods">
+                                    <div class="zz-payment-method active">
+                                        <input type="radio" name="paymentMethod" id="payment-cod" value="COD" class="zz-payment-radio" checked>
+                                        <label for="payment-cod" class="zz-payment-label">Cash On Delivery</label>
+                                        <div class="zz-payment-icon">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- <div class="zz-payment-method">
+                                        <input type="radio" name="paymentMethod" id="online" value="Online" class="zz-payment-radio">
+                                        <label for="payment-card" class="zz-payment-label">Online</label>
+                                        <div class="zz-payment-icon">
+                                            <i class="fas fa-credit-card"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="zz-payment-method">
+                                        <input type="radio" name="paymentMethod" id="payment-wallet" value="Wallet" class="zz-payment-radio">
+                                        <label for="payment-wallet" class="zz-payment-label">Wallet</label>
+                                        <div class="zz-payment-icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary Section -->
+            <div class="col-lg-4">
+                <div class="zz-checkout-summary">
+                    <h3 class="zz-summary-title">Order Summary</h3>
+                    
+                    <!-- Applied Coupon Section (show if coupon applied) -->
+                    <% if (cart && cart.coupon) { %>
+                        <div class="zz-coupon-applied">
+                            <div class="zz-coupon-info">
+                                <i class="fas fa-check-circle zz-coupon-icon"></i>
+                                <span class="zz-coupon-text">Coupon "<%= cart.coupon.code %>" applied</span>
+                            </div>
+                            <span class="zz-coupon-remove" id="remove-coupon">
+                                <i class="fas fa-times"></i> Remove
+                            </span>
+                        </div>
+                    <% } %>
+                    
+                    <!-- Order Items List -->
+                    <div class="zz-order-items">
+                        <% if (cart && cart.items && cart.items.length > 0) { %>
+                            <% cart.items.forEach(item => { 
+                                if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+                            %>
+                                <div class="zz-order-item">
+                                    <div class="zz-order-item-image">
+                                        <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+                                    </div>
+                                    <div class="zz-order-item-info">
+                                        <div class="zz-order-item-name"><%= item.productId.productName %></div>
+                                        <div class="zz-order-item-meta">
+                                            <% if (item.productId.brand && item.productId.brand.name) { %>
+                                                <span>Brand: <%= item.productId.brand.name %></span>
+                                            <% } %>
+                                            <% if (item.size) { %>
+                                                <span> | Size: <%= item.size %></span>
+                                            <% } %>
+                                            <% if (item.color) { %>
+                                                <span> | Color: <%= item.color %></span>
+                                            <% } %>
+                                            <span> | Qty: <%= item.quantity %></span>
+                                        </div>
+                                        <div class="zz-order-item-price">
+                                            ₹<%= (item.productId.salePrice * item.quantity).toFixed(2) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p>No items in the cart.</p>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Summary Breakdown -->
+                    <div class="zz-summary-details">
+                        <div class="zz-summary-item">
+                            <span class="zz-summary-label">Subtotal</span>
+                            <span class="zz-summary-value">₹<%= cart && cart.subtotal ? cart.subtotal.toFixed(2) : '0.00' %></span>
+                        </div>
+                        
+                        <div class="zz-summary-item">
+                            <span class="zz-summary-label">Shipping</span>
+                            <span class="zz-summary-value">
+                                <%= cart && cart.shippingCharge ? '₹' + cart.shippingCharge.toFixed(2) : 'Free' %>
+                            </span>
+                        </div>
+                        
+                        <% if (cart && cart.coupon && cart.discount) { %>
+                            <div class="zz-summary-item">
+                                <span class="zz-summary-label">Coupon Discount</span>
+                                <span class="zz-summary-value">-₹<%= cart.discount.toFixed(2) %></span>
+                            </div>
+                        <% } %>
+                        
+                        <div class="zz-summary-item">
+                            <span class="zz-summary-label">Tax</span>
+                            <span class="zz-summary-value">₹<%= cart && cart.tax ? cart.tax.toFixed(2) : '0.00' %></span>
+                        </div>
+                        
+                        <div class="zz-summary-total">
+                            <span class="zz-total-label">Total</span>
+                            <span class="zz-total-value">₹<%= cart && cart.total ? cart.total.toFixed(2) : '0.00' %></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Place Order Button -->
+
+                    <button class="zz-place-order-btn" id="place-order">Place Order</button>
+                    
+                    <!-- Payment Information -->
+                    <div class="zz-payment-info">
+                        <p>Secure Payment Gateway</p>
+                        <div class="zz-payment-icons">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="totalAmount" value="<%= cart.total  %>">
+
+    <!-- Edit Address Modal -->
+<div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-address-form">
+                    <input type="hidden" id="edit-address-id" name="addressId">
+                    <div class="zz-form-group">
+                        <label class="zz-form-label" for="edit-name">Full Name*</label>
+                        <input type="text" class="zz-form-control" id="edit-name" name="name" >
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="zz-form-group">
+                        <label class="address-type-option">
+                            <input type="radio" name="addressType" id="homeType" value="home" > Home
+                        </label>  
+                        <label class="address-type-option">
+                            <input type="radio" name="addressType" id="workType" value="work" > Work
+                        </label>
+                        <label class="address-type-option">
+                            <input type="radio" name="addressType" id="otherType" value="other" > Other
+                        </label>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="zz-form-group">
+                        <label class="zz-form-label" for="edit-landmark">Landmark*</label>
+                        <input type="text" class="zz-form-control" id="edit-landmark" name="landMark" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="zz-form-row">
+                        <div class="zz-form-col">
+                            <div class="zz-form-group">
+                                <label class="zz-form-label" for="edit-city">City*</label>
+                                <input type="text" class="zz-form-control" id="edit-city" name="city" >
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="zz-form-col">
+                            <div class="zz-form-group">
+                                <label class="zz-form-label" for="edit-state">State*</label>
+                                <input type="text" class="zz-form-control" id="edit-state" name="state" >
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="zz-form-col">
+                            <div class="zz-form-group">
+                                <label class="zz-form-label" for="edit-pincode">Pincode*</label>
+                                <input type="text" class="zz-form-control" id="edit-pincode" name="pincode" >
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="zz-form-row">
+                        <div class="zz-form-col">
+                            <div class="zz-form-group">
+                                <label class="zz-form-label" for="edit-phone">Phone Number*</label>
+                                <input type="tel" class="zz-form-control" id="edit-phone" name="phone" >
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="zz-form-col">
+                            <div class="zz-form-group">
+                                <label class="zz-form-label" for="edit-alt-phone">Alternate Phone</label>
+                                <input type="tel" class="zz-form-control" id="edit-alt-phone" name="altPhone">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-edit-address">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <%- include("../partials/user/footer") %>
+
+    <!-- JavaScript -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+    // / Validation function
+    function validateAddress(address) {
+        let errors = {};
+
+        // Validate addressType
+        if (!address.addressType) {
+        errors.addressType = "Select address type";
+        } else if (!["home", "work", "other"].includes(address.addressType)) {
+        errors.addressType = "Invalid address type";
+        }
+
+        // Validate name
+        if (!address.name) {
+        errors.name = "Name required";
+        } else if (address.name.length < 2 || address.name.length > 50) {
+        errors.name = "Name must be 2-50 characters";
+        } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s.]*[a-zA-Z]$/.test(address.name)) {
+        errors.name = "Name can only have letters, spaces, periods";
+        }
+
+        // Validate landmark
+        if (!address.landMark) {
+        errors.landMark = "Landmark required";
+        } else if (address.landMark.length < 3 || address.landMark.length > 50) {
+        errors.landMark = "Landmark must be 3-50 characters";
+        } else if (!/^(?=.*[a-zA-Z0-9])(?!.*\s{3,})[a-zA-Z0-9][-.,&()a-zA-Z0-9\s]*[a-zA-Z0-9]$/.test(address.landMark)) {
+        errors.landMark = "Landmark can only have letters, numbers, -.,&()";
+        }
+
+        // Validate city
+        if (!address.city) {
+        errors.city = "City required";
+        } else if (address.city.length < 3 || address.city.length > 50) {
+        errors.city = "City must be 3-50 characters";
+        } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s-]*[a-zA-Z]$/.test(address.city)) {
+        errors.city = "City can only have letters, spaces, hyphens";
+        }
+
+        // Validate state
+        if (!address.state) {
+        errors.state = "State required";
+        } else if (address.state.length < 2 || address.state.length > 50) {
+        errors.state = "State must be 2-50 characters";
+        }
+
+        // Validate pincode
+        if (!address.pincode) {
+        errors.pincode = "PIN code required";
+        } else if (address.pincode.length !== 6) {
+        errors.pincode = "PIN code must be 6 digits";
+        } else if (!/^\d+$/.test(address.pincode)) {
+        errors.pincode = "PIN code must be digits only";
+        }
+
+        // Validate phone
+        if (!address.phone) {
+        errors.phone = "Phone number required";
+        } else if (address.phone.length !== 10) {
+        errors.phone = "Phone must be 10 digits";
+        } else if (!/^[6-9][0-9]{9}$/.test(address.phone)) {
+        errors.phone = "Phone must start with 6, 7, 8, or 9";
+        }
+
+
+        if (address.altPhone) {
+            if (address.altPhone.length !== 10) {
+                errors.altPhone = "Alt phone must be 10 digits";
+            } else if (!/^[6-9][0-9]{9}$/.test(address.altPhone)) {
+                errors.altPhone = "Alt phone must start with 6, 7, 8, or 9";
+            }
+        }
+
+        return Object.keys(errors).length > 0 ? errors : null;
+    }
+
+        function displayFormErrors(form, errors) {
+            clearErrors(form);
+            if (errors && typeof errors === 'object') {
+                Object.entries(errors).forEach(([field, message]) => {
+                    const input = form.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        input.classList.add('is-invalid');
+                        const feedback = input.nextElementSibling;
+                        if (feedback?.classList.contains('invalid-feedback')) {
+                            feedback.textContent = message;
+                        }
+                    }
+                });
+            }
+        }
+
+        function clearErrors(form) {
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        }
+
+    // add address section 
+    const addAdress = document.getElementById('addAdress');
+    addAdress.addEventListener("submit",async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(addAdress);
+        const jsonData  = Object.fromEntries(formData);
+
+        Object.keys(jsonData).forEach(key => {
+            if (typeof jsonData[key] === 'string') {
+                jsonData[key] = jsonData[key].trim();
+            }
+        })
+
+        const errors = validateAddress(jsonData);
+        if(errors) {
+            displayFormErrors(addAdress , errors);
+            console.log("errors from ", errors)
+            Swal.fire({
+                icon: 'error',
+                title: 'Input validation error',
+                confirmButtonColor: '#000000'
+            });
+            return
+        }
+           try {
+
+            const response = await fetch("/addAdrress", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: result.message || 'Address updated successfully!',
+                        timer:1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error updating address: ' + result.message,
+                        confirmButtonColor: '#000000'
+                    });
+                }
+            
+           } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text:error.message ||  'An error occurred while updating the address.',
+                confirmButtonColor: '#000000'
+            });
+            
+           }
+
+    })
+
+
+        const currentUserId = document.getElementById("currentUserId").value;
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const addressId = this.getAttribute('data-address-id');
+                const addressItem = this.closest('.address-item');
+
+
+                // Populate modal fields with address data
+                document.getElementById('edit-address-id').value = addressId;
+                document.getElementById('edit-name').value = addressItem.querySelector('.address-name').textContent.trim().replace('• ', '');
+                document.getElementById('edit-landmark').value = addressItem.querySelector('.address-text').textContent.split(',')[0].trim();
+                document.getElementById('edit-city').value = addressItem.querySelector('.address-text').textContent.split(',')[1].trim();
+                document.getElementById('edit-state').value = addressItem.querySelector('.address-text').textContent.split(',')[2].trim().split('-')[0].trim();
+                document.getElementById('edit-pincode').value = addressItem.querySelector('.address-text').textContent.split('-')[1].trim();
+                document.getElementById('edit-phone').value = addressItem.querySelector('.address-phone').textContent.split('Alternate:')[0].replace('Phone:', '').trim();
+                document.getElementById('edit-alt-phone').value = addressItem.querySelector('.address-phone').textContent.split('Alternate:')[1]?.trim() || '';
+                const addressType  = addressItem.querySelector('.address-type').textContent.trim();
+                document.getElementById(`${addressType}Type`).checked = true;
+              
+            });
+        });
+
+        // Edite Address 
+        document.getElementById('save-edit-address').addEventListener('click', async function() {
+            const form = document.getElementById('edit-address-form');
+            const formData = new FormData(form);
+
+            const jsonData  = Object.fromEntries(formData);
+
+            Object.keys(jsonData).forEach(key => {
+                if (typeof jsonData[key] === 'string') {
+                    jsonData[key] = jsonData[key].trim();
+                }
+            });
+
+            const errors = validateAddress(jsonData);
+            if(errors) {
+                console.log("errrors:",errors);
+                displayFormErrors(form , errors)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Input validation error',
+                    confirmButtonColor: '#000000',
+                    timer:1500
+                });
+                return;
+            }
+         
+            try {
+
+                const response = await fetch(`/update-address/${form.addressId.value}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Address updated successfully!',
+                        confirmButtonColor: '#000000',
+                        timer:1500
+                    }).then(() => {
+                        // Close the modal using vanilla JavaScript
+                        const modal = document.getElementById('editAddressModal');
+                        modal.classList.remove('show');
+                        modal.setAttribute('aria-hidden', 'true');
+                        modal.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                        const modalBackdrop = document.querySelector('.modal-backdrop');
+                        if (modalBackdrop) modalBackdrop.remove();
+
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error updating address: ' + result.message,
+                        confirmButtonColor: '#000000'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the address.',
+                    confirmButtonColor: '#000000'
+                });
+            }
+        });
+
+
+
+
+        $(document).ready(function() {
+            // Handle Payment Method Selection
+            $('.zz-payment-method').on('click', function() {
+                $('.zz-payment-method').removeClass('active');
+                $(this).addClass('active');
+                $(this).find('input').prop('checked', true);
+
+                $('#card-payment-details').hide();
+                $('#upi-payment-details').hide();
+
+                const paymentMethod = $(this).find('input').val();
+                if (paymentMethod === 'card') {
+                    $('#card-payment-details').show();
+                } else if (paymentMethod === 'upi') {
+                    $('#upi-payment-details').show();
+                }
+            });
+
+            // Handle Saved Address Checkbox Selection
+            $('.address-checkbox').on('change', function() {
+                $('.address-checkbox').not(this).prop('checked', false);
+                $('.address-item').removeClass('active');
+                if ($(this).is(':checked')) {
+                    $(this).closest('.address-item').addClass('active');
+                }
+            });
+
+            // Show New Address Form and Deselect Saved Addresses
+            $('#add-new-address').on('click', function(e) {
+                e.preventDefault();
+                $('.address-checkbox').prop('checked', false);
+                $('.address-item').removeClass('active');
+                $('#new-address-form').show();
+            });
+
+            // Cancel New Address Form
+            $('#cancel-new-address').on('click', function() {
+                $('#new-address-form').hide();
+                $('#new-address-form').find('input').val('');
+                // Revert to default address if exists
+                const defaultAddress = $('.address-item').filter(function() {
+                    return $(this).data('address-id') === $('.address-item.active').data('address-id');
+                });
+                if (defaultAddress.length) {
+                    defaultAddress.find('.address-checkbox').prop('checked', true);
+                    defaultAddress.addClass('active');
+                }
+            });
+
+            // // Save New Address
+            // $('#save-new-address').on('click', function() {
+            //     const addressData = {
+            //         userId: userId,
+            //         name: $('#name-new').val(),
+            //         landMark: $('#landmark-new').val(),
+            //         city: $('#city-new').val(),
+            //         state: $('#state-new').val(),
+            //         pincode: $('#pincode-new').val(),
+            //         phone: $('#phone-new').val(),
+            //         altPhone: $('#alt-phone-new').val(),
+            //         saveAddress: $('#save-address-new').is(':checked'),
+            //         // isDefault: $('#default-address-new').is(':checked')
+            //     };
+
+            //     $.ajax({
+            //         url: '/api/save-address',
+            //         method: 'POST',
+            //         data: addressData,
+            //         success: function(response) {
+            //             if (response.success) {
+            //                 Swal.fire({
+            //                     icon: 'success',
+            //                     title: 'Success',
+            //                     text: 'Address saved successfully!',
+            //                     confirmButtonColor: '#000000'
+            //                 }).then(() => {
+            //                     location.reload();
+            //                 });
+            //             } else {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Error',
+            //                     text: 'Error saving address: ' + response.message,
+            //                     confirmButtonColor: '#000000'
+            //                 });
+            //             }
+            //         },
+            //         error: function() {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Error',
+            //                 text: 'An error occurred while saving the address.',
+            //                 confirmButtonColor: '#000000'
+            //             });
+            //         }
+            //     });
+            // });
+
+
+
+            // // Remove Coupon
+            // $('#remove-coupon').on('click', function() {
+            //     $.ajax({
+            //         url: '/api/remove-coupon',
+            //         method: 'POST',
+            //         data: { userId: userId },
+            //         success: function(response) {
+            //             if (response.success) {
+            //                 Swal.fire({
+            //                     icon: 'success',
+            //                     title: 'Success',
+            //                     text: 'Coupon removed successfully!',
+            //                     confirmButtonColor: '#000000'
+            //                 }).then(() => {
+            //                     location.reload();
+            //                 });
+            //             } else {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Error',
+            //                     text: 'Error removing coupon: ' + response.message,
+            //                     confirmButtonColor: '#000000'
+            //                 });
+            //             }
+            //         },
+            //         error: function() {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Error',
+            //                 text: 'An error occurred while removing the coupon.',
+            //                 confirmButtonColor: '#000000'
+            //             });
+            //         }
+            //     });
+            // });
+
+
+            const totalAmount = Number(document.getElementById("totalAmount").value)
+
+
+            document.getElementById("place-order").addEventListener("click", async function (e) {
+                e.preventDefault();
+
+
+                const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+                const paymentMethod = selectedPayment ? selectedPayment.value : null;
+
+                const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+                const addressId = selectedAddress ? selectedAddress.value : null;
+
+
+                if (!selectedAddress) {
+                    Swal.fire('Error', 'Please select a shipping address', 'error');
+                    return;
+                }
+                if (!selectedPayment) {
+                    Swal.fire('Error', 'Please select a payment method', 'error');
+                    return;
+                }
+
+                const orderData = {
+                    paymentMethod,
+                    addressId,
+                    totalAmount
+                }
+
+                console.log("orderdata:",orderData);
+
+                try {
+
+                    const response = await fetch('/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderData)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire('Success', result.message, 'success');
+                        window.location.href = '/order-success';
+                    } else  if (result.redirect) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Authentication Required',
+                            text: 'Please sign in to place order..',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = result.redirect;
+                        });
+                    }else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message || 'Failed to remove to place order.',
+                            timer: 1500,
+                            showConfirmButton: "OK"
+                        })
+                    }
+
+                    
+                } catch (error) {
+                    console.error('Error placing order:', error);
+                    Swal.fire('Error', 'An error occurred while placing the order', 'error');
+                }
+             
+
+
+
+            })
+            // Place Order
+            // $('#place-order').on('click', function(e) {
+            //     e.preventDefault();
+                
+            //     const formData = $('#checkout-form').serializeArray();
+            //     const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            //     const selectedAddress = $('input[name="selectedAddress"]:checked').val() || null;
+
+            //     const orderData = {
+            //         userId: userId,
+            //         paymentMethod: paymentMethod,
+            //         addressId: selectedAddress,
+            //         orderNotes: $('#order-notes').val()
+            //     };
+
+            //     formData.forEach(item => {
+            //         orderData[item.name] = item.value;
+            //     });
+
+            //     if (!selectedAddress && !$('#new-address-form').is(':visible')) {
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Error',
+            //             text: 'Please select an address or add a new one.',
+            //             confirmButtonColor: '#000000'
+            //         });
+            //         return;
+            //     }
+
+            //     $.ajax({
+            //         url: '/place-order',
+            //         method: 'POST',
+            //         data: orderData,
+            //         success: function(response) {
+            //             if (response.success) {
+            //                 Swal.fire({
+            //                     icon: 'success',
+            //                     title: 'Success',
+            //                     text: 'Order placed successfully!',
+            //                     confirmButtonColor: '#000000'
+            //                 }).then(() => {
+            //                     window.location.href = '/order-confirmation/' + response.orderId;
+            //                 });
+            //             } else {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Error',
+            //                     text: 'Error placing order: ' + response.message,
+            //                     confirmButtonColor: '#000000'
+            //                 });
+            //             }
+            //         },
+            //         error: function() {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Error',
+            //                 text: 'An error occurred while placing the order.',
+            //                 confirmButtonColor: '#000000'
+            //             });
+            //         }
+            //     });
+            // });
+
+
+
+
+
+        });
+
+
+    </script>
+</body>
+</html>

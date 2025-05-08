@@ -179,8 +179,8 @@
         }
         
         .back-btn {
-            background-color: transparent;
-            color: #333;
+            background-color: #000000;
+            color: #fff;
             border: 1px solid #ddd;
             padding: 8px 15px;
             border-radius: 4px;
@@ -240,7 +240,7 @@
         <%- include("../partials/user/sidebar", {active: 'address'}) %>
         
         <div class="content">
-            <div class="greeting">EDIT ADDRESS</div>
+            <div class="greeting">Edit Address</div>
             
             <div style="text-align: right; margin-bottom: 20px;">
                 <a href="/address" class="back-btn">
@@ -334,10 +334,10 @@
                         </div>
                     </div>
                     
-                    <div class="checkbox-container">
+                    <!-- <div class="checkbox-container">
                         <input type="checkbox" id="defaultAddress" name="isDefault" value="true" <%= address.isDefault ? 'checked' : '' %>>
                         <label for="defaultAddress">Set as default address for delivery</label>
-                    </div>
+                    </div> -->
                     
                     <button type="submit" class="save-btn" id="saveBtn">
                         <i class="fa fa-check-circle" style="margin-right: 5px;"></i> Update Address

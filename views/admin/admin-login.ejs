@@ -1,4 +1,3 @@
-<!-- admin-login.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +29,7 @@
         }
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         label {
             display: block;
@@ -46,6 +46,10 @@
             box-sizing: border-box;
             font-size: 16px;
         }
+        input.invalid {
+            border-color: #d9534f;
+            background-color: #fff6f6;
+        }
         button {
             background-color: #000000;
             color: white;
@@ -58,11 +62,21 @@
             font-weight: bold;
         }
         button:hover {
-            background-color: #000000;
+            background-color: #333333;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
         .error-message {
             color: #d9534f;
-            margin-top: 15px;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .server-error {
+            color: #d9534f;
+            margin-bottom: 15px;
             text-align: center;
         }
         .forgot-password {
@@ -73,6 +87,9 @@
             color: #000000;
             text-decoration: none;
         }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -80,12 +97,12 @@
         <h2>Admin Login</h2>
         
         <% if (locals.errorMessage) { %>
-            <div class="error-message">
+            <div class="server-error">
                 <%= errorMessage %>
             </div>
         <% } %>
         
-        <form action="/admin/login" method="POST">
+        <form action="/admin/login" method="POST" id="loginForm" novalidate>
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input 
@@ -96,6 +113,7 @@
                     required
                     <% if (locals.email) { %>value="<%= email %>"<% } %>
                 >
+                <div class="error-message" id="emailError"></div>
             </div>
             
             <div class="form-group">
@@ -107,14 +125,90 @@
                     placeholder="Enter your password"
                     required
                 >
+                <div class="error-message" id="passwordError"></div>
             </div>
             
-            <button type="submit">Login</button>
+            <button type="submit" id="submitButton" disabled>Login</button>
         </form>
         
         <div class="forgot-password">
             <a href="/admin/forgot-password">Forgot password?</a>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const submitButton = document.getElementById('submitButton');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Function to validate email
+            function validateEmail() {
+                const email = emailInput.value.trim();
+                if (!email) {
+                    emailInput.classList.add('invalid');
+                    emailError.textContent = 'Email is required';
+                    emailError.style.display = 'block';
+                    return false;
+                } else if (!emailRegex.test(email)) {
+                    emailInput.classList.add('invalid');
+                    emailError.textContent = 'Please enter a valid email';
+                    emailError.style.display = 'block';
+                    return false;
+                } else {
+                    emailInput.classList.remove('invalid');
+                    emailError.style.display = 'none';
+                    return true;
+                }
+            }
+
+            // Function to validate password
+            function validatePassword() {
+                const password = passwordInput.value;
+                if (!password) {
+                    passwordInput.classList.add('invalid');
+                    passwordError.textContent = 'Password is required';
+                    passwordError.style.display = 'block';
+                    return false;
+                } else if (password.length < 6) {
+                    passwordInput.classList.add('invalid');
+                    passwordError.textContent = 'Password must be at least 6 characters';
+                    passwordError.style.display = 'block';
+                    return false;
+                } else {
+                    passwordInput.classList.remove('invalid');
+                    passwordError.style.display = 'none';
+                    return true;
+                }
+            }
+
+            // Function to validate entire form
+            function validateForm() {
+                const isEmailValid = validateEmail();
+                const isPasswordValid = validatePassword();
+                submitButton.disabled = !(isEmailValid && isPasswordValid);
+            }
+
+            // Event listeners for real-time validation
+            emailInput.addEventListener('input', validateForm);
+            passwordInput.addEventListener('input', validateForm);
+
+            // Validate on form submit
+            form.addEventListener('submit', function (event) {
+                if (!validateEmail() || !validatePassword()) {
+                    event.preventDefault(); // Prevent form submission if invalid
+                }
+            });
+
+            // Initial validation
+            validateForm();
+        });
+    </script>
 </body>
 </html>

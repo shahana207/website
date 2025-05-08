@@ -10,7 +10,7 @@ const cartSchema=new Schema({
     items:[{
         productId:{
             type:Schema.Types.ObjectId,
-            ref:"Product",
+            ref:"product",
             required:true
         },
         quantity:{
@@ -37,8 +37,14 @@ const cartSchema=new Schema({
     subtotal:{
         type:Number,
         default:0
-
+    },
+    total:{
+        type:Number,
+        default:0
     }
+    
+
+
 })
 const Cart=mongoose.model('cart',cartSchema);
 module.exports=Cart;

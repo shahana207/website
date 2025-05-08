@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const dotenv = require("dotenv").config();
 const session = require("express-session");
 const fs = require('fs').promises;
+const mongoose=require('mongoose');
 const path = require('path');
 
 
@@ -434,8 +435,6 @@ const userAddress = async (req, res) => {
 
 
 
-
-
 const addAddress = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -480,7 +479,7 @@ const postAddAddress = async (req, res) => {
 
         const {
             addressType, name, city, landMark, state,
-            pincode, phone, altPhone, isDefault
+            pincode, phone, altPhone 
         } = req.body;
 
         if (!addressType || !name || !city || !landMark || !state || !pincode || !phone || !altPhone) {
@@ -498,7 +497,7 @@ const postAddAddress = async (req, res) => {
             pincode,
             phone,
             altPhone,
-            isDefault: isDefault === 'true'
+            // isDefault: isDefault === 'true'
         };
 
         if (!userAddress) {
@@ -507,14 +506,12 @@ const postAddAddress = async (req, res) => {
                 address: [newAddress]
             });
             await addressDoc.save();
-        } else {
-            if (newAddress.isDefault) {
-                userAddress.address.forEach(addr => addr.isDefault = false);
-            }
+        }
+         else {
+
             userAddress.address.push(newAddress);
             await userAddress.save();
           
-            
         }
 
         return res.status(200).json({ success: true, message: 'Address saved successfully' });
@@ -525,6 +522,143 @@ const postAddAddress = async (req, res) => {
         return res.status(500).json({ success: false, message: 'An error occurred while saving the address' });
     }
 };
+
+
+
+// const checkoutAddAddress = async (req , res ) => {
+//     try {
+
+//         console.log("req.body:",req.body);
+
+
+//         const userId = req.session.user;
+
+//         if (!userId) {
+//             return res.status(401).json({ success: false, message: 'User not authenticated' });
+//         }
+
+//         const userData = await User.findById(userId);
+//         if (!userData) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+
+//         const {
+//             addressType, name, city, landMark, state,
+//             pincode, phone, altPhone 
+//         } = req.body;
+
+//         // if (!addressType || !name || !city || !landMark || !state || !pincode || !phone || !altPhone) {
+//         //     return res.status(400).json({ success: false, message: 'Missing required address fields' });
+//         // }
+
+
+//         if (!addressType || !name || !city || !landMark || !state || !pincode || !phone) {
+//             return res.status(400).json({ success: false, message: 'Missing required address fields' });
+//         }
+        
+
+//         console.log({
+//             addressType, name, city, landMark, state,
+//             pincode, phone, altPhone 
+//         })
+
+//         const userAddress = await Address.findOne({ userId });
+
+
+//         console.log("new adderss:",userAddress)
+
+//         const newAddress = {
+//             addressType:addressType,
+//             name,
+//             city,
+//             landMark,
+//             state,
+//             pincode,
+//             phone,
+//             altPhone
+//         };
+
+
+//         console.log("newAddress funtioin:",newAddress)
+
+//         if (!userAddress) {
+//             const addressDoc = new Address({
+//                 userId,
+//                 address: [newAddress]
+//             });
+//             await addressDoc.save();
+//         } else {
+//             userAddress.address.push(newAddress);
+//             await userAddress.save();
+          
+//         }
+
+//         console.log("added to theaddress::")
+
+
+//         return res.status(200).json({ success: true, message: 'Address saved successfully' });
+    
+
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+
+
+
+const checkoutAddAddress = async (req, res) => {
+    try {
+      const userId = req.session.user;
+  
+      if (!userId) {
+        return res.status(401).json({ success: false, message: "User not authenticated" });
+      }
+  
+      const userData = await User.findById(userId);
+      if (!userData) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+  
+      const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
+  
+      // Validate required fields
+      if (!addressType || !name || !city || !landMark || !state || !pincode || !phone) {
+        return res.status(400).json({ success: false, message: "Missing required address fields" });
+      };
+  
+      const newAddress = {
+        addressType,
+        name,
+        city,
+        landMark,
+        state,
+        pincode,
+        phone,
+        altPhone: altPhone || "",
+      };
+  
+      const userAddress = await Address.findOne({ userId });
+  
+      if (!userAddress) {
+        const addressDoc = new Address({
+          userId,
+          address: [newAddress],
+        });
+        await addressDoc.save();
+      } else {
+        await Address.updateOne(
+          { userId },
+          { $push: { address: newAddress } }
+        );
+      }
+  
+      return res.status(200).json({ success: true, message: "Address saved successfully" });
+    } catch (error) {
+      console.error("Error in checkoutAddAddress:", error);
+      return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };
+
 
 // Controller for rendering the edit address page
 const editAddress = async (req, res) => {
@@ -557,10 +691,79 @@ const editAddress = async (req, res) => {
     }
 };
 
+
+
+// const editAddressCheckout = async (req, res) => {
+//     try {
+//         // const data = req.body;
+//         const addressId = req.params.id; 
+
+
+
+//         console.log("in backend req.body :",req.body);
+        
+//         console.log('Received addressId:', addressId);
+//         // console.log('Form data:', data);
+
+//         // const user = req.session.user;
+
+      
+//         // if (!user || !user._id) {
+//         //     return res.json({success:false, message:'User session invalid!'}); 
+//         // }
+
+        
+//         // const findAddress = await Address.findOne({
+//         //     userId: user._id,
+//         //     'address._id': addressId,
+//         // });
+
+//         // if (!findAddress) {
+//         //     return res.json({success:false, message:'Address not found for ID!'}); 
+//         // }
+
+//         // if (data.isDefault === 'on') {
+//         //     await Address.updateMany(
+//         //         { userId: user._id, 'address._id': { $ne: addressId } },
+//         //         { $set: { 'address.$[].isDefault': false } }
+//         //     );
+//         // }
+
+       
+//         // await Address.updateOne(
+//         //     { userId: user._id, 'address._id': addressId },
+//         //     {
+//         //         $set: {
+//         //             'address.$.addressType': data.addressType,
+//         //             'address.$.name': data.name,
+//         //             'address.$.city': data.city,
+//         //             'address.$.landMark': data.landMark,
+//         //             'address.$.state': data.state,
+//         //             'address.$.pincode': data.pincode,
+//         //             'address.$.phone': data.phone,
+//         //             'address.$.altPhone': data.altPhone,
+//         //             'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
+//         //         },
+//         //     }
+//         // );
+
+//         return res.json({success:true, message:'Address changed succusfully '}); 
+
+//     } catch (error) {
+//         console.error('Error in edit address:', error);
+//         return res.redirect('/pageNotFound');
+//     }
+// };
+
+
+
+
 const postEditAddress = async (req, res) => {
     try {
         const data = req.body;
         const addressId = req.params.id; 
+
+        console.log("in backend req.body :",req.body);
         
         console.log('Received addressId:', addressId);
         console.log('Form data:', data);
@@ -582,12 +785,12 @@ const postEditAddress = async (req, res) => {
             return res.json({success:false, message:'Address not found for ID!'}); 
         }
 
-        if (data.isDefault === 'on') {
-            await Address.updateMany(
-                { userId: user._id, 'address._id': { $ne: addressId } },
-                { $set: { 'address.$[].isDefault': false } }
-            );
-        }
+        // if (data.isDefault === 'on') {
+        //     await Address.updateMany(
+        //         { userId: user._id, 'address._id': { $ne: addressId } },
+        //         // { $set: { 'address.$[].isDefault': false } }
+        //     );
+        // }
 
        
         await Address.updateOne(
@@ -602,12 +805,12 @@ const postEditAddress = async (req, res) => {
                     'address.$.pincode': data.pincode,
                     'address.$.phone': data.phone,
                     'address.$.altPhone': data.altPhone,
-                    'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
+                    // 'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
                 },
             }
         );
 
-        return res.json({success:true, message:'Address not found for ID!'}); 
+        return res.json({success:true, message:'Address updated successfully'}); 
 
     } catch (error) {
         console.error('Error in edit address:', error);
@@ -678,4 +881,6 @@ module.exports = {
     editAddress,
     postEditAddress,
     deleteAddress,
+
+    checkoutAddAddress
 };

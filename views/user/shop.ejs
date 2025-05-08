@@ -2,224 +2,333 @@
 <link rel="stylesheet" href="/style/css/shop.css">
 
 <style>
-        .nice-select, .nice-select * {
-          all: unset !important;
-        }
+    .nice-select, .nice-select * {
+        all: unset !important;
+    }
+
+    /* Add styles for stock status */
+    .stock-status {
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .in-stock {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    .out-of-stock {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .add-to-cart-btn {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .add-to-cart-btn:hover:not(:disabled) {
+        background-color: #333;
+        transform: translateY(-2px);
+    }
+
+    .add-to-cart-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="zz-breadcrumb-area">
-  <div class="container">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb zz-breadcrumb">
-        <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Shop</li>
-      </ol>
-    </nav>
-  </div>
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb zz-breadcrumb">
+                <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Shop</li>
+            </ol>
+        </nav>
+    </div>
 </div>
 
 <div class="main-container">
-  <section class="shop-page container">
-    <!-- Search Bar -->
-    <div class="shop-topbar">
-      <div class="search-bar">
-        <form action="/shop" method="GET" class="search-form" id="search-form">
-          <input
-            type="text"
-            name="search"
-            placeholder="Search items..."
-            class="search-input"
-            value="<%= typeof search !== 'undefined' ? search : '' %>"
-          />
-          <button type="submit" class="search-button">Search</button>
-          <!-- Hidden inputs to preserve sort and filter state -->
-          <input type="hidden" name="sort" value="<%= typeof sort !== 'undefined' ? sort : '' %>" />
-          <input type="hidden" name="cat" value="<%= typeof selectedCategory !== 'undefined' ? selectedCategory : '' %>" />
-          <input type="hidden" name="brand" value="<%= typeof selectedBrand !== 'undefined' ? selectedBrand : '' %>" />
-          <input type="hidden" name="minPrice" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>" />
-          <input type="hidden" name="maxPrice" value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" />
-        </form>
-      </div>
-    </div>
-    
-    <div class="product-list-container">
-      <!-- Sidebar with Filters -->
-      <aside class="sidebar">
-        <!-- Categories -->
-        <div class="filter-section">
-          <div class="filter-title">Categories</div>
-          <div class="category-brand-container">
-            <ul>
-              <% for(let i=0; i < category.length; i++) { %>
-              <li class="filter-item">
-                <a
-                  href="/shop?cat=<%= category[i]._id %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %><%= typeof sort !== 'undefined' && sort ? '&sort=' + sort : '' %><%= typeof selectedBrand !== 'undefined' && selectedBrand ? '&brand=' + selectedBrand : '' %><%= typeof minPrice !== 'undefined' && minPrice ? '&minPrice=' + minPrice : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-                  ><%= category[i].name %></a
-                >
-              </li>
-              <% } %>
-            </ul>
-          </div>
+    <section class="shop-page container">
+        <!-- Search Bar -->
+        <div class="shop-topbar">
+            <div class="search-bar">
+                <form action="/shop" method="GET" class="search-form" id="search-form">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search items..."
+                        class="search-input"
+                        value="<%= typeof search !== 'undefined' ? search : '' %>"
+                    />
+                    <button type="submit" class="search-button">Search</button>
+                    <!-- Hidden inputs to preserve sort and filter state -->
+                    <input type="hidden" name="sort" value="<%= typeof sort !== 'undefined' ? sort : '' %>" />
+                    <input type="hidden" name="cat" value="<%= typeof selectedCategory !== 'undefined' ? selectedCategory : '' %>" />
+                    <input type="hidden" name="brand" value="<%= typeof selectedBrand !== 'undefined' ? selectedBrand : '' %>" />
+                    <input type="hidden" name="minPrice" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>" />
+                    <input type="hidden" name="maxPrice" value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" />
+                </form>
+            </div>
         </div>
-       
-
-        <form id="search-form" method="GET" action="/your-endpoint">
-          <div class="zz-filter-group">
-            <label for="sortSelect" class="zz-filter-label text-center fs-3">Sort By</label>
-            <ul id="sortSelect" class="list-group">
-              <li class="list-group-item" data-value="newest" <%= sort === 'newest' ? 'class="active"' : '' %>>Newest First</li>
-              <li class="list-group-item" data-value="price-low" <%= sort === 'price-low' ? 'class="active"' : '' %>>Price: Low to High</li>
-              <li class="list-group-item" data-value="price-high" <%= sort === 'price-high' ? 'class="active"' : '' %>>Price: High to Low</li>
-              <li class="list-group-item" data-value="a-z" <%= sort === 'a-z' ? 'class="active"' : '' %>>Name: A to Z</li>
-              <li class="list-group-item" data-value="z-a" <%= sort === 'z-a' ? 'class="active"' : '' %>>Name: Z to A</li>
-            </ul>
-          </div>
-        </form>
         
-        
-        <!-- Brands -->
-        <div class="filter-section">
-          <div class="filter-title">Brands</div>
-          <div class="category-brand-container">
-            <ul>
-              <% brand.forEach(b => { %>
-              <li class="filter-item">
-                <a
-                  href="/shop?brand=<%= b._id %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-                  ><%= b.name %></a
-                >
-              </li>
-              <% }) %>
+        <div class="product-list-container">
+            <!-- Sidebar with Filters -->
+            <aside class="sidebar">
+                <!-- Categories -->
+                <div class="filter-section">
+                    <div class="filter-title">Categories</div>
+                    <div class="category-brand-container">
+                        <ul>
+                            <% for(let i=0; i < category.length; i++) { %>
+                            <li class="filter-item">
+                                <a
+                                    href="/shop?cat=<%= category[i]._id %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %><%= typeof sort !== 'undefined' && sort ? '&sort=' + sort : '' %><%= typeof selectedBrand !== 'undefined' && selectedBrand ? '&brand=' + selectedBrand : '' %><%= typeof minPrice !== 'undefined' && minPrice ? '&minPrice=' + minPrice : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                                ><%= category[i].name %></a>
+                            </li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+
+                <form id="sort-form" method="GET" action="/shop">
+                    <div class="zz-filter-group">
+                        <label for="sortSelect" class="zz-filter-label text-center fs-3">Sort By</label>
+                        <ul id="sortSelect" class="list-group">
+                            <li class="list-group-item" data-value="newest" <%= sort === 'newest' ? 'class="active"' : '' %>>Newest First</li>
+                            <li class="list-group-item" data-value="price-low" <%= sort === 'price-low' ? 'class="active"' : '' %>>Price: Low to High</li>
+                            <li class="list-group-item" data-value="price-high" <%= sort === 'price-high' ? 'class="active"' : '' %>>Price: High to Low</li>
+                            <li class="list-group-item" data-value="a-z" <%= sort === 'a-z' ? 'class="active"' : '' %>>Name: A to Z</li>
+                            <li class="list-group-item" data-value="z-a" <%= sort === 'z-a' ? 'class="active"' : '' %>>Name: Z to A</li>
+                        </ul>
+                        <!-- Hidden inputs to preserve other query parameters -->
+                        <input type="hidden" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" />
+                        <input type="hidden" name="cat" value="<%= typeof selectedCategory !== 'undefined' ? selectedCategory : '' %>" />
+                        <input type="hidden" name="brand" value="<%= typeof selectedBrand !== 'undefined' ? selectedBrand : '' %>" />
+                        <input type="hidden" name="minPrice" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>" />
+                        <input type="hidden" name="maxPrice" value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" />
+                        <input type="hidden" name="page" value="1" />
+                        <input type="hidden" name="sort" id="sortInput" value="<%= sort %>">
+                    </div>
+                </form>
+                
+                <!-- Brands -->
+                <div class="filter-section">
+                    <div class="filter-title">Brands</div>
+                    <div class="category-brand-container">
+                        <ul>
+                            <% brand.forEach(b => { %>
+                            <li class="filter-item">
+                                <a
+                                    href="/shop?brand=<%= b._id %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                                ><%= b.name %></a>
+                            </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Price Filter -->
+                <div class="price-filter">
+                    <div class="filter-title">Filter by Price</div>
+                    <div class="price-options">
+                        <a
+                            href="/shop?minPrice=0&maxPrice=500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+                        ><button type="button" class="price-button">Under ₹500</button></a>
+                        <a
+                            href="/shop?minPrice=500&maxPrice=1000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+                        ><button type="button" class="price-button">₹500 - ₹1000</button></a>
+                        <a
+                            href="/shop?minPrice=1000&maxPrice=1500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+                        ><button type="button" class="price-button">₹1000 - ₹1500</button></a>
+                        <a
+                            href="/shop?minPrice=1500&maxPrice=1000000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+                        ><button type="button" class="price-button">Above ₹1500</button></a>
+                    </div>
+                </div>
+
+                <!-- Clear Filters -->
+                <a href="/shop" class="price-button" style="margin-top: 10px;">Clear Filters</a>
+            </aside>
+
+            <!-- Product Grid -->
+            <main class="product-grid">
+                <% if (products.length > 0) { %>
+                <% products.forEach(product => { %>
+                <div class="product-card">
+                    <span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">❤️</span>
+                    <a href="/productDetails?id=<%= product._id %>">
+                        <img
+                            src="/Uploads/product-images/<%= product.productImage[0] %>"
+                            alt="<%= product.productName %>"
+                        />
+                        <h4><%= product.productName %></h4>
+                        <p>Brand: <%= product.brand.name %></p>
+                        <p>
+                            Price: ₹<%= product.salePrice.toLocaleString('en-IN') %>
+                            <span class="text-muted">
+                                <strike>₹<%= product.regularPrice.toLocaleString('en-IN') %></strike>
+                            </span>
+                        </p>
+                        <!-- Display Stock Status -->
+                        <!-- <div class="stock-status">
+                            <% if (product.status === "Available" && product.quantity > 0) { %>
+                                <span class="in-stock">In Stock (<%= product.quantity %> available)</span>
+                            <% } else { %>
+                                <span class="out-of-stock">Out of Stock</span>
+                            <% } %>
+                        </div> -->
+                    </a>
+                    <!-- Update Add to Cart Button -->
+                    <% if (product.status === "Available" && product.quantity > 0) { %>
+                        <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+                    <% } else { %>
+                        <button class="add-to-cart-btn" disabled>Out of Stock</button>
+                    <% } %>
+                </div>
+                <% }) %>
+                <% } else { %>
+                <p>No products found.</p>
+                <% } %>
+            </main>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 0) { %>
+        <nav aria-label="Product navigation">
+            <ul class="pagination zz-pagination">
+                <!-- Previous Button -->
+                <li class="page-item zz-page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <a
+                        class="page-link zz-page-link"
+                        href="/shop?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                        aria-label="Previous"
+                    >
+                        <span aria-hidden="true">«</span>
+                    </a>
+                </li>
+                <!-- Page Numbers -->
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item zz-page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a
+                        class="page-link zz-page-link"
+                        href="/shop?page=<%= i %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                    ><%= i %></a>
+                </li>
+                <% } %>
+                <!-- Next Button -->
+                <li class="page-item zz-page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                    <a
+                        class="page-link zz-page-link"
+                        href="/shop?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                        aria-label="Next"
+                    >
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </li>
             </ul>
-          </div>
-        </div>
-
-        <!-- Sort By -->
-         
-        
-
-        <!-- Price Filter -->
-        <div class="price-filter">
-          <div class="filter-title">Filter by Price</div>
-          <div class="price-options">
-            <a
-              href="/shop?minPrice=0&maxPrice=500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-              ><button type="button" class="price-button">Under ₹500</button></a
-            >
-            <a
-              href="/shop?minPrice=500&maxPrice=1000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-              ><button type="button" class="price-button">₹500 - ₹1000</button></a
-            >
-            <a
-              href="/shop?minPrice=1000&maxPrice=1500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-              ><button type="button" class="price-button">₹1000 - ₹1500</button></a
-            >
-            <a
-              href="/shop?minPrice=1500&maxPrice=1000000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-              ><button type="button" class="price-button">Above ₹1500</button></a
-            >
-          </div>
-        </div>
-
-        <!-- Clear Filters -->
-        <a href="/shop" class="price-button" style="margin-top: 10px;">Clear Filters</a>
-      </aside>
-
-      <!-- Product Grid -->
-      <main class="product-grid">
-        <% if (products.length > 0) { %>
-        <% products.forEach(product => { %>
-        <div class="product-card">
-          <span class="wishlist-btn" onclick="">❤️</span>
-          <a href="/productDetails?id=<%= product._id %>">
-            <img
-              src="/Uploads/product-images/<%= product.productImage[0] %>"
-              alt="<%= product.productName %>"
-            />
-            <h4><%= product.productName %></h4>
-            <p>Brand: <%= product.brand.name %></p>
-            <p>
-              Price: ₹<%= product.salePrice.toLocaleString('en-IN') %>
-              <span class="text-muted">
-                <strike>₹<%= product.regularPrice.toLocaleString('en-IN') %></strike>
-              </span>
-            </p>
-          </a>
-          <button class="add-to-cart-btn" onclick="">Add to Cart</button>
-        </div>
-        <% }) %>
-        <% } else { %>
-        <p>No products found.</p>
+        </nav>
         <% } %>
-      </main>
-    </div>
-
-    <!-- Pagination -->
-    <% if (totalPages > 0) { %>
-    <nav aria-label="Product navigation">
-      <ul class="pagination zz-pagination">
-        <!-- Previous Button -->
-        <li class="page-item zz-page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-          <a
-            class="page-link zz-page-link"
-            href="/shop?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-            aria-label="Previous"
-          >
-            <span aria-hidden="true">«</span>
-          </a>
-        </li>
-        <!-- Page Numbers -->
-        <% for(let i = 1; i <= totalPages; i++) { %>
-        <li class="page-item zz-page-item <%= currentPage === i ? 'active' : '' %>">
-          <a
-            class="page-link zz-page-link"
-            href="/shop?page=<%= i %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-            ><%= i %></a
-          >
-        </li>
-        <% } %>
-        <!-- Next Button -->
-        <li class="page-item zz-page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-          <a
-            class="page-link zz-page-link"
-            href="/shop?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-            aria-label="Next"
-          >
-            <span aria-hidden="true">»</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <% } %>
-  </section>
+    </section>
 </div>
 
-
-  <script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
 document.querySelectorAll('#sortSelect .list-group-item').forEach(function (item) {
-  item.addEventListener('click', function () {
-    const sortValue = item.getAttribute('data-value');
-    console.log(sortValue);
-
-    // Create a new URL object based on the current page URL
-    const url = new URL(window.location.href);
-
-    // Set or update the 'sort' parameter in the URL
-    url.searchParams.set('sort', sortValue);
-
-    // Reset page to 1 if pagination exists
-    if (url.searchParams.has('page')) {
-      url.searchParams.set('page', 1);
-    }
-
-    // Redirect to updated URL
-    window.location.href = url.toString();
-  });
+    item.addEventListener('click', function () {
+        const sortValue = item.getAttribute('data-value');
+        document.getElementById('sortInput').value = sortValue;
+        document.getElementById('sort-form').submit();
+    });
 });
 
+// Add to Cart via AJAX (similar to productDetails.ejs)
+function addToCart(productId) {
+    $.ajax({
+        url: '/addToCart',
+        method: 'POST',
+        data: {
+            id: productId,
+            qty: 1
+        },
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart!',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Add to Cart',
+                    text: response.message,
+                    showConfirmButton: true
+                });
+            }
+        },
+        error: function(err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while adding to cart',
+                showConfirmButton: true
+            });
+        }
+    });
+}
+
+// Add to Wishlist (stub function, implement as needed)
+function addToWishlist(productId) {
+    $.ajax({
+        url: '/addToWishlist',
+        method: 'POST',
+        data: {
+            id: productId
+        },
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Wishlist!',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Add to Wishlist',
+                    text: response.message,
+                    showConfirmButton: true
+                });
+            }
+        },
+        error: function(err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while adding to wishlist',
+                showConfirmButton: true
+            });
+        }
+    });
+}
 </script>
-
-
-  
 
 <%- include("../../views/partials/user/footer") %>

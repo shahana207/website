@@ -10,6 +10,7 @@ const { userAuth } = require("../middlewares/auth");
 const productController = require('../controllers/user/productController');
 const profileController = require("../controllers/user/profileController");
 const cartController = require("../controllers/user/cartController");
+const checkoutController = require('../controllers/user/checkoutController');
 const { route } = require("./adminRouter");
 
 
@@ -106,16 +107,44 @@ router.get("/address",userAuth,profileController.userAddress);
 router.get("/add-address",userAuth,profileController.addAddress);
 
 router.post("/add-address", userAuth, profileController.postAddAddress);
+router.post("/addAdrress", userAuth, profileController.checkoutAddAddress);
+
 
 router.get('/edit-address', userAuth, profileController.editAddress);
 
 router.post('/update-address/:id', userAuth, profileController.postEditAddress);
 
+
+// router.post('/edit-address-checkout/:id', userAuth, profileController.editAddressCheckout);
+
+
 router.get("/delete-address",userAuth,profileController.deleteAddress);
 
 
-//cart management
-router.get("/cart",userAuth,cartController.loadCartPage);
+// Cart Management
+router.get('/cart',userAuth,cartController.loadCart);
+
+router.post('/addToCart',userAuth,cartController.addToCart);
+
+router.put('/update-cart',userAuth,cartController.updateCart);
+
+router.patch('/removeFromCart/:productId', userAuth,cartController.removeFromCart);
+
+
+//checkout management
+
+router.get('/checkout', userAuth, checkoutController.loadCheckout);
+
+router.post('/save-address', checkoutController.saveAddress);
+
+router.post("/place-order",userAuth,checkoutController.placeOrder);
+
+router.get("/order-success",checkoutController.ordersuccess);
+
+
+
+
+
 
 
 

@@ -1,3 +1,4 @@
+
 <%- include("../../views/partials/user/header") %>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,6 +8,8 @@
     <title>Fazion - Product Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body {
             font-family: 'Nunito Sans', sans-serif;
@@ -98,7 +101,6 @@
 
         .product-meta {
             margin-bottom: 15px;
-            
         }
 
         .product-meta p {
@@ -307,212 +309,205 @@
             font-weight: 600;
         }
         .zz-related-products {
-    padding-top: 40px;
-    margin-top: 40px;
-    border-top: 1px solid #eee;
-}
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+        }
 
-.zz-section-title {
-    font-size: 24px;
-    font-weight: 800;
-    margin-bottom: 25px;
-    color: #222;
-    position: relative;
-    padding-bottom: 10px;
-    text-align: center;
-}
+        .zz-section-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            color: #222;
+            position: relative;
+            padding-bottom: 10px;
+            text-align: center;
+        }
 
-.zz-section-title:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
-    background-color: #e74c3c;
-    border-radius: 2px;
-}
+        .zz-section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: #e74c3c;
+            border-radius: 2px;
+        }
 
-.product-item {
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+        .product-item {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-.product-item:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-5px);
-}
+        .product-item:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
 
-.product-img-wrap {
-    position: relative;
-    padding: 15px;
-    background-color: #f5f5f5;
-    text-align: center;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .product-img-wrap {
+            position: relative;
+            padding: 15px;
+            background-color: #f5f5f5;
+            text-align: center;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.product-img-wrap img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
+        .product-img-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
 
-.wishlist-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-}
+        .wishlist-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
 
-.wishlist-btn a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    background-color: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    color: #e74c3c;
-    transition: all 0.3s ease;
-}
+        .wishlist-btn a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            color: #e74c3c;
+            transition: all 0.3s ease;
+        }
 
-.wishlist-btn a:hover {
-    color: #c0392b;
-    transform: scale(1.2);
-}
+        .wishlist-btn a:hover {
+            color: #c0392b;
+            transform: scale(1.2);
+        }
 
-.product-details {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
+        .product-details {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
 
-.product-details h6 {
-    font-size: 16px;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 600;
-    line-height: 1.4;
-}
+        .product-details h6 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.4;
+        }
 
-.price-box {
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #333;
-}
+        .price-box {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
 
-.cart-btn {
-    display: block;
-    width: 100%;
-    padding: 10px 0;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
+        .cart-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 0;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
 
-.cart-btn:hover {
-    background-color: #333;
-    transform: translateY(-2px);
-}
-.product-gallery {
-    position: relative;
-    max-width: 600px;
-    margin: 0 auto;
-}
+        .cart-btn:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+        .product-gallery {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-.product-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #ff4c4c;
-    color: white;
-    padding: 5px 10px;
-    font-weight: bold;
-    z-index: 5;
-    border-radius: 3px;
-}
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ff4c4c;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            z-index: 5;
+            border-radius: 3px;
+        }
 
-.zoom-container {
-    position: relative;
-    overflow: hidden;
-    cursor: crosshair; /* Indicates zoomable area */
-}
+        .zoom-container {
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair; /* Indicates zoomable area */
+        }
 
-.main-image {
-    width: 100%;
-    display: block;
-    transition: opacity 0.3s;
-}
+        .zoom-lens {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #e0e0e0;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            background-color: white;
+            pointer-events: none; 
+            z-index: 10;
+        }
 
-.zoom-lens {
-    position: absolute;
-    width: 150px;
-    height: 150px;
-    border: 2px solid #e0e0e0;
-    overflow: hidden;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    background-color: white;
-    pointer-events: none; 
-    z-index: 10;
-}
+        #lensImage {
+            position: absolute;
+            pointer-events: none;
+        }
 
-#lensImage {
-    position: absolute;
-    pointer-events: none;
-}
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
 
-.thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-}
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
 
-.thumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
-}
+        .thumbnail.active {
+            border-color: #4a90e2;
+        }
 
-.thumbnail.active {
-    border-color: #4a90e2;
-}
-
-
-@media (max-width: 768px) {
-    .zoom-lens {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .thumbnail {
-        width: 50px;
-        height: 50px;
-    }
-}
+        @media (max-width: 768px) {
+            .zoom-lens {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+        }
 
         /* Responsive Design */
         @media (max-width: 991px) {
@@ -551,125 +546,121 @@
             .product-price {
                 font-size: 30px;
                 font-weight: bold;
-
             }
         }
         .product-gallery {
-    position: relative;
-    max-width: 600px;
-    margin: 0 auto;
-}
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-.product-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #ff4c4c;
-    color: white;
-    padding: 5px 10px;
-    font-weight: bold;
-    z-index: 5;
-    border-radius: 3px;
-}
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ff4c4c;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            z-index: 5;
+            border-radius: 3px;
+        }
 
-.zoom-container {
-    position: relative;
-    overflow: hidden;
-    cursor: zoom-in;
-}
+        .zoom-container {
+            position: relative;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
 
-.zoom-container.zoomed {
-    cursor: move;
-}
+        .zoom-container.zoomed {
+            cursor: move;
+        }
 
-.main-image {
-    width: 100%;
-    display: block;
-    transition: transform 0.1s ease-out;
-}
+        .main-image {
+            width: 100%;
+            display: block;
+            transition: transform 0.1s ease-out;
+        }
 
-.thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-}
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
 
-.thumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
-}
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
 
-.thumbnail.active {
-    border-color: #4a90e2;
-}
-.zz-breadcrumb-area {
-  background-color: #f9f9f9;
-  padding: 20px 0;
-}
+        .thumbnail.active {
+            border-color: #4a90e2;
+        }
+        .zz-breadcrumb-area {
+            background-color: #f9f9f9;
+            padding: 20px 0;
+        }
 
-.zz-breadcrumb {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  background: transparent;
-}
+        .zz-breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            background: transparent;
+        }
 
-.zz-breadcrumb-item {
-  font-size: 14px;
-  color: #555;
-  display: flex;
-  align-items: center;
-}
+        .zz-breadcrumb-item {
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
 
-.zz-breadcrumb-item + .zz-breadcrumb-item::before {
-  content: "›";
-  padding: 0 8px;
-  color: #999;
-  font-size: 13px;
-}
+        .zz-breadcrumb-item + .zz-breadcrumb-item::before {
+            content: "›";
+            padding: 0 8px;
+            color: #999;
+            font-size: 13px;
+        }
 
-.zz-breadcrumb-item a {
-  text-decoration: none;
-  color: #007bff;
-  transition: color 0.3s ease;
-}
+        .zz-breadcrumb-item a {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
 
-.zz-breadcrumb-item a:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
+        .zz-breadcrumb-item a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
 
-.zz-breadcrumb-item.active {
-  color: #6c757d;
-  font-weight: 500;
-  cursor: default;
-}
-
-
+        .zz-breadcrumb-item.active {
+            color: #6c757d;
+            font-weight: 500;
+            cursor: default;
+        }
     </style>
 </head>
 <body>
-    
-        <div class="zz-breadcrumb-area">
-            <div class="container">
-              <nav aria-label="breadcrumb">
+    <div class="zz-breadcrumb-area">
+        <div class="container">
+            <nav aria-label="breadcrumb">
                 <ol class="breadcrumb zz-breadcrumb">
-                  <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
-                  <li class="breadcrumb-item zz-breadcrumb-item " aria-current="page"><a href="/shop">Shop</a></li>
-                  <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Product Details</li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item" aria-current="page"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Product Details</li>
                 </ol>
-              </nav>
-            </div>
-          </div>
-          
+            </nav>
+        </div>
+    </div>
+    
     <div class="container1">
         <div class="product-gallery">
             <% if (product.productOffer > 0) { %>
@@ -698,11 +689,11 @@
                 <% } %>
             </div>
             <div class="rating">
-                <i class="fas fa-star text-muted" ></i>
-                <i class="fas fa-star text-muted" ></i>
-                <i class="fas fa-star text-muted" ></i>
-                <i class="fas fa-star text-muted" ></i>
-                <i class="fas fa-star text-muted" ></i>
+                <i class="fas fa-star text-muted"></i>
+                <i class="fas fa-star text-muted"></i>
+                <i class="fas fa-star text-muted"></i>
+                <i class="fas fa-star text-muted"></i>
+                <i class="fas fa-star text-muted"></i>
                 <span></span>
             </div>
            
@@ -745,8 +736,7 @@
             
             <% if (product.sizes && product.sizes.length > 0) { %>
                 <div class="size-options">
-                    <p>Size:</p>
-                    <select name="size" onchange="updateAddToCartUrl()">
+                    <select name="size" onchange="updateAddToCartParams()">
                         <option value="" disabled selected>Select Size</option>
                         <% product.sizes.forEach(size => { %>
                             <option value="<%= size %>"><%= size %></option>
@@ -755,16 +745,13 @@
                 </div>
             <% } %>
           
-            
             <% if (product.status === "Available" && product.quantity > 0) { %>
-                <a href="/addToCart?id=<%= product._id %>&qty=1&size=&color=" id="addToCartBtn" class="add-to-cart">ADD TO CART</a>
+                <!-- Replace the <a> tag with a <button> for AJAX -->
+                <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">ADD TO CART</button>
             <% } else { %>
                 <button class="add-to-cart" disabled>OUT OF STOCK</button>
             <% } %>
         </div>
-
-        <!-- Sidebar -->
-      
     </div>
 
     <!-- Description and Reviews -->
@@ -828,167 +815,189 @@
     </div>
 </div>
 
+<%- include("../partials/user/footer") %>
 
-    <%- include("../partials/user/footer") %>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script>
-        function changeMainImage(thumbnail) {
-            const mainImage = document.querySelector('.main-image');
-            mainImage.src = thumbnail.src;
-            
-           
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
-                thumb.classList.remove('active');
-            });
-            thumbnail.classList.add('active');
-        }
-        
-        function selectColor(element, color) {
-            document.querySelectorAll('.color-options span').forEach(span => {
-                span.classList.remove('active');
-            });
-            element.classList.add('active');
-            document.getElementById('selectedColor').value = color;
-            updateAddToCartUrl();
-        }
-        
-        function updateAddToCartUrl() {
-    const sizeSelect = document.querySelector('select[name="size"]');
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (!addToCartBtn) return;
-
-    const size = sizeSelect ? sizeSelect.value : '';
-    const color = document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : '';
-
-    const baseUrl = addToCartBtn.href.split('&size=')[0];
-    addToCartBtn.href = `${baseUrl}&size=${encodeURIComponent(size)}&color=${encodeURIComponent(color)}`;
-}
-
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            if (thumbnails.length > 0) {
-                thumbnails[0].classList.add('active');
-            }
-            
-            
-            document.querySelector('select[name="size"]')?.addEventListener('change', updateAddToCartUrl);
-            
-            
-            updateAddToCartUrl();
-        });
-
-     
-document.addEventListener('DOMContentLoaded', function() {
-    const zoomContainer = document.querySelector('.zoom-container');
-    const mainImage = document.getElementById('zoomImage');
-    
-   
-    const zoomLens = document.getElementById('zoomLens');
-    if (zoomLens) {
-        zoomLens.remove();
-    }
-    
-   
-    let isZoomed = false;
-    let zoomLevel = 2.5; 
-    
-    
-    let originalWidth, originalHeight;
-    
-    
-    function initializeImage() {
-        originalWidth = mainImage.offsetWidth;
-        originalHeight = mainImage.offsetHeight;
-        
-        // Set container dimensions to match image
-        zoomContainer.style.width = originalWidth + 'px';
-        zoomContainer.style.height = originalHeight + 'px';
-    }
-    
-   
-    if (mainImage.complete) {
-        initializeImage();
-    } else {
-        mainImage.onload = initializeImage;
-    }
-    
-    // Toggle zoom on click
-    zoomContainer.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        if (!isZoomed) {
-            
-            const rect = zoomContainer.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            
-            
-            const percentX = mouseX / originalWidth;
-            const percentY = mouseY / originalHeight;
-            
-            // Apply zoom
-            mainImage.style.width = (originalWidth * zoomLevel) + 'px';
-            mainImage.style.height = (originalHeight * zoomLevel) + 'px';
-            
-          
-            const offsetX = mouseX - (originalWidth * zoomLevel * percentX);
-            const offsetY = mouseY - (originalHeight * zoomLevel * percentY);
-            
-            mainImage.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px)';
-            zoomContainer.style.overflow = 'hidden';
-            
-            isZoomed = true;
-        } else {
-            // Reset to original state
-            mainImage.style.width = '';
-            mainImage.style.height = '';
-            mainImage.style.transform = '';
-            isZoomed = false;
-        }
-    });
-    
-   
-    zoomContainer.addEventListener('mousemove', function(e) {
-        if (!isZoomed) return;
-        
-        const rect = zoomContainer.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-       
-        const percentX = mouseX / originalWidth;
-        const percentY = mouseY / originalHeight;
-        
-       
-        const offsetX = mouseX - (originalWidth * zoomLevel * percentX);
-        const offsetY = mouseY - (originalHeight * zoomLevel * percentY);
-        
-        mainImage.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px)';
-    });
-    
-    
-    window.changeMainImage = function(thumbnail) {
-       
-        const newSrc = thumbnail.src;
-        mainImage.src = newSrc;
-        
-       
-        mainImage.style.width = '';
-        mainImage.style.height = '';
-        mainImage.style.transform = '';
-        isZoomed = false;
-        
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function changeMainImage(thumbnail) {
+        const mainImage = document.querySelector('.main-image');
+        mainImage.src = thumbnail.src;
         
         document.querySelectorAll('.thumbnail').forEach(thumb => {
             thumb.classList.remove('active');
         });
         thumbnail.classList.add('active');
-    };
-});
-    </script>
+    }
+    
+    function selectColor(element, color) {
+        document.querySelectorAll('.color-options span').forEach(span => {
+            span.classList.remove('active');
+        });
+        element.classList.add('active');
+        document.getElementById('selectedColor').value = color;
+        updateAddToCartParams();
+    }
+    
+    function updateAddToCartParams() {
+        const sizeSelect = document.querySelector('select[name="size"]');
+        const size = sizeSelect ? sizeSelect.value : '';
+        const color = document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : '';
+        return { size, color };
+    }
+
+    // AJAX function to add to cart
+    function addToCart(productId) {
+        const { size, color } = updateAddToCartParams();
+        const qty = 1; // Default quantity as per your controller
+
+        // Validate size if required
+        const sizeSelect = document.querySelector('select[name="size"]');
+        if (sizeSelect && !size) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please select a size',
+                showConfirmButton: true,
+                timer: 1500
+            });
+            return;
+        }
+
+        $.ajax({
+            url: '/addToCart',
+            method: 'POST',
+            data: {
+                id: productId,
+                qty: qty,
+                size: size,
+                color: color
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Add to Cart',
+                        text: response.message,
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: function(err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while adding to cart',
+                    showConfirmButton: true
+                });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        if (thumbnails.length > 0) {
+            thumbnails[0].classList.add('active');
+        }
+        
+        document.querySelector('select[name="size"]')?.addEventListener('change', updateAddToCartParams);
+        
+        // No need to update the URL since we're using AJAX
+    });
+
+    // Zoom functionality (unchanged)
+    document.addEventListener('DOMContentLoaded', function() {
+        const zoomContainer = document.querySelector('.zoom-container');
+        const mainImage = document.getElementById('zoomImage');
+        
+        let isZoomed = false;
+        let zoomLevel = 2.5; 
+        
+        let originalWidth, originalHeight;
+        
+        function initializeImage() {
+            originalWidth = mainImage.offsetWidth;
+            originalHeight = mainImage.offsetHeight;
+            
+            zoomContainer.style.width = originalWidth + 'px';
+            zoomContainer.style.height = originalHeight + 'px';
+        }
+        
+        if (mainImage.complete) {
+            initializeImage();
+        } else {
+            mainImage.onload = initializeImage;
+        }
+        
+        zoomContainer.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!isZoomed) {
+                const rect = zoomContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const percentX = mouseX / originalWidth;
+                const percentY = mouseY / originalHeight;
+                
+                mainImage.style.width = (originalWidth * zoomLevel) + 'px';
+                mainImage.style.height = (originalHeight * zoomLevel) + 'px';
+                
+                const offsetX = mouseX - (originalWidth * zoomLevel * percentX);
+                const offsetY = mouseY - (originalHeight * zoomLevel * percentY);
+                
+                mainImage.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px)';
+                zoomContainer.style.overflow = 'hidden';
+                
+                isZoomed = true;
+            } else {
+                mainImage.style.width = '';
+                mainImage.style.height = '';
+                mainImage.style.transform = '';
+                isZoomed = false;
+            }
+        });
+        
+        zoomContainer.addEventListener('mousemove', function(e) {
+            if (!isZoomed) return;
+            
+            const rect = zoomContainer.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const percentX = mouseX / originalWidth;
+            const percentY = mouseY / originalHeight;
+            
+            const offsetX = mouseX - (originalWidth * zoomLevel * percentX);
+            const offsetY = mouseY - (originalHeight * zoomLevel * percentY);
+            
+            mainImage.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px)';
+        });
+        
+        window.changeMainImage = function(thumbnail) {
+            const newSrc = thumbnail.src;
+            mainImage.src = newSrc;
+            
+            mainImage.style.width = '';
+            mainImage.style.height = '';
+            mainImage.style.transform = '';
+            isZoomed = false;
+            
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+        };
+    });
+</script>
 </body>
 </html>
-
 <%- include("../../views/partials/user/footer") %>
