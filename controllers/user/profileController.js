@@ -11,7 +11,7 @@ const path = require('path');
 
 
 
-// Generate 6-digit OTP
+
 function generateOtp() {
     const digits = '1234567890';
     let otp = "";
@@ -21,7 +21,7 @@ function generateOtp() {
     return otp;
 }
 
-// Send OTP to email
+
 const sendVerificationEmail = async (email, otp) => {
     try {
         const transporter = nodemailer.createTransport({
@@ -208,10 +208,10 @@ const userProfile = async(req, res) => {
 };
 
 
-const getEditProfile = async(req,res)=>{
+const getEditProfile = async(req, res) => {
     try {
         const userId = req.session.user;
-        const userData = await User.findById(userId).select('name gender email phone');
+        const userData = await User.findById(userId).select('name gender email phone profilePicture');
         
         if (!userData) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -230,25 +230,24 @@ const getEditProfile = async(req,res)=>{
     }
 };
 
-
-
-
 const updateProfile = async (req, res) => {
     try {
         const userId = req.session.user;
         const { name, phone } = req.body;
+        // Validate name length
+        if (name && name.length > 10) {
+            return res.status(400).json({ success: false, message: 'Name must be 10 characters or less' });
+        }
+        
         const updateData = { name, phone };
-
         let oldProfilePicture = null;
 
         if (req.file) {
-            // Get the current user's profile picture to delete later
             const user = await User.findById(userId).select('profilePicture');
             oldProfilePicture = user.profilePicture;
 
             const tempPath = req.file.path;
             const fileName = `${Date.now()}-${req.file.originalname.replace(/\s+/g, '_')}`;
-            console.log(__dirname,'dirname')
             const permanentPath = path.join(__dirname, '..', '..', 'public', 'Uploads', 'profile-pictures', fileName);
             
             await fs.mkdir(path.dirname(permanentPath), { recursive: true });
@@ -263,7 +262,6 @@ const updateProfile = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // Delete old profile picture if it exists
         if (oldProfilePicture && req.file) {
             const oldPicturePath = path.join(__dirname, '..', '..', 'public', oldProfilePicture);
             try {
@@ -279,6 +277,9 @@ const updateProfile = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+
+
 
 
 
@@ -418,14 +419,14 @@ const userAddress = async (req, res) => {
         const userData = await User.findById(userId);
         const addressDocs = await Address.find({ userId });
 
-        // Flatten the nested address arrays
+        
         const address = addressDocs.flatMap(doc => doc.address);
 
         res.render('address', {
             user: userData,
             active: 'address',
             profilePicture: userData.profilePicture,
-            address // now this is a flat array of individual address objects
+            address 
         });
     } catch (error) {
         console.error(error);
@@ -455,7 +456,6 @@ const addAddress = async (req, res) => {
             errorMessage: req.session.errorMessage
         });
 
-        // Clear session messages after rendering
         req.session.successMessage = null;
         req.session.errorMessage = null;
     } catch (error) {
@@ -497,7 +497,7 @@ const postAddAddress = async (req, res) => {
             pincode,
             phone,
             altPhone,
-            // isDefault: isDefault === 'true'
+            
         };
 
         if (!userAddress) {
@@ -525,84 +525,7 @@ const postAddAddress = async (req, res) => {
 
 
 
-// const checkoutAddAddress = async (req , res ) => {
-//     try {
 
-//         console.log("req.body:",req.body);
-
-
-//         const userId = req.session.user;
-
-//         if (!userId) {
-//             return res.status(401).json({ success: false, message: 'User not authenticated' });
-//         }
-
-//         const userData = await User.findById(userId);
-//         if (!userData) {
-//             return res.status(404).json({ success: false, message: 'User not found' });
-//         }
-
-//         const {
-//             addressType, name, city, landMark, state,
-//             pincode, phone, altPhone 
-//         } = req.body;
-
-//         // if (!addressType || !name || !city || !landMark || !state || !pincode || !phone || !altPhone) {
-//         //     return res.status(400).json({ success: false, message: 'Missing required address fields' });
-//         // }
-
-
-//         if (!addressType || !name || !city || !landMark || !state || !pincode || !phone) {
-//             return res.status(400).json({ success: false, message: 'Missing required address fields' });
-//         }
-        
-
-//         console.log({
-//             addressType, name, city, landMark, state,
-//             pincode, phone, altPhone 
-//         })
-
-//         const userAddress = await Address.findOne({ userId });
-
-
-//         console.log("new adderss:",userAddress)
-
-//         const newAddress = {
-//             addressType:addressType,
-//             name,
-//             city,
-//             landMark,
-//             state,
-//             pincode,
-//             phone,
-//             altPhone
-//         };
-
-
-//         console.log("newAddress funtioin:",newAddress)
-
-//         if (!userAddress) {
-//             const addressDoc = new Address({
-//                 userId,
-//                 address: [newAddress]
-//             });
-//             await addressDoc.save();
-//         } else {
-//             userAddress.address.push(newAddress);
-//             await userAddress.save();
-          
-//         }
-
-//         console.log("added to theaddress::")
-
-
-//         return res.status(200).json({ success: true, message: 'Address saved successfully' });
-    
-
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }
 
 
 
@@ -621,7 +544,6 @@ const checkoutAddAddress = async (req, res) => {
   
       const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
   
-      // Validate required fields
       if (!addressType || !name || !city || !landMark || !state || !pincode || !phone) {
         return res.status(400).json({ success: false, message: "Missing required address fields" });
       };
@@ -660,7 +582,6 @@ const checkoutAddAddress = async (req, res) => {
   };
 
 
-// Controller for rendering the edit address page
 const editAddress = async (req, res) => {
     try {
         const addressId = req.query.id; 
@@ -692,72 +613,6 @@ const editAddress = async (req, res) => {
 };
 
 
-
-// const editAddressCheckout = async (req, res) => {
-//     try {
-//         // const data = req.body;
-//         const addressId = req.params.id; 
-
-
-
-//         console.log("in backend req.body :",req.body);
-        
-//         console.log('Received addressId:', addressId);
-//         // console.log('Form data:', data);
-
-//         // const user = req.session.user;
-
-      
-//         // if (!user || !user._id) {
-//         //     return res.json({success:false, message:'User session invalid!'}); 
-//         // }
-
-        
-//         // const findAddress = await Address.findOne({
-//         //     userId: user._id,
-//         //     'address._id': addressId,
-//         // });
-
-//         // if (!findAddress) {
-//         //     return res.json({success:false, message:'Address not found for ID!'}); 
-//         // }
-
-//         // if (data.isDefault === 'on') {
-//         //     await Address.updateMany(
-//         //         { userId: user._id, 'address._id': { $ne: addressId } },
-//         //         { $set: { 'address.$[].isDefault': false } }
-//         //     );
-//         // }
-
-       
-//         // await Address.updateOne(
-//         //     { userId: user._id, 'address._id': addressId },
-//         //     {
-//         //         $set: {
-//         //             'address.$.addressType': data.addressType,
-//         //             'address.$.name': data.name,
-//         //             'address.$.city': data.city,
-//         //             'address.$.landMark': data.landMark,
-//         //             'address.$.state': data.state,
-//         //             'address.$.pincode': data.pincode,
-//         //             'address.$.phone': data.phone,
-//         //             'address.$.altPhone': data.altPhone,
-//         //             'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
-//         //         },
-//         //     }
-//         // );
-
-//         return res.json({success:true, message:'Address changed succusfully '}); 
-
-//     } catch (error) {
-//         console.error('Error in edit address:', error);
-//         return res.redirect('/pageNotFound');
-//     }
-// };
-
-
-
-
 const postEditAddress = async (req, res) => {
     try {
         const data = req.body;
@@ -785,12 +640,7 @@ const postEditAddress = async (req, res) => {
             return res.json({success:false, message:'Address not found for ID!'}); 
         }
 
-        // if (data.isDefault === 'on') {
-        //     await Address.updateMany(
-        //         { userId: user._id, 'address._id': { $ne: addressId } },
-        //         // { $set: { 'address.$[].isDefault': false } }
-        //     );
-        // }
+      
 
        
         await Address.updateOne(
@@ -805,7 +655,7 @@ const postEditAddress = async (req, res) => {
                     'address.$.pincode': data.pincode,
                     'address.$.phone': data.phone,
                     'address.$.altPhone': data.altPhone,
-                    // 'address.$.isDefault': data.isDefault === 'on', // Handle isDefault checkbox
+                    
                 },
             }
         );
@@ -868,6 +718,7 @@ module.exports = {
     userProfile,
     getEditProfile,
     updateProfile,
+    // deleteProfilePicture,
     changeEmail,
     changeEmailValid,
     verifyEmailOtp,

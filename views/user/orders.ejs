@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fazion Order History">
+    <title>Fazion - Order History</title>
+
+    <!-- External CSS dependencies -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Scoped styles */
+        .orders-content {
+            color: #333;
+            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .profile-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: white;
+        }
+        
+        .header {
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #444;
+            font-size: 30px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .order-history {
+            margin-top: 30px;
+        }
+        
+        .order-card {
+            background: #FFF;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .order-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .order-date {
+            color: #777;
+            font-size: 16px;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 20px;
+            border-radius: 0; /* Square shape */
+            width: 115px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        
+        .status-processing {
+            background-color: #38f27f; /* Orange */
+            color: #333;
+        }
+        
+        .status-delivered {
+            background-color: #e36724; /* Green */
+            color: white;
+        }
+        
+        .status-cancelled {
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+        
+        .status-returned {
+            background-color: #20c997; /* Teal */
+            color: white;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 100px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .product-qty {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .total-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .total-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .view-details {
+            background-color: #007bff; /* Blue */
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 0; /* Square shape */
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .view-details:hover {
+            background-color: #0056b3; /* Darker blue */
+        }
+        
+        .no-orders {
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination a {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .pagination a:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .pagination a.active {
+            background-color: #010101;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .pagination a.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-date {
+                margin-top: 5px;
+            }
+            
+            .status-badge {
+                position: static;
+                margin-top: 10px;
+                display: inline-block;
+            }
+            
+            .order-total {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .view-details {
+                margin-top: 10px;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .pagination a {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/user/header") %>
+    
+    <div class="profile-container">
+        <%- include("../partials/user/sidebar", { active: 'orders' }) %>
+        
+        <div class="content">
+            <div class="header">
+                <h1>Your Order History</h1>
+            </div>
+            
+            <div class="order-history orders-content">
+                <% if (orders && orders.length > 0) { %>
+                    <% orders.forEach(order => { %>
+                        <div class="order-card">
+                            <div class="status-badge <%= order.status === 'Delivered' ? 'status-delivered' : order.status === 'Cancelled' ? 'status-cancelled' : order.status === 'Returned' ? 'status-returned' : 'status-processing' %>"
+                                 onclick="showStatus('<%= order.status %>')">
+                                <%= order.status %>
+                            </div>
+                            
+                            <div class="order-header">
+                                <div class="order-id">Order #<%= order.orderId %></div>
+                                <div class="order-date">
+                                    <%= order.createdOn ? order.createdOn.toLocaleDateString('en-GB') : 'Date not available' %>
+                                </div>
+                            </div>
+                            
+                            <% order.orderedItems.forEach(item => { %>
+                                <div class="order-item">
+                                    <div class="product-image">
+                                        <img src="/Uploads/product-images/<%= item.product?.productImage?.[0] || '/images/placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
+                                    </div>
+                                    <div class="product-details">
+                                        <div class="product-name"><%= item.product?.productName || 'Product Name Unavailable' %></div>
+                                        <div class="product-qty">Qty: <%= item.quantity %></div>
+                                        <div class="product-price">₹<%= item.price.toFixed(2) %></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                            
+                            <div class="order-total">
+                                <div class="total-label">Total: <span class="total-amount">₹<%= order.finalAmount.toFixed(2) %></span></div>
+                                <button class="view-details" data-order-id="<%= order.orderId %>">View Details</button>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="no-orders">No orders found.</div>
+                <% } %>
+                
+                <!-- Pagination Controls -->
+                <% if (totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage - 1 %>">Previous</a>
+                        <% } else { %>
+                            <a class="disabled">Previous</a>
+                        <% } %>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %>">Next</a>
+                        <% } else { %>
+                            <a class="disabled">Next</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <%- include("../partials/user/footer") %>
+    
+    <!-- External JS dependencies -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+    
+    <script>
+        // View Details Functionality
+        document.querySelectorAll('.view-details').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                console.log('Viewing details for order:', orderId);
+                window.location.href = `/order-details/${orderId}`;
+            });
+        });
+
+        // Show Status Functionality
+        async function showStatus(status) {
+            await Swal.fire({
+                icon: 'info',
+                title: 'Order Status',
+                text: `The status of this order is: ${status}`,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#007bff'
+            });
+        }
+    </script>
+</body>
+</html>

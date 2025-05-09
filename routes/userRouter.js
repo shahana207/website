@@ -11,6 +11,7 @@ const productController = require('../controllers/user/productController');
 const profileController = require("../controllers/user/profileController");
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require('../controllers/user/checkoutController');
+const ordersController = require('../controllers/user/ordersController');
 const { route } = require("./adminRouter");
 
 
@@ -139,10 +140,22 @@ router.post('/save-address', checkoutController.saveAddress);
 
 router.post("/place-order",userAuth,checkoutController.placeOrder);
 
-router.get("/order-success",checkoutController.ordersuccess);
+router.get("/order-success", userAuth, checkoutController.orderSuccess); 
+
+router.get("/download-invoice/:orderId", userAuth, checkoutController.downloadInvoice);
 
 
+// //order management
 
+router.get("/order",ordersController.loadOrders);
+
+router.post('/cancel-order', userAuth, ordersController.cancelOrder);
+
+router.get('/order-details/:orderId', userAuth, ordersController.viewOrderDetails);
+
+router.post('/cancel-item', userAuth, ordersController.cancelItem);
+
+router.post('/return-item', userAuth, ordersController.returnItem);
 
 
 

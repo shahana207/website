@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Success</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -225,25 +227,10 @@
             z-index: 1;
         }
         
-        .dec-1 {
-            top: -15px;
-            left: 30px;
-        }
-        
-        .dec-2 {
-            top: -15px;
-            right: 30px;
-        }
-        
-        .dec-3 {
-            bottom: -15px;
-            left: 30px;
-        }
-        
-        .dec-4 {
-            bottom: -15px;
-            right: 30px;
-        }
+        .dec-1 { top: -15px; left: 30px; }
+        .dec-2 { top: -15px; right: 30px; }
+        .dec-3 { bottom: -15px; left: 30px; }
+        .dec-4 { bottom: -15px; right: 30px; }
         
         .summary-title {
             font-size: 16px;
@@ -558,79 +545,26 @@
         }
         
         @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.7;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.3;
-            }
-            100% {
-                transform: scale(0.95);
-                opacity: 0.7;
-            }
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.7; }
         }
         
         @media (max-width: 768px) {
-            .detail-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .actions-card {
-                flex-direction: column;
-            }
-            
-            .success-header {
-                padding: 30px 20px;
-            }
-            
-            .order-summary {
-                margin: 20px;
-                padding: 20px;
-            }
-            
-            .status-section {
-                padding: 20px;
-            }
-            
-            .progress-tracker {
-                padding: 0;
-            }
-            
-            .progress-tracker::before,
-            .progress-tracker::after {
-                left: 25px;
-                right: 25px;
-            }
-            
-            .progress-step {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .progress-step i {
-                font-size: 16px;
-            }
-            
-            .step-label {
-                font-size: 11px;
-                top: 50px;
-            }
-            
-            .items-table th, 
-            .items-table td {
-                padding: 12px 10px;
-                font-size: 14px;
-            }
-            
-            .product-icon {
-                display: none;
-            }
+            .detail-grid { grid-template-columns: 1fr; gap: 15px; }
+            .actions-card { flex-direction: column; }
+            .success-header { padding: 30px 20px; }
+            .order-summary { margin: 20px; padding: 20px; }
+            .status-section { padding: 20px; }
+            .progress-tracker { padding: 0; }
+            .progress-tracker::before, .progress-tracker::after { left: 25px; right: 25px; }
+            .progress-step { width: 40px; height: 40px; }
+            .progress-step i { font-size: 16px; }
+            .step-label { font-size: 11px; top: 50px; }
+            .items-table th, .items-table td { padding: 12px 10px; font-size: 14px; }
+            .product-icon { display: none; }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container tracker-loaded">
@@ -668,19 +602,19 @@
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-hashtag"></i> Order ID</span>
-                        <span class="detail-value">a7ada3e3-a7a1-4849-ab85-0d29f2831be</span>
+                        <span class="detail-value"><%= order.orderId %></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-calendar"></i> Order Date</span>
-                        <span class="detail-value">May 7, 2025</span>
+                        <span class="detail-value"><%= order.createdOn.toLocaleDateString() %></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-info-circle"></i> Status</span>
-                        <span class="detail-value">Pending</span>
+                        <span class="detail-value"><%= order.status %></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-credit-card"></i> Payment Method</span>
-                        <span class="detail-value">Cash on Delivery</span>
+                        <span class="detail-value"><%= order.paymentMethod %></span>
                     </div>
                 </div>
             </div>
@@ -717,24 +651,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="product-name">
-                                    <div class="product-icon">
-                                        <i class="fas fa-laptop"></i>
-                                    </div>
-                                    Apple 2025 MacBook Air
-                                </td>
-                                <td>1</td>
-                                <td>₹124,900.00</td>
-                                <td class="price-highlight">₹124,900.00</td>
-                            </tr>
+                            <% order.orderedItems.forEach(item => { %>
+                                <tr>
+                                    <td class="product-name">
+                                        <div class="product-icon">
+                                            <i class="fas fa-laptop"></i>
+                                        </div>
+                                        <%= item.product ? item.product.productName : 'Product Not Found' %>
+                                    </td>
+                                    <td><%= item.quantity %></td>
+                                    <td>₹<%= item.price.toFixed(2) %></td>
+                                    <td class="price-highlight">₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                                </tr>
+                            <% }); %>
                             <tr class="summary-row">
                                 <td colspan="3">Subtotal</td>
-                                <td>₹124,900.00</td>
+                                <td>₹<%= order.totalPrice.toFixed(2) %></td>
                             </tr>
                             <tr class="summary-row">
                                 <td colspan="3">Coupon Discount</td>
-                                <td>₹0.00</td>
+                                <td>₹<%= order.discount.toFixed(2) %></td>
                             </tr>
                             <tr class="summary-row">
                                 <td colspan="3">Offer Discount</td>
@@ -746,7 +682,7 @@
                             </tr>
                             <tr class="summary-row total">
                                 <td colspan="3">Total Amount</td>
-                                <td class="price-highlight">₹124,950.00</td>
+                                <td class="price-highlight">₹<%= order.finalAmount.toFixed(2) %></td>
                             </tr>
                         </tbody>
                     </table>
@@ -755,25 +691,75 @@
         </div>
         
         <div class="actions-card">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary download-invoice" data-order-id="<%= order.orderId %>">
                 <i class="fas fa-download"></i> Download Invoice
             </button>
-            <button class="btn btn-secondary">
+            <a href="/shop" class="btn btn-secondary">
                 <i class="fas fa-shopping-cart"></i> Continue Shopping
-            </button>
-            <button class="btn btn-tertiary">
+            </a>
+            <a href="/order-details/<%= order.orderId %>" class="btn btn-tertiary">
                 <i class="fas fa-eye"></i> View Order Details
-            </button>
+            </a>
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script>
-        // This would handle any dynamic functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for error query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error,
+                    confirmButtonColor: '#4f46e5',
+                    timer: 3000
+                });
+            }
+
             // Animation for progress bar and other elements
             setTimeout(function() {
                 document.querySelector('.container').classList.add('tracker-loaded');
             }, 500);
+
+            // Handle invoice download
+            document.querySelector('.download-invoice').addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                fetch(`/download-invoice/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to download invoice');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Invoice_${orderId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error('Error downloading invoice:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to download invoice. Please try again.',
+                        confirmButtonColor: '#4f46e5',
+                    });
+                });
+            });
         });
     </script>
 </body>

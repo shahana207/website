@@ -6,6 +6,7 @@ const userController = require("../controllers/admin/userController");
 const categoryController = require("../controllers/admin/categoryControllers");
 const brandController = require("../controllers/admin/brandControllers");
 const productController = require("../controllers/admin/productController");
+const orderController=require("../controllers/admin/orderController");
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -88,6 +89,16 @@ router.post('/editProduct/:id', adminAuth, upload.array('newImages', 4), product
 
 router.patch('/deleteProduct/:id', adminAuth, productController.deleteProduct);
 
+
+
+//order management
+router.get('/ordersadmin', adminAuth,orderController. getOrders);
+
+router.get('/order-details/:orderId', adminAuth,orderController.getOrderDetails);
+
+router.post('/update-order-status/:orderId', adminAuth,orderController.updateOrderStatus);
+
+router.post('/handle-return-request',adminAuth,orderController. handleReturnRequest);
 
 
 module.exports=router;
