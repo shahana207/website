@@ -256,41 +256,58 @@ document.querySelectorAll('#sortSelect .list-group-item').forEach(function (item
 });
 
 // Add to Cart via AJAX (similar to productDetails.ejs)
-function addToCart(productId) {
-    $.ajax({
-        url: '/addToCart',
-        method: 'POST',
-        data: {
-            id: productId,
-            qty: 1
-        },
-        success: function(response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added to Cart!',
-                    text: response.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed to Add to Cart',
-                    text: response.message,
-                    showConfirmButton: true
-                });
-            }
-        },
-        error: function(err) {
+async function addToCart(productId) {
+    try {
+        
+        const response = await fetch("/addToCart",{
+            method:"POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                 id: productId,
+                qty: 1
+            })
+
+        })
+
+        const result = await response.json();
+
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart!',
+                text: result.message,
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+        } else  if (result.redirect) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Authentication Required',
+                text: result.message || 'Please sign in to add to cart..',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = result.redirect;
+            });
+        }else {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'An error occurred while adding to cart',
-                showConfirmButton: true
-            });
+                text: result.message || 'Failed to add to cart',
+                timer: 1500,
+                showConfirmButton: "OK"
+            })
         }
-    });
+    } catch (error) {
+        Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text:"Error:" + err.message  || 'An error occurred while adding to cart',
+                showConfirmButton: true
+            })
+    }
+
 }
 
 // Add to Wishlist (stub function, implement as needed)

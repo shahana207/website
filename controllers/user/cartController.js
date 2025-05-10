@@ -9,16 +9,16 @@ const loadCart = async (req, res) => {
       console.log('ready');
       const userId = req.session.user;
       if (!userId) {
-        return res.redirect('/login'); // Redirect to login if user is not authenticated
+        return res.redirect('/login'); 
       }
-  
+      
       const userData = await User.findById(userId);
-      let cart = await Cart.findOne({ userId }).populate('items.productId'); // Populate product details
+      let cart = await Cart.findOne({ userId }).populate('items.productId'); 
   
       if (cart) {
-        cart.items = cart.items.filter(item => item.productId); // Ensure no invalid items
+        cart.items = cart.items.filter(item => item.productId); 
         cart.shippingCharge = 50;
-        cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0); // Recalculate subtotal
+        cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0); 
         cart.total = cart.subtotal + cart.shippingCharge;
         await cart.save();
       }
@@ -26,7 +26,8 @@ const loadCart = async (req, res) => {
       console.log(cart, 'cart data');
   
       res.render('cart', {
-        cart,
+        user:userData,     
+           cart,
         userId,
         profilePicture: userData.profilePicture || null,
       });
@@ -42,10 +43,10 @@ const addToCart = async (req, res) => {
     const { id, qty } = req.body;
     const quantity = parseInt(qty);
     const userId = req.session.user;
-    console.log(quantity, userId, id, 'add to cart data'); // Log the input data
+   
 
     if (!userId) {
-      return res.status(401).json({ success: false, message: 'User not authenticated' });
+      return res.status(401).json({ success: false, message: 'User not authenticated' ,redirect:"/login"});
     }
 
     if (isNaN(quantity) || quantity <= 0) {

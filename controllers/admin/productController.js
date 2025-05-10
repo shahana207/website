@@ -35,7 +35,7 @@ const getAllProducts = async (req, res) => {
         
         const regexSearch = escapeRegex(search);
         const searchQuery = {
-            isBlocked: false,
+           
             isDeleted:false,
             $or: [
                 { productName: { $regex: regexSearch, $options: 'i' } },
@@ -298,9 +298,7 @@ const editProduct = async (req, res) => {
             productImages = productImages.filter(img => img !== image);
         }
 
-        /*
-        while editing images were get added once again; cropped + imageofcropped
-        */
+        
         if (req.files && req.files.length > 0) {
             const newImages = req.files;
             if (productImages.length + newImages.length > 4) {

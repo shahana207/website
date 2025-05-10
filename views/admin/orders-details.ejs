@@ -399,7 +399,12 @@
                             <option value="Return Request" <%= order.status === 'Return Request' ? 'selected' : '' %>>Return Request</option>
                             <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
                         </select>
-                        <button type="button" class="update-status-btn" onclick="updateStatus()">Update Status</button>
+                        <button type="button" class="update-status-btn" onclick="updateStatus()" 
+                        <%= order.status === 'Returned' || order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Return Request' ? 'disabled' : '' %> >
+                         Update Status</button>
+            
+
+
                         <% if (order.status !== 'Cancelled' && order.status !== 'Delivered') { %>
                             <!-- <button type="button" class="cancel-order-btn" onclick="cancelOrder()">Cancel Order</button> -->
                         <% } %>

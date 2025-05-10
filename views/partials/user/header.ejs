@@ -14,7 +14,8 @@
         rel="stylesheet">
 
     <!-- Css Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.css" />    <link rel="stylesheet" href="/style/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.css" />
+    <link rel="stylesheet" href="/style/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/style/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/style/css/elegant-icons.css" type="text/css">
     <link rel="stylesheet" href="/style/css/magnific-popup.css" type="text/css">
@@ -62,32 +63,122 @@
             font-size: 24px;
             cursor: pointer;
         }
+
         .cart-link {
-  position: relative;
-  display: inline-block;
-  padding: 8px;
-  transition: transform 0.2s ease;
-}
+            position: relative;
+            display: inline-block;
+            padding: 8px;
+            transition: transform 0.2s ease;
+        }
 
-.cart-link:hover {
-  transform: scale(1.1);
-}
+        .cart-link:hover {
+            transform: scale(1.1);
+        }
 
-.shopping-cart {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: #333;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke 0.3s;
-}
+        .shopping-cart {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #333;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
 
-.cart-link:hover .shopping-cart {
-  stroke: #ff6f61; /* Hover color */
-}
+        .cart-link:hover .shopping-cart {
+            stroke: #ff6f61; /* Hover color */
+        }
 
+        /* Profile Image and Dropdown Styling */
+        .header__profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .header__profile-img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sign-in-link {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .sign-in-link:hover {
+            color: #ff6f61;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            min-width: 120px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            z-index: 1000;
+            right: 0;
+            top: 100%;
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f8f9fa;
+            color: #ff6f61;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Adjust for offcanvas menu (mobile view) */
+        .offcanvas__option .header__profile-img {
+            width: 28px;
+            height: 28px;
+            margin-right: 6px;
+        }
+
+        .offcanvas__option .dropdown-content {
+            position: static;
+            box-shadow: none;
+            background-color: transparent;
+            margin-left: 40px;
+        }
+
+        .offcanvas__option .dropdown-content a {
+            color: #666;
+            padding: 5px 0;
+        }
+
+        .offcanvas__option .dropdown-content a:hover {
+            background-color: transparent;
+            color: #ff6f61;
+        }
     </style>
 </head>
 
@@ -104,8 +195,7 @@
             <div class="offcanvas__links">
                 <% if (locals.user) { %>
                     <div class="dropdown">
-                        <img class="header__profile-img" src="<%= (user && user.profilePicture) || '/img/default-profile.png' %>">
-
+                        <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/img/default-profile.png' %>">
                         <a href="#" class="sign-in-link"><%= locals.user.name %></a>
                         <div class="dropdown-content">
                             <a href="/userProfile">Profile</a>
@@ -144,6 +234,7 @@
                             <div class="header__top__links">
                                 <% if (locals.user) { %>
                                     <div class="dropdown">
+                                        <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/img/default-profile.png' %>">
                                         <a href="#" class="sign-in-link"><%= locals.user.name %></a>
                                         <div class="dropdown-content">
                                             <a href="/userProfile">Profile</a>
@@ -181,7 +272,7 @@
                 
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
-                       <a href="/cart" style="color: #333;"><i class="fa fa-shopping-cart"></i></a>
+                        <a href="/cart" style="color: #333;"><i class="fa fa-shopping-cart"></i></a>
                         <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
                     </div>
                 </div>

@@ -5,8 +5,8 @@ const passport = require("passport");
 
 const {uploadProfilePicture}=require("../helpers/multer");
 
-// const { route } = require("../app");
-const { userAuth } = require("../middlewares/auth");
+
+const { userAuth ,userLogin } = require("../middlewares/auth");
 const productController = require('../controllers/user/productController');
 const profileController = require("../controllers/user/profileController");
 const cartController = require("../controllers/user/cartController");
@@ -68,6 +68,9 @@ router.get("/shop",userAuth,userController.loadShoppingPage);
 router.get("/productDetails",userAuth,productController.productDetails);
 
 
+
+
+
 //password management
 router.get("/forgot-password",profileController.getforgotPasspage);
 
@@ -80,6 +83,10 @@ router.get("/reset-password",profileController.getResetPassPage);
 router.post("/resend-forgot-otp",profileController.resendOtp);
 
 router.post("/reset-password",profileController.postNewPassword);
+
+
+
+
 
 //profile management
 router.get("/userProfile",userAuth,profileController.userProfile);
@@ -108,6 +115,7 @@ router.get("/address",userAuth,profileController.userAddress);
 router.get("/add-address",userAuth,profileController.addAddress);
 
 router.post("/add-address", userAuth, profileController.postAddAddress);
+
 router.post("/addAdrress", userAuth, profileController.checkoutAddAddress);
 
 
@@ -116,8 +124,8 @@ router.get('/edit-address', userAuth, profileController.editAddress);
 router.post('/update-address/:id', userAuth, profileController.postEditAddress);
 
 
-// router.post('/edit-address-checkout/:id', userAuth, profileController.editAddressCheckout);
 
+router.get("/wallet",profileController.getWalletPage);
 
 router.get("/delete-address",userAuth,profileController.deleteAddress);
 
@@ -156,7 +164,6 @@ router.get('/order-details/:orderId', userAuth, ordersController.viewOrderDetail
 router.post('/cancel-item', userAuth, ordersController.cancelItem);
 
 router.post('/return-item', userAuth, ordersController.returnItem);
-
 
 
 

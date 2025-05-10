@@ -7,7 +7,7 @@ const session = require("express-session");
 const fs = require('fs').promises;
 const mongoose=require('mongoose');
 const path = require('path');
-
+const Wallet = require("../../models/walletSchema")
 
 
 
@@ -234,7 +234,7 @@ const updateProfile = async (req, res) => {
     try {
         const userId = req.session.user;
         const { name, phone } = req.body;
-        // Validate name length
+       
         if (name && name.length > 10) {
             return res.status(400).json({ success: false, message: 'Name must be 10 characters or less' });
         }
@@ -704,7 +704,63 @@ const loadCartPage = async (req,res)=>{
     } catch (error) {
         
     }
-}
+};
+
+const getWalletPage = async (req, res , next) => {
+    try {
+    
+      const userId = req.session.user;
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Please login to view Wallet", redirectUrl:"/login" });
+        }
+        
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(403).json({
+                message: "User not found with this ID", redirectUrl: '/login'
+            });
+        }
+        
+        const { page = 1, limit = 5 } = req.query;
+        
+        // Find the wallet
+        let wallet = await Wallet.findOne({userId: user._id});
+        
+        if (!wallet) {
+            wallet = new Wallet({
+                userId: user._id,
+                balance: 0,
+            });
+            await wallet.save();
+        }
+        
+        let filteredWallet = { ...wallet.toObject() };
+        let transactions = wallet.transactions || [];
+        let count = 0;
+
+        if (transactions && transactions.length > 0) {
+            count = transactions.length; 
+            transactions = transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice((page - 1) * limit, page * limit);
+        }
+
+        filteredWallet.transactions = transactions;
+
+        res.render("wallet", { 
+            user,
+            wallet: filteredWallet,
+            page,
+            limit,
+            count,
+        });
+    } catch (error) {
+        error.statusCode = 500; 
+        next(error);
+    }
+};
+
 
 
 
@@ -732,6 +788,6 @@ module.exports = {
     editAddress,
     postEditAddress,
     deleteAddress,
-
+    getWalletPage,
     checkoutAddAddress
 };

@@ -9,11 +9,9 @@ const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
+const { upload } = require("../helpers/multer");  
 
-// Destructure to get 'upload' directly
-const { upload } = require("../helpers/multer");  // Don't need to import 'multer' here
 
-// Now you can use 'upload' directly in your routes
 
 
 //error management
@@ -77,7 +75,7 @@ router.get('/load-add-product',adminAuth,productController.getProductAddPage);
 router.post('/addProducts', adminAuth, upload.array('productImages', 4), productController.addProducts);
 
 
-// router.post('/addProducts', adminAuth, upload.array('productImages', 4), productController.addProducts);
+
 
 router.post('/block-product',adminAuth,productController.blockProduct)
 

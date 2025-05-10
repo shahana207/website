@@ -2,19 +2,20 @@ const User = require('../../models/userSchema');
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const Product = require('../../models/productSchema');
+const Wallet = require("../../models/walletSchema");
+const {generateCustomId}  = require("../../utils/helpers")
 
-// Get all orders with pagination
 const getOrders = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5; // Orders per page
+        const limit = 5; 
         const skip = (page - 1) * limit;
 
-        // Count total orders
+      
         const totalOrders = await Order.countDocuments();
         const totalPages = Math.ceil(totalOrders / limit);
 
-        // Fetch paginated orders
+        
         const orders = await Order.find()
             .populate('user', 'name email')
             .populate('orderedItems.product', 'productName productImage')
@@ -22,7 +23,6 @@ const getOrders = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        // Fallback to _id timestamp if createdOn is missing
         orders.forEach(order => {
             if (!order.createdOn) {
                 order.createdOn = order._id.getTimestamp();
@@ -46,7 +46,7 @@ const getOrders = async (req, res) => {
     }
 };
 
-// Get order details
+
 const getOrderDetails = async (req, res) => {
     try {
         const order = await Order.findOne({ orderId: req.params.orderId })
@@ -64,7 +64,7 @@ const getOrderDetails = async (req, res) => {
     }
 };
 
-// Update order status
+
 const updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -93,7 +93,7 @@ const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Restore stock if cancelled or returned
+       
         if (['Cancelled', 'Returned'].includes(status)) {
             for (const item of order.orderedItems) {
                 if (item.returnStatus !== 'Cancelled' && item.returnStatus !== 'Returned') {
@@ -113,10 +113,10 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-// Handle return request
+
 const handleReturnRequest = async (req, res) => {
     try {
-        const { orderId, itemId, action } = req.body; // action: 'approve' or 'reject'
+        const { orderId, itemId, action } = req.body; 
 
         if (!['approve', 'reject'].includes(action)) {
             return res.status(400).json({ success: false, message: 'Invalid action' });
@@ -127,43 +127,66 @@ const handleReturnRequest = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Find the item
+        
         const item = order.orderedItems.find(i => i._id.toString() === itemId);
         if (!item) {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        // Check if the item has a return request
+        
         if (item.returnStatus !== 'Return Requested') {
             return res.status(400).json({ success: false, message: 'No return request found for this item' });
         }
 
         if (action === 'approve') {
-            // Approve return
+          
             item.returnStatus = 'Returned';
             
-            // Restore product quantity
+          
             const product = await Product.findById(item.product);
             if (product) {
                 product.quantity += item.quantity;
                 await product.save();
             }
 
-            // Adjust order totals
-            const returnedItemTotal = item.price * item.quantity;
-            order.totalPrice -= returnedItemTotal;
-            order.finalAmount -= returnedItemTotal;
-            if (order.finalAmount < 0) order.finalAmount = 0;
+            
+            const refundAmount = item.price * item.quantity;
 
-            // Check if all items are returned
+             order.refundAmount += refundAmount;
+
+             const wallet = await Wallet.findOneAndUpdate(
+                { userId: order.user },
+                {
+                  $setOnInsert: {
+                    userId: order.user,
+                  },
+                  $inc: { balance: refundAmount },
+                  $push: {
+                    transactions: {
+                      transactionId: generateCustomId("RFD"),
+                      amount: refundAmount,
+                      type: "Credit",
+                      status: "Completed",
+                      method: "Refund",
+                      description: `Refund for order #${order.orderId}`,
+                      orderId: order._id,
+                      date: Date.now(),
+                    },
+                  },
+                  $set: { lastUpdated: new Date() },
+                },
+                { upsert: true, new: true }
+              );
+
+           
             const allReturnedOrRequested = order.orderedItems.every(i => i.returnStatus === 'Returned' || i.returnStatus === 'Cancelled');
             if (allReturnedOrRequested) {
                 order.status = 'Returned';
             }
         } else {
-            // Reject return
+        
             item.returnStatus = 'Not Returned';
-            item.returnReason = null; // Clear the reason
+            item.returnReason = null; 
         }
 
         await order.save();

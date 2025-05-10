@@ -144,65 +144,19 @@ const securePassword = async(password)=>{
 
 
 
-// const verifyOtp = async (req, res) => {
-//   try {
-//       const { otp } = req.body;
-//       console.log(req.body);
-      
-
-//       if (!otp) {
-//           return res.status(400).json({ success:false, message: "OTP is required" });
-//       }
-
-      
-//       if (otp == req.session.userOtp) {
-//           const user = req.session.userData;
-//           const passwordHash = await securePassword(user.password);
-
-//           const saveUserData = new User({
-//             name: user.name,
-//             email: user.email,
-//             phone: user.phone,
-//             password: passwordHash,
-//           });
-          
-
-//           await saveUserData.save();
-
-//           // Set user session
-//           req.session.user = {
-//               _id: saveUserData._id,
-//               name: saveUserData.name,
-//               email: saveUserData.email,
-//               isAdmin: saveUserData.isAdmin,              
-//             };
-            
-//           // Clear OTP and temp user data
-//           req.session.userOtp = null;
-//           req.session.userData = null;
-
-//           return res.status(200).json({ success: true, message: "OTP verified successfully", redirectUrl: "/" });
-//         } else {
-//           return res.status(400).json({ success:false, message: "Invalid OTP, please try again" });
-//       }
-//   } catch (error) {
-//       console.error("Error Verifying OTP:", error.message);
-//       return res.status(500).json({ success: false, message: "An error occurred",error:error.message});
-// }
-// };
 
 
 const verifyOtp = async (req, res) => {
   try {
       const { otp } = req.body;
 
-      // Check if OTP expired
+      
       if (req.session.otpExpires && Date.now() > req.session.otpExpires) {
           req.session.userOtp = null;
           return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
       }
 
-      // Registration OTP verification
+      
       if (req.session.userOtp && otp === req.session.userOtp) {
           const user = req.session.userData;
 
@@ -210,7 +164,7 @@ const verifyOtp = async (req, res) => {
               return res.status(400).json({ success: false, message: "User data missing in session" });
           }
 
-          // Hash password before saving
+         
           const hashedPass = await bcrypt.hash(user.password, 10);
 
           const saveUserData = new User({
@@ -222,7 +176,7 @@ const verifyOtp = async (req, res) => {
 
           await saveUserData.save();
 
-          // Clear session OTPs
+          
           req.session.userOtp = null;
           req.session.userData = null;
           req.session.otpExpires = null;
@@ -398,10 +352,10 @@ const loadShoppingPage = async (req, res) => {
     }
 
    
-    const limit = 9; // Products per page
+    const limit = 9;
     const skip = (Number(page) - 1) * limit;
 
-    // Fetch products
+   
     const products = await Product.find(query)
       .populate('category')
       .populate('brand')
@@ -409,7 +363,7 @@ const loadShoppingPage = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // Total products for pagination
+    
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
 
@@ -451,7 +405,5 @@ module.exports = {
   loadLogin,
   logout,
   loadShoppingPage,
-  // filterProduct,
-  // filterByPrice,
-  // searchProducts,
+  
 };

@@ -398,7 +398,7 @@
             const orderRows = document.querySelectorAll('#ordersTableBody tr');
 
             function performSearch() {
-                const searchTerm = searchInput.value.toLowerCase();
+                const searchTerm = searchInput.value.trim().toLowerCase();
                 
                 orderRows.forEach(row => {
                     const orderId = row.cells[0].textContent.toLowerCase();

@@ -44,7 +44,37 @@ const adminAuth = (req, res, next) => {
     }
 };
 
+
+
+
+const userLogin = async (req, res, next) => {
+    try {
+
+       let userId =  req.session.user;
+
+       if(!userId){
+              return res.status(401).json({ success: false, message: 'User not authenticated .....!!!' ,redirect:"/login"});
+       }
+      
+
+        const user = await User.findById(userId);
+
+        if (!user || user.isBlocked) {
+            return res.status(401).json({ success: false, message: 'User is Blocked cant take actions' ,redirect:"/login"}); 
+        }
+        next(); 
+        
+    } catch (error) {
+        console.error("Error in user authentication middleware:", error);
+        res.redirect('/pagenotfound')
+    }
+};
+
+
+
 module.exports = {
     userAuth,
-    adminAuth
+    adminAuth,
+    userLogin
+
 };

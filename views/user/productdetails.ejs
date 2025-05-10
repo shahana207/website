@@ -847,10 +847,11 @@
         return { size, color };
     }
 
-    // AJAX function to add to cart
-    function addToCart(productId) {
+
+    // fetch function to add to cart
+    async function addToCart(productId) {
         const { size, color } = updateAddToCartParams();
-        const qty = 1; // Default quantity as per your controller
+        const qty = 1; 
 
         // Validate size if required
         const sizeSelect = document.querySelector('select[name="size"]');
@@ -864,42 +865,58 @@
             return;
         }
 
-        $.ajax({
-            url: '/addToCart',
-            method: 'POST',
-            data: {
-                id: productId,
-                qty: qty,
-                size: size,
-                color: color
-            },
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Added to Cart!',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Failed to Add to Cart',
-                        text: response.message,
-                        showConfirmButton: true
-                    });
-                }
-            },
-            error: function(err) {
+        try {
+        
+            const response = await fetch("/addToCart",{
+                method:"POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: productId,
+                    qty: qty,
+                    size: size,
+                    color: color
+                })
+
+            })
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart!',
+                    text: result.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+            } else  if (result.redirect) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Authentication Required',
+                    text: result.message || 'Please sign in to add to cart..',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = result.redirect;
+                });
+            }else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'An error occurred while adding to cart',
-                    showConfirmButton: true
-                });
+                    text: result.message || 'Failed to add to cart',
+                    timer: 1500,
+                    showConfirmButton: "OK"
+                })
             }
-        });
+        } catch (error) {
+            Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text:"Error:" + err.message  || 'An error occurred while adding to cart',
+                    showConfirmButton: true
+                })
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {

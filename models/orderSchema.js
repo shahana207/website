@@ -79,7 +79,11 @@ const orderSchema = new Schema({
   couponApplied: {
     type: Boolean,
     default: false 
-  }
+  },
+  refundAmount: {
+    type: Number,
+    default: 0
+  },
 });
 
 const Order = mongoose.model("Order", orderSchema);
