@@ -1,3 +1,4 @@
+<!-- This is a proper header.ejs that should replace your current one -->
 <!DOCTYPE html>
 <html lang="zxx">
 
@@ -179,6 +180,17 @@
             background-color: transparent;
             color: #ff6f61;
         }
+        
+        /* Wishlist icon styling */
+        .wishlist-icon {
+            margin-right: 15px;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+        
+        .wishlist-icon:hover {
+            transform: scale(1.1);
+            color: #ff6f61;
+        }
     </style>
 </head>
 
@@ -210,7 +222,9 @@
             </div>
         </div>
         <div class="offcanvas__nav__option">
+            <a href="/wishlist"><i class="fa fa-heart"></i></a>
             <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
+            <a href="/cart"><i class="fa fa-shopping-cart"></i></a>
         </div>
         <div id="mobile-menu-wrap"></div>
         <div class="offcanvas__text">
@@ -256,7 +270,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="header__logo">
-                        <a style="color: black; font-weight: 700; font-size: 24px; font-family: 'Initial', sans-serif; text-decoration: none;">
+                        <a href="/" style="color: black; font-weight: 700; font-size: 24px; font-family: 'Initial', sans-serif; text-decoration: none;">
                             Fazion
                         </a>
                     </div>
@@ -272,6 +286,7 @@
                 
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
+                        <a href="/wishlist" class="wishlist-icon" style="color: #333;"><i class="fa fa-heart"></i></a>
                         <a href="/cart" style="color: #333;"><i class="fa fa-shopping-cart"></i></a>
                         <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
                     </div>
@@ -282,29 +297,3 @@
         </div>
     </header>
     <!-- Header Section End -->
-
-    <!-- Search Model Begin -->
-    <div class="search-model">
-        <div class="h-100 d-flex align-items-center justify-content-center">
-            <div class="search-close-switch"><i class="fa fa-close"></i></div>
-            <form class="search-model-form" action="/shop" method="GET">
-                <input type="text" name="search" placeholder="Search products..." required>
-            </form>
-        </div>
-    </div>
-    <!-- Search Model End -->
-
-    <!-- Js Plugins -->
-    <script src="/style/js/jquery-3.3.1.min.js"></script>
-    <script src="/style/js/bootstrap.min.js"></script>
-    <script src="/style/js/jquery.nice-select.min.js"></script>
-    <script src="/style/js/jquery.nicescroll.min.js"></script>
-    <script src="/style/js/jquery.magnific-popup.min.js"></script>
-    <script src="/style/js/jquery.countdown.min.js"></script>
-    <script src="/style/js/jquery.slicknav.js"></script>
-    <script src="/style/js/mixitup.min.js"></script>
-    <script src="/style/js/owl.carousel.min.js"></script>
-    <script src="/style/js/main.js"></script>
-</body>
-
-</html>

@@ -21,7 +21,7 @@ const userSchema = new Schema({
   profilePicture: {
     type: String,
     required: false,
-    default: null // Store the path or URL to the profile picture
+    default: null 
   },
   googleId: {
     type: String,

@@ -447,6 +447,48 @@
         .address-checkbox {
             margin-right: 10px;
         }
+         /* Coupon Section */
+        .zz-coupon-section {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .zz-coupon-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .zz-coupon-form {
+            display: flex;
+        }
+        
+        .zz-coupon-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+        
+        .zz-apply-coupon {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 5px 5px 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .zz-apply-coupon:hover {
+            background-color: #333;
+        }
         
         /* Responsive Styles */
         @media (max-width: 991px) {
@@ -644,7 +686,7 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- <div class="zz-payment-method">
+                                     <div class="zz-payment-method">
                                         <input type="radio" name="paymentMethod" id="online" value="Online" class="zz-payment-radio">
                                         <label for="payment-card" class="zz-payment-label">Online</label>
                                         <div class="zz-payment-icon">
@@ -658,7 +700,7 @@
                                         <div class="zz-payment-icon">
                                             <i class="fas fa-wallet"></i>
                                         </div>
-                                    </div> -->
+                                    </div> 
                                 </div>
                             </div>
                         </form>
@@ -754,6 +796,15 @@
                     <!-- Place Order Button -->
 
                     <button class="zz-place-order-btn" id="place-order">Place Order</button>
+
+                     <!-- Coupon Section -->
+                <div class="zz-coupon-section">
+                    <h3 class="zz-coupon-title">Have a coupon?</h3>
+                    <form class="zz-coupon-form">
+                        <input type="text" class="zz-coupon-input" placeholder="Enter coupon code">
+                        <button type="button" class="zz-apply-coupon">Apply</button>
+                    </form>
+                </div>
                     
                     <!-- Payment Information -->
                     <div class="zz-payment-info">
@@ -1177,92 +1228,7 @@
                 }
             });
 
-            // // Save New Address
-            // $('#save-new-address').on('click', function() {
-            //     const addressData = {
-            //         userId: userId,
-            //         name: $('#name-new').val(),
-            //         landMark: $('#landmark-new').val(),
-            //         city: $('#city-new').val(),
-            //         state: $('#state-new').val(),
-            //         pincode: $('#pincode-new').val(),
-            //         phone: $('#phone-new').val(),
-            //         altPhone: $('#alt-phone-new').val(),
-            //         saveAddress: $('#save-address-new').is(':checked'),
-            //         // isDefault: $('#default-address-new').is(':checked')
-            //     };
-
-            //     $.ajax({
-            //         url: '/api/save-address',
-            //         method: 'POST',
-            //         data: addressData,
-            //         success: function(response) {
-            //             if (response.success) {
-            //                 Swal.fire({
-            //                     icon: 'success',
-            //                     title: 'Success',
-            //                     text: 'Address saved successfully!',
-            //                     confirmButtonColor: '#000000'
-            //                 }).then(() => {
-            //                     location.reload();
-            //                 });
-            //             } else {
-            //                 Swal.fire({
-            //                     icon: 'error',
-            //                     title: 'Error',
-            //                     text: 'Error saving address: ' + response.message,
-            //                     confirmButtonColor: '#000000'
-            //                 });
-            //             }
-            //         },
-            //         error: function() {
-            //             Swal.fire({
-            //                 icon: 'error',
-            //                 title: 'Error',
-            //                 text: 'An error occurred while saving the address.',
-            //                 confirmButtonColor: '#000000'
-            //             });
-            //         }
-            //     });
-            // });
-
-
-
-            // // Remove Coupon
-            // $('#remove-coupon').on('click', function() {
-            //     $.ajax({
-            //         url: '/api/remove-coupon',
-            //         method: 'POST',
-            //         data: { userId: userId },
-            //         success: function(response) {
-            //             if (response.success) {
-            //                 Swal.fire({
-            //                     icon: 'success',
-            //                     title: 'Success',
-            //                     text: 'Coupon removed successfully!',
-            //                     confirmButtonColor: '#000000'
-            //                 }).then(() => {
-            //                     location.reload();
-            //                 });
-            //             } else {
-            //                 Swal.fire({
-            //                     icon: 'error',
-            //                     title: 'Error',
-            //                     text: 'Error removing coupon: ' + response.message,
-            //                     confirmButtonColor: '#000000'
-            //                 });
-            //             }
-            //         },
-            //         error: function() {
-            //             Swal.fire({
-            //                 icon: 'error',
-            //                 title: 'Error',
-            //                 text: 'An error occurred while removing the coupon.',
-            //                 confirmButtonColor: '#000000'
-            //             });
-            //         }
-            //     });
-            // });
+          
 
 
             const totalAmount = Number(document.getElementById("totalAmount").value)
@@ -1338,69 +1304,7 @@
 
 
             })
-            // Place Order
-            // $('#place-order').on('click', function(e) {
-            //     e.preventDefault();
-                
-            //     const formData = $('#checkout-form').serializeArray();
-            //     const paymentMethod = $('input[name="paymentMethod"]:checked').val();
-            //     const selectedAddress = $('input[name="selectedAddress"]:checked').val() || null;
-
-            //     const orderData = {
-            //         userId: userId,
-            //         paymentMethod: paymentMethod,
-            //         addressId: selectedAddress,
-            //         orderNotes: $('#order-notes').val()
-            //     };
-
-            //     formData.forEach(item => {
-            //         orderData[item.name] = item.value;
-            //     });
-
-            //     if (!selectedAddress && !$('#new-address-form').is(':visible')) {
-            //         Swal.fire({
-            //             icon: 'error',
-            //             title: 'Error',
-            //             text: 'Please select an address or add a new one.',
-            //             confirmButtonColor: '#000000'
-            //         });
-            //         return;
-            //     }
-
-            //     $.ajax({
-            //         url: '/place-order',
-            //         method: 'POST',
-            //         data: orderData,
-            //         success: function(response) {
-            //             if (response.success) {
-            //                 Swal.fire({
-            //                     icon: 'success',
-            //                     title: 'Success',
-            //                     text: 'Order placed successfully!',
-            //                     confirmButtonColor: '#000000'
-            //                 }).then(() => {
-            //                     window.location.href = '/order-confirmation/' + response.orderId;
-            //                 });
-            //             } else {
-            //                 Swal.fire({
-            //                     icon: 'error',
-            //                     title: 'Error',
-            //                     text: 'Error placing order: ' + response.message,
-            //                     confirmButtonColor: '#000000'
-            //                 });
-            //             }
-            //         },
-            //         error: function() {
-            //             Swal.fire({
-            //                 icon: 'error',
-            //                 title: 'Error',
-            //                 text: 'An error occurred while placing the order.',
-            //                 confirmButtonColor: '#000000'
-            //             });
-            //         }
-            //     });
-            // });
-
+           
 
 
 

@@ -12,6 +12,7 @@ const profileController = require("../controllers/user/profileController");
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require('../controllers/user/checkoutController');
 const ordersController = require('../controllers/user/ordersController');
+const wishlistController=require("../controllers/user/wishlistController");
 const { route } = require("./adminRouter");
 
 
@@ -164,6 +165,17 @@ router.get('/order-details/:orderId', userAuth, ordersController.viewOrderDetail
 router.post('/cancel-item', userAuth, ordersController.cancelItem);
 
 router.post('/return-item', userAuth, ordersController.returnItem);
+
+
+//wishlist management
+
+router.get("/wishlist",userAuth,wishlistController.loadWishlist);
+
+router.post("/addToWishlist",userAuth,wishlistController.addToWishList);
+
+router.get("/getWishlist", userAuth, wishlistController.getWishlist);
+
+router.post("/wishlist/remove", userAuth, wishlistController.removeFromWishlist);
 
 
 

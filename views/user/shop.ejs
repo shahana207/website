@@ -47,6 +47,25 @@
         background-color: #ccc;
         cursor: not-allowed;
     }
+    .wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.wishlist-btn i {
+    color: #ccc; /* Default color (grey for outline heart) */
+}
+
+.wishlist-btn.active i {
+    color: #e74c3c; /* Red color for filled heart when active */
+}
+.wishlist-btn svg {
+    transition: fill 0.3s ease;
+}
 </style>
 
 <div class="zz-breadcrumb-area">
@@ -168,7 +187,11 @@
                 <% if (products.length > 0) { %>
                 <% products.forEach(product => { %>
                 <div class="product-card">
-                    <span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">❤️</span>
+<span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">
+    <svg class="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+</span>
                     <a href="/productDetails?id=<%= product._id %>">
                         <img
                             src="/Uploads/product-images/<%= product.productImage[0] %>"
@@ -182,14 +205,7 @@
                                 <strike>₹<%= product.regularPrice.toLocaleString('en-IN') %></strike>
                             </span>
                         </p>
-                        <!-- Display Stock Status -->
-                        <!-- <div class="stock-status">
-                            <% if (product.status === "Available" && product.quantity > 0) { %>
-                                <span class="in-stock">In Stock (<%= product.quantity %> available)</span>
-                            <% } else { %>
-                                <span class="out-of-stock">Out of Stock</span>
-                            <% } %>
-                        </div> -->
+                       
                     </a>
                     <!-- Update Add to Cart Button -->
                     <% if (product.status === "Available" && product.quantity > 0) { %>
@@ -311,26 +327,45 @@ async function addToCart(productId) {
 }
 
 // Add to Wishlist (stub function, implement as needed)
+// Add to Wishlist
+// Add to Wishlist
 function addToWishlist(productId) {
     $.ajax({
         url: '/addToWishlist',
         method: 'POST',
-        data: {
-            id: productId
-        },
+        data: { id: productId },
         success: function(response) {
-            if (response.success) {
+            if (response.status) {
+                const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
+                if (response.message.includes('removed')) {
+                    wishlistBtn.classList.remove('active');
+                    wishlistBtn.innerHTML = '<i class="far fa-heart"></i>';
+                } else {
+                    wishlistBtn.classList.add('active');
+                    wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                }
+
                 Swal.fire({
                     icon: 'success',
-                    title: 'Added to Wishlist!',
+                    title: response.message.includes('added') ? 'Added to Wishlist!' : 'Removed from Wishlist!',
                     text: response.message,
                     showConfirmButton: false,
                     timer: 1500
                 });
+            } else if (response.redirect) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Authentication Required',
+                    text: response.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = response.redirect;
+                });
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Failed to Add to Wishlist',
+                    title: 'Failed to Update Wishlist',
                     text: response.message,
                     showConfirmButton: true
                 });
@@ -340,12 +375,34 @@ function addToWishlist(productId) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'An error occurred while adding to wishlist',
+                text: 'An error occurred while updating wishlist',
                 showConfirmButton: true
             });
         }
     });
 }
+
+// Initialize wishlist icons
+document.addEventListener('DOMContentLoaded', function() {
+    $.ajax({
+        url: '/getWishlist',
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.wishlist) {
+                response.wishlist.forEach(productId => {
+                    const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
+                    if (wishlistBtn) {
+                        wishlistBtn.classList.add('active');
+                        wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                    }
+                });
+            }
+        },
+        error: function(err) {
+            console.error('Error fetching wishlist:', err);
+        }
+    });
+});
 </script>
 
 <%- include("../../views/partials/user/footer") %>

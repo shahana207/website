@@ -2,6 +2,8 @@
 // const mongoose = require('mongoose')
 
 
+const Category = require("../../models/categorySchema");
+const mongoose = require('mongoose');
 
 
 const categoryInfo = async (req,res)=>{
@@ -105,8 +107,6 @@ const getActiveCategory = async (req, res) => {
 };
 
 
-  const Category = require("../../models/categorySchema");
-const mongoose = require('mongoose');
 
 const editCategory = async (req, res) => {
     try {

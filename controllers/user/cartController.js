@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const loadCart = async (req, res) => {
     try {
-      console.log('ready');
+      // console.log('ready');
       const userId = req.session.user;
       if (!userId) {
         return res.redirect('/login'); 

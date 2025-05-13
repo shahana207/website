@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,283 +8,116 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="/style/css/adminheader.css">
 
   <style>
     body {
       background-color: #f5f5f5;
       font-family: Arial, sans-serif;
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
     }
-
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background-color: #2c3e50;
-      color: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-
-    .sidebar.collapsed {
-      width: 80px;
-    }
-
-    .sidebar.mobile-visible {
-      left: 0;
-    }
-
-    .logo-container {
-      padding: 20px;
-      text-align: center;
-    }
-
-    .brand-name {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .brand-tagline {
-      font-size: 14px;
-      opacity: 0.8;
-    }
-
-    .menu-item {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      color: white;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .menu-item:hover {
-      background-color: #34495e;
-    }
-
-    .menu-item.active {
-      background-color: #3498db;
-    }
-
-    .menu-item .icon {
-      margin-right: 15px;
-      flex-shrink: 0;
-    }
-
-    .sidebar.collapsed .menu-item span,
-    .sidebar.collapsed .brand-tagline,
-    .sidebar.collapsed .logo-container .brand-name {
-      display: none;
-    }
-
-    /* Sidebar Toggle */
-    .sidebar-toggle {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1100;
-      cursor: pointer;
-      display: none;
-    }
-
-    .sidebar-toggle svg {
-      width: 24px;
-      height: 24px;
-      color: #2c3e50;
-    }
-
-    /* Admin Header */
-    .admin-header {
-      position: fixed;
-      top: 0;
-      left: 280px;
-      right: 0;
-      background-color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 15px 20px;
-      z-index: 900;
-      transition: left 0.3s ease;
-    }
-
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .admin-profile-img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .account-btn {
-      display: flex;
-      align-items: center;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      border-radius: 4px;
-      min-width: 160px;
-    }
-
-    .dropdown-content.show {
-      display: block;
-    }
-
-    .dropdown-content a {
-      display: block;
-      padding: 10px 15px;
-      color: #333;
-      text-decoration: none;
-    }
-
-    .dropdown-content a:hover {
-      background-color: #f5f5f5;
-    }
-
-    /* Main Content */
-    .main-content {
-      margin-left: 280px;
-      margin-top: 70px;
-      padding: 20px;
-      flex-grow: 1;
-      transition: margin-left 0.3s ease;
-    }
-
     .product-container {
       background-color: white;
       border-radius: 8px;
-      padding: 30px;
+      padding: 92px;
+      margin: 21px auto;
+      max-width: 1213px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
     .search-container {
       background-color: #000000;
       padding: 20px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-
     .table th {
       background-color: #000000;
       color: white;
     }
-
     .btn-add-product {
       background-color: #0d6efd;
       color: white;
     }
-
     .product-image {
       width: 60px;
       height: 60px;
       object-fit: cover;
       border-radius: 4px;
     }
-
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .alert {
+      margin-bottom: 20px;
+      display: none;
+    }
     .color-list {
       max-width: 100px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .color-list:hover {
       overflow: visible;
       white-space: normal;
     }
+   
+/* pagination css */
+/* Pagination Container */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 0;
+  flex-wrap: wrap;
+}
 
-    /* Pagination */
-    .pagination-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      padding: 20px 0;
-      flex-wrap: wrap;
-    }
+/* Page Links */
+.pagination-container a {
+  text-decoration: none;
+  color: #000000;
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
 
-    .pagination-container a {
-      text-decoration: none;
-      color: #000000;
-      padding: 8px 14px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #fff;
-      transition: all 0.2s ease;
-    }
+/* Hover Effect */
+.pagination-container a:hover {
+  background-color: #000000;
+  color: #fff;
+  border-color: #007bff;
+}
 
-    .pagination-container a:hover {
-      background-color: #000000;
-      color: #fff;
-      border-color: #007bff;
-    }
+/* Current Page */
+.pagination-container .current-page {
+  padding: 8px 14px;
+  background-color: #000000;
+  color: white;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  font-weight: bold;
+  cursor: default;
+}
 
-    .pagination-container .current-page {
-      padding: 8px 14px;
-      background-color: #000000;
-      color: white;
-      border-radius: 6px;
-      border: 1px solid #000000;
-      font-weight: bold;
-      cursor: default;
-    }
+/* Responsive (Optional) */
+@media (max-width: 576px) {
+  .pagination-container a,
+  .pagination-container .current-page {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
 
-    /* Responsive Design */
-    @media (max-width: 992px) {
-      .sidebar {
-        left: -280px;
-      }
-
-      .sidebar.mobile-visible {
-        left: 0;
-      }
-
-      .sidebar-toggle {
-        display: block;
-      }
-
-      .admin-header {
-        left: 0;
-      }
-
-      .main-content {
-        margin-left: 0;
-      }
-
+    @media (max-width: 768px) {
       .product-container {
         padding: 15px;
+        margin: 10px;
       }
-
       .search-container {
         padding: 15px;
       }
-
       .table th, .table td {
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .pagination-container a,
-      .pagination-container .current-page {
-        padding: 6px 10px;
         font-size: 14px;
       }
     }
@@ -291,205 +125,140 @@
 </head>
 <body>
   <%- include("../partials/admin/header") %>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <div class="container product-container">
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <h2>Products</h2>
-        </div>
-        <div class="col-md-6 text-end">
-          <a href="/admin/load-add-product" class="btn btn-add-product">Add Product+</a>
-        </div>
+  <div class="container product-container">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <h2>Products</h2>
       </div>
+      <div class="col-md-6 text-end">
+        <a href="/admin/load-add-product" class="btn btn-add-product">Add Product+</a>
+      </div>
+    </div>
 
-      <!-- Success/Error Message -->
-      <div id="alertMessage" class="alert" role="alert"></div>
+    <!-- Success/Error Message -->
+    <div id="alertMessage" class="alert" role="alert"></div>
 
-      <div class="search-container">
-        <div class="row justify-content-center">
-          <div class="col-md-8">
-            <div class="input-group">
-              <input type="text" class="form-control" id="searchInput" placeholder="Search products, brands, categories, or colors">
-              <button class="btn btn-primary" type="button" id="searchBtn">Search</button>
-            </div>
+    <div class="search-container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search products, brands, categories, or colors">
+            <button class="btn btn-primary" type="button" id="searchBtn">Search</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Image</th>
-              <th>Brand</th>
-              <th>Category</th>
-              <th>Colors</th>
-              <th>Regular Price</th>
-              <th>Sale Price</th>
-              <th>Quantity</th>
-              <th>Size</th>
-              <th>Status</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="productTableBody">
-            <% data.forEach(product => { %>
-            <tr data-product-id="<%= product._id %>">
-              <td><%= product.productName %></td>
-              <td>
-                <% if (product.productImage && product.productImage.length > 0) { %>
-                  <img src="/Uploads/product-images/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
-                <% } else { %>
-                  <img src="/Uploads/product-images/placeholder.jpg" alt="No Image" class="product-image">
-                <% } %>
-              </td>
-              <td><%= product.brand ? product.brand.name : 'N/A' %></td>
-              <td><%= product.category ? product.category.name : 'N/A' %></td>
-              <td class="color-list">
-                <%= product.color && product.color.length > 0 ? product.color.join(', ') : 'N/A' %>
-              </td>
-              <td>₹<%= product.regularPrice.toFixed(2) %></td>
-              <td>₹<%= product.salePrice.toFixed(2) %></td>
-              <td><%= product.quantity %></td>
-              <td class="color-list">
-                <%= product.sizes && product.sizes.length > 0 ? product.sizes.join(', ') : 'N/A' %>
-              </td>
-              <td>
-                <button class="btn btn-sm <%= product.isBlocked ? 'btn-danger' : 'btn-success' %> toggle-block-btn">
-                  <%= product.isBlocked ? 'Unblock' : 'Block' %>
-                </button>
-              </td>
-              <td>
-                <a href="/admin/editProduct?id=<%= product._id %>" class="btn btn-success btn-sm">Edit</a>
-              </td>
-              <td>
-                <button class="btn btn-danger btn-sm delete-btn">Delete</button>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Image</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Colors</th>
+            <th>Regular Price</th>
+            <th>Sale Price</th>
+            <th>Quantity</th>
+            <th>Size</th>
+            <th>Status</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody">
+          <% data.forEach(product => { %>
+          <tr data-product-id="<%= product._id %>">
+            <td><%= product.productName %></td>
+            <td>
+              <% if (product.productImage && product.productImage.length > 0) { %>
+                <img src="/Uploads/product-images/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
+              <% } else { %>
+                <img src="/Uploads/product-images/placeholder.jpg" alt="No Image" class="product-image">
+              <% } %>
+            </td>
+            <td><%= product.brand ? product.brand.name : 'N/A' %></td>
+            <td><%= product.category ? product.category.name : 'N/A' %></td>
+            <td class="color-list">
+              <%= product.color && product.color.length > 0 ? product.color.join(', ') : 'N/A' %>
+            </td>
+           
+            <td>₹<%= product.regularPrice.toFixed(2) %></td>
+            <td>₹<%= product.salePrice.toFixed(2) %></td>
+            <td><%= product.quantity %></td>
+            <td class="color-list">
+              <%= product.sizes && product.sizes.length > 0 ? product.sizes.join(', ') : 'N/A' %>
+          </td>
+            <td>
+              <button class="btn btn-sm <%= product.isBlocked ? 'btn-danger' : 'btn-success' %> toggle-block-btn">
+                <%= product.isBlocked ? 'Unblock' : 'Block' %>
+              </button>
+            </td>
+            <td>
+              <a href="/admin/editProduct?id=<%= product._id %>" class="btn btn-success btn-sm">Edit</a>
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Pagination -->
-      <div class="pagination-container">
-        <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined') { %>
-          <% if (currentPage > 1) { %>
-            <a href="?page=<%= currentPage - 1 %>">« Previous</a>
-          <% } %>
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="current-page"><%= i %></span>
-            <% } else { %>
-              <a href="?page=<%= i %>"><%= i %></a>
-            <% } %>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>">Next »</a>
+    <!-- pagination -->
+
+    <div class="pagination-container">
+      <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined') { %>
+        <% if (currentPage > 1) { %>
+          <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %>
+    
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="current-page"><%= i %></span>
+          <% } else { %>
+            <a href="?page=<%= i %>"><%= i %></a>
           <% } %>
         <% } %>
-      </div>
-    </div>
-  </div>
+    
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+      <% } %>
+</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Sidebar and layout
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarToggle = document.querySelector('.sidebar-toggle');
-      const adminHeader = document.querySelector('.admin-header');
-      const mainContent = document.querySelector('.main-content');
-
-      function updateLayout() {
-        if (window.innerWidth <= 992) {
-          sidebar.classList.remove('collapsed');
-          sidebar.style.left = '-280px';
-          adminHeader.style.left = '0';
-          mainContent.style.marginLeft = '0';
-        } else {
-          sidebar.style.left = '0';
-          if (sidebar.classList.contains('collapsed')) {
-            adminHeader.style.left = '80px';
-            mainContent.style.marginLeft = '80px';
-          } else {
-            adminHeader.style.left = '280px';
-            mainContent.style.marginLeft = '280px';
-          }
-        }
-      }
-
-      sidebarToggle.addEventListener('click', function () {
-        if (window.innerWidth <= 992) {
-          sidebar.classList.toggle('mobile-visible');
-        } else {
-          sidebar.classList.toggle('collapsed');
-          updateLayout();
-        }
-      });
-
-      window.addEventListener('resize', updateLayout);
-      updateLayout();
-
-      // Account dropdown
-      const accountBtn = document.getElementById('accountBtn');
-      const accountDropdown = document.getElementById('accountDropdown');
-      if (accountBtn && accountDropdown) {
-        accountBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          accountDropdown.classList.toggle('show');
-        });
-
-        document.addEventListener('click', function (e) {
-          if (!accountBtn.contains(e.target)) {
-            accountDropdown.classList.remove('show');
-          }
-        });
-      }
-
-      // Menu active state
-      const currentPath = window.location.pathname;
-      const menuItems = document.querySelectorAll('.menu-item');
-      menuItems.forEach(item => {
-        item.classList.remove('active');
-        const href = item.getAttribute('href');
-        if ((href === '/admin' && currentPath === '/admin') || (href !== '/admin' && currentPath.includes(href))) {
-          item.classList.add('active');
-        }
-      });
-
-      // Product management
       const urlParams = new URLSearchParams(window.location.search);
       const success = urlParams.get('success');
       if (success) {
         showSwal('success', decodeURIComponent(success));
       }
-
+  
       const searchInput = document.getElementById('searchInput');
       const searchBtn = document.getElementById('searchBtn');
-
-      searchBtn.addEventListener(' EJS click', function () {
+  
+      searchBtn.addEventListener('click', function () {
         const query = searchInput.value.trim();
         window.location.href = `/admin/products?search=${encodeURIComponent(query)}`;
       });
-
+  
       searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
           searchBtn.click();
         }
       });
-
+  
       document.querySelectorAll('.toggle-block-btn').forEach(button => {
         button.addEventListener('click', function () {
           const row = this.closest('tr');
           const productId = row.dataset.productId;
           const isBlocked = this.textContent.trim() === 'Unblock';
           const endpoint = isBlocked ? '/admin/unblock-product' : '/admin/block-product';
-
+  
           fetch(`${endpoint}?id=${productId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
@@ -511,12 +280,12 @@
             });
         });
       });
-
+  
       document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function () {
           const row = this.closest('tr');
           const productId = row.dataset.productId;
-
+  
           Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -548,7 +317,8 @@
           });
         });
       });
-
+  
+      // SweetAlert wrapper function
       function showSwal(type, message) {
         Swal.fire({
           icon: type,
@@ -562,5 +332,6 @@
       }
     });
   </script>
+  
 </body>
 </html>
