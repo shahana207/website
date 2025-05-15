@@ -47,24 +47,44 @@
         background-color: #ccc;
         cursor: not-allowed;
     }
-    .wishlist-btn {
+.wishlist-btn {
     position: absolute;
     top: 10px;
     right: 10px;
     font-size: 20px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.wishlist-btn i {
-    color: #ccc; /* Default color (grey for outline heart) */
-}
-
-.wishlist-btn.active i {
-    color: #e74c3c; /* Red color for filled heart when active */
-}
 .wishlist-btn svg {
-    transition: fill 0.3s ease;
+    fill: #ccc; /* Default color (grey for outline heart) */
+    stroke: #ccc;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.wishlist-btn.active svg {
+    fill: #e74c3c; /* Red color for filled heart when active */
+    stroke: #e74c3c;
+}
+/* Highlight active filters */
+.filter-item a.active {
+    color: #e74c3c;
+    font-weight: 600;
+    background-color: #f8f8f8;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.price-button.active {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+}
+
+.list-group-item.active {
+    background-color: #e74c3c;
+    color: #fff;
+    font-weight: 600;
 }
 </style>
 
@@ -107,20 +127,21 @@
             <!-- Sidebar with Filters -->
             <aside class="sidebar">
                 <!-- Categories -->
-                <div class="filter-section">
-                    <div class="filter-title">Categories</div>
-                    <div class="category-brand-container">
-                        <ul>
-                            <% for(let i=0; i < category.length; i++) { %>
-                            <li class="filter-item">
-                                <a
-                                    href="/shop?cat=<%= category[i]._id %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %><%= typeof sort !== 'undefined' && sort ? '&sort=' + sort : '' %><%= typeof selectedBrand !== 'undefined' && selectedBrand ? '&brand=' + selectedBrand : '' %><%= typeof minPrice !== 'undefined' && minPrice ? '&minPrice=' + minPrice : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-                                ><%= category[i].name %></a>
-                            </li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </div>
+               <div class="filter-section">
+    <div class="filter-title">Categories</div>
+    <div class="category-brand-container">
+        <ul>
+            <% for(let i=0; i < category.length; i++) { %>
+            <li class="filter-item">
+                <a
+                    href="/shop?cat=<%= category[i]._id %><%= typeof search !== 'undefined' && search ? '&search=' + search : '' %><%= typeof sort !== 'undefined' && sort ? '&sort=' + sort : '' %><%= typeof selectedBrand !== 'undefined' && selectedBrand ? '&brand=' + selectedBrand : '' %><%= typeof minPrice !== 'undefined' && minPrice ? '&minPrice=' + minPrice : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                    class="<%= selectedCategory === category[i]._id.toString() ? 'active' : '' %>"
+                ><%= category[i].name %></a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
+</div>
 
                 <form id="sort-form" method="GET" action="/shop">
                     <div class="zz-filter-group">
@@ -144,39 +165,40 @@
                 </form>
                 
                 <!-- Brands -->
-                <div class="filter-section">
-                    <div class="filter-title">Brands</div>
-                    <div class="category-brand-container">
-                        <ul>
-                            <% brand.forEach(b => { %>
-                            <li class="filter-item">
-                                <a
-                                    href="/shop?brand=<%= b._id %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
-                                ><%= b.name %></a>
-                            </li>
-                            <% }) %>
-                        </ul>
-                    </div>
-                </div>
+               <div class="filter-section">
+    <div class="filter-title">Brands</div>
+    <div class="category-brand-container">
+        <ul>
+            <% brand.forEach(b => { %>
+            <li class="filter-item">
+                <a
+                    href="/shop?brand=<%= b._id %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                    class="<%= selectedBrand === b._id.toString() ? 'active' : '' %>"
+                ><%= b.name %></a>
+            </li>
+            <% }) %>
+        </ul>
+    </div>
+</div>
 
                 <!-- Price Filter -->
-                <div class="price-filter">
-                    <div class="filter-title">Filter by Price</div>
-                    <div class="price-options">
-                        <a
-                            href="/shop?minPrice=0&maxPrice=500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-                        ><button type="button" class="price-button">Under ₹500</button></a>
-                        <a
-                            href="/shop?minPrice=500&maxPrice=1000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-                        ><button type="button" class="price-button">₹500 - ₹1000</button></a>
-                        <a
-                            href="/shop?minPrice=1000&maxPrice=1500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-                        ><button type="button" class="price-button">₹1000 - ₹1500</button></a>
-                        <a
-                            href="/shop?minPrice=1500&maxPrice=1000000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
-                        ><button type="button" class="price-button">Above ₹1500</button></a>
-                    </div>
-                </div>
+             <div class="price-filter">
+    <div class="filter-title">Filter by Price</div>
+    <div class="price-options">
+        <a
+            href="/shop?minPrice=0&maxPrice=500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+        ><button type="button" class="price-button <%= minPrice === '0' && maxPrice === '500' ? 'active' : '' %>">Under ₹500</button></a>
+        <a
+            href="/shop?minPrice=500&maxPrice=1000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+        ><button type="button" class="price-button <%= minPrice === '500' && maxPrice === '1000' ? 'active' : '' %>">₹500 - ₹1000</button></a>
+        <a
+            href="/shop?minPrice=1000&maxPrice=1500<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+        ><button type="button" class="price-button <%= minPrice === '1000' && maxPrice === '1500' ? 'active' : '' %>">₹1000 - ₹1500</button></a>
+        <a
+            href="/shop?minPrice=1500&maxPrice=1000000<%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= selectedCategory ? '&cat=' + selectedCategory : '' %><%= selectedBrand ? '&brand=' + selectedBrand : '' %>"
+        ><button type="button" class="price-button <%= minPrice === '1500' && maxPrice === '1000000' ? 'active' : '' %>">Above ₹1500</button></a>
+    </div>
+</div>
 
                 <!-- Clear Filters -->
                 <a href="/shop" class="price-button" style="margin-top: 10px;">Clear Filters</a>
@@ -326,7 +348,6 @@ async function addToCart(productId) {
 
 }
 
-// Add to Wishlist (stub function, implement as needed)
 // Add to Wishlist
 // Add to Wishlist
 function addToWishlist(productId) {
@@ -339,10 +360,8 @@ function addToWishlist(productId) {
                 const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
                 if (response.message.includes('removed')) {
                     wishlistBtn.classList.remove('active');
-                    wishlistBtn.innerHTML = '<i class="far fa-heart"></i>';
                 } else {
                     wishlistBtn.classList.add('active');
-                    wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
                 }
 
                 Swal.fire({
@@ -393,7 +412,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
                     if (wishlistBtn) {
                         wishlistBtn.classList.add('active');
-                        wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
                     }
                 });
             }

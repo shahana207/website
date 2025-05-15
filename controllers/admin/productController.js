@@ -11,7 +11,6 @@ const { sanitizeFilter } = require('mongoose');
 
 const getProductAddPage = async (req, res) => {
     try {
-
         const category = await Category.find({});
         const brands = await Brand.find({ isBlocked: false });
         res.render('add-product', {

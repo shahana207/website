@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const {generateCustomId} = require("../utils/helpers")
-
+const { generateCustomId } = require("../utils/helpers");
 
 const orderSchema = new Schema({
   orderId: {
@@ -30,7 +29,7 @@ const orderSchema = new Schema({
     },
     returnStatus: { 
         type: String,
-        enum: ["Not Returned", "Return Requested", "Returned","Cancelled"],
+        enum: ["Not Returned", "Return Requested", "Returned", "Cancelled"],
         default: "Not Returned",
     },
     returnReason: { type: String, trim: true },
@@ -40,6 +39,10 @@ const orderSchema = new Schema({
     required: true
   },
   discount: {
+    type: Number,
+    default: 0
+  },
+  shippingCharge: {
     type: Number,
     default: 0
   },
@@ -70,11 +73,10 @@ const orderSchema = new Schema({
       enum: ["COD", "Online", "Wallet"], 
       required: true,
       default: "COD"
-    },
+  },
   createdOn: {
     type: Date,
     default: Date.now,
-    // required: true
   },
   couponApplied: {
     type: Boolean,
@@ -87,8 +89,4 @@ const orderSchema = new Schema({
 });
 
 const Order = mongoose.model("Order", orderSchema);
-module.exports = Order;
-
-
-
-
+module.exports = Order;

@@ -8,6 +8,7 @@ const brandController = require("../controllers/admin/brandControllers");
 const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
 const couponController=require("../controllers/admin/couponController");
+const offerController = require("../controllers/admin/offerController");
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
 const { upload } = require("../helpers/multer");  
@@ -110,6 +111,19 @@ router.post("/coupon/edit/:id", adminAuth, couponController.editCoupon);
 router.get("/coupon/:id", adminAuth, couponController.getCoupon);
 
 router.post("/coupon/delete/:id", adminAuth, couponController.deleteCoupon);
+
+
+// Offer management
+router.get('/offers', adminAuth, offerController.getAllOffers);
+
+// router.get('/offers/add', adminAuth, offerController.getAddOfferPage);
+ 
+router.get('/addOffer', adminAuth, offerController.getAddOfferPage);
+router.get('/editOffer/:id', adminAuth, offerController.getEditOfferPage);
+router.get('/applicable-items', adminAuth, offerController.getApplicableItems);
+router.post('/addOffer', adminAuth, offerController.addOffer);
+router.post('/offers/:id/edit', adminAuth, offerController.editOffer);
+router.post('/toggleOffer', adminAuth, offerController.toggleOffer);
 
 
 module.exports=router;

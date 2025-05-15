@@ -148,15 +148,20 @@ router.get('/checkout', userAuth, checkoutController.loadCheckout);
 router.post('/save-address', checkoutController.saveAddress);
 
 router.post("/place-order",userAuth,checkoutController.placeOrder);
-
+router.post("/verify-payment",userAuth,checkoutController.verifyPayment)
 router.get("/order-success", userAuth, checkoutController.orderSuccess); 
 
 router.get("/download-invoice/:orderId", userAuth, checkoutController.downloadInvoice);
 
+router.get('/available-coupons', userAuth,checkoutController.getAvailableCoupons);
+
+router.post('/apply-coupon', checkoutController.applyCoupon);
+
+router.post('/remove-coupon', checkoutController.removeCoupon);
 
 // //order management
 
-router.get("/order",ordersController.loadOrders);
+router.get("/order",userAuth,ordersController.loadOrders);
 
 router.post('/cancel-order', userAuth, ordersController.cancelOrder);
 
@@ -176,6 +181,8 @@ router.post("/addToWishlist",userAuth,wishlistController.addToWishList);
 router.get("/getWishlist", userAuth, wishlistController.getWishlist);
 
 router.post("/wishlist/remove", userAuth, wishlistController.removeFromWishlist);
+
+//
 
 
 

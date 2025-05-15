@@ -46,10 +46,6 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        input.invalid {
-            border-color: #d9534f;
-            background-color: #fff6f6;
-        }
         button {
             background-color: #000000;
             color: white;
@@ -63,10 +59,6 @@
         }
         button:hover {
             background-color: #333333;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
         }
         .error-message {
             color: #d9534f;
@@ -128,7 +120,7 @@
                 <div class="error-message" id="passwordError"></div>
             </div>
             
-            <button type="submit" id="submitButton" disabled>Login</button>
+            <button type="submit" id="submitButton">Login</button>
         </form>
         
         <div class="forgot-password">
@@ -141,73 +133,59 @@
             const form = document.getElementById('loginForm');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
-            const submitButton = document.getElementById('submitButton');
             const emailError = document.getElementById('emailError');
             const passwordError = document.getElementById('passwordError');
 
             // Email validation regex
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 
-            // Function to validate email
-            function validateEmail() {
-                const email = emailInput.value.trim();
-                if (!email) {
-                    emailInput.classList.add('invalid');
-                    emailError.textContent = 'Email is required';
-                    emailError.style.display = 'block';
-                    return false;
-                } else if (!emailRegex.test(email)) {
-                    emailInput.classList.add('invalid');
-                    emailError.textContent = 'Please enter a valid email';
-                    emailError.style.display = 'block';
-                    return false;
-                } else {
-                    emailInput.classList.remove('invalid');
-                    emailError.style.display = 'none';
-                    return true;
-                }
+            // Function to show error message
+            function showError(element, message) {
+                element.textContent = message;
+                element.style.display = 'block';
             }
 
-            // Function to validate password
-            function validatePassword() {
-                const password = passwordInput.value;
-                if (!password) {
-                    passwordInput.classList.add('invalid');
-                    passwordError.textContent = 'Password is required';
-                    passwordError.style.display = 'block';
-                    return false;
-                } else if (password.length < 6) {
-                    passwordInput.classList.add('invalid');
-                    passwordError.textContent = 'Password must be at least 6 characters';
-                    passwordError.style.display = 'block';
-                    return false;
-                } else {
-                    passwordInput.classList.remove('invalid');
-                    passwordError.style.display = 'none';
-                    return true;
-                }
+            // Function to clear error messages
+            function clearErrors() {
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
             }
 
-            // Function to validate entire form
-            function validateForm() {
-                const isEmailValid = validateEmail();
-                const isPasswordValid = validatePassword();
-                submitButton.disabled = !(isEmailValid && isPasswordValid);
-            }
-
-            // Event listeners for real-time validation
-            emailInput.addEventListener('input', validateForm);
-            passwordInput.addEventListener('input', validateForm);
-
-            // Validate on form submit
+            // Form submit event listener
             form.addEventListener('submit', function (event) {
-                if (!validateEmail() || !validatePassword()) {
-                    event.preventDefault(); // Prevent form submission if invalid
+                // Clear previous error messages
+                clearErrors();
+
+                // Get input values
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                // Validation flags
+                let isValid = true;
+
+                // Validate email
+                if (!email) {
+                    showError(emailError, 'Email is required');
+                    isValid = false;
+                } else if (!emailRegex.test(email)) {
+                    showError(emailError, 'Please enter a valid email');
+                    isValid = false;
+                }
+
+                // Validate password
+                if (!password) {
+                    showError(passwordError, 'Password is required');
+                    isValid = false;
+                } else if (password.length < 6) {
+                    showError(passwordError, 'Password must be at least 6 characters');
+                    isValid = false;
+                }
+
+                // Prevent form submission if validation fails
+                if (!isValid) {
+                    event.preventDefault();
                 }
             });
-
-            // Initial validation
-            validateForm();
         });
     </script>
 </body>
