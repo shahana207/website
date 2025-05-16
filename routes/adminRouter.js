@@ -10,6 +10,7 @@ const orderController=require("../controllers/admin/orderController");
 const couponController=require("../controllers/admin/couponController");
 const offerController = require("../controllers/admin/offerController");
 
+
 const { userAuth, adminAuth } = require("../middlewares/auth");
 const { upload } = require("../helpers/multer");  
 
@@ -124,6 +125,11 @@ router.get('/applicable-items', adminAuth, offerController.getApplicableItems);
 router.post('/addOffer', adminAuth, offerController.addOffer);
 router.post('/offers/:id/edit', adminAuth, offerController.editOffer);
 router.post('/toggleOffer', adminAuth, offerController.toggleOffer);
+
+// Sales Report Routes
+router.get('/sales-report', adminAuth, adminController.getSalesReport);
+
+router.get('/export-sales-report/:format', adminAuth, adminController.exportSalesReport);
 
 
 module.exports=router;

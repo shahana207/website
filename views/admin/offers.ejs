@@ -131,7 +131,7 @@
     font-size: 0.85rem;
     padding: 1rem;
     text-align: left;
-    text-transform: uppercase;
+    text-transform: capitalize;
   }
 
   .table tbody tr {
@@ -420,16 +420,16 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th width="15%">Offer Name</th>
-                  <th width="10%">Type</th>
-                  <th width="15%">Applicable</th>
-                  <th width="10%">Discount Type</th>
-                  <th width="10%" class="text-center">Amount</th>
-                  <th width="10%" class="text-center">Valid From</th>
-                  <th width="10%" class="text-center">Valid Until</th>
-                  <th width="10%" class="text-center">Status</th>
-                  <th width="10%" class="text-center">List/Unlist</th>
-                  <th width="10%" class="text-center">Actions</th>
+                  <th width="15%">offer name</th>
+                  <th width="10%">type</th>
+                  <th width="15%">applicable</th>
+                  <th width="10%">discount type</th>
+                  <th width="10%" class="text-center">amount</th>
+                  <th width="10%" class="text-center">valid from</th>
+                  <th width="10%" class="text-center">valid until</th>
+                  <th width="10%" class="text-center">status</th>
+                  <th width="10%" class="text-center">list/unlist</th>
+                  <th width="10%" class="text-center">actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -532,6 +532,10 @@
           <div class="modal-body">
             <p id="modalMessage">Are you sure you want to toggle this offer?</p>
             <form id="toggleOfferForm" action="/admin/toggleOffer" method="POST">
+              <!-- Add CSRF token if your app uses CSRF protection -->
+              <% if (typeof csrfToken !== 'undefined') { %>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <% } %>
               <input type="hidden" id="offer_actionID" name="id">
               <input type="hidden" id="offer_actionType" name="action">
               <div class="modal-button-group">
@@ -550,6 +554,12 @@
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script>
     function toggleList(offerID, action) {
+      // Validate inputs
+      if (!offerID || !['list', 'unlist'].includes(action)) {
+        alert('Invalid request. Please try again.');
+        return;
+      }
+
       document.getElementById("offer_actionID").value = offerID;
       document.getElementById("offer_actionType").value = action;
       document.getElementById("modalTitle").textContent = action === "list" ? "List Offer" : "Unlist Offer";
@@ -567,23 +577,27 @@
     document.getElementById('toggleOfferForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
+      const submitBtn = form.querySelector('.modal-btn-confirm');
+      submitBtn.disabled = true;
+
       try {
-        const submitBtn = form.querySelector('.modal-btn-confirm');
-        submitBtn.disabled = true;
         const response = await fetch(form.action, {
           method: 'POST',
           body: new FormData(form),
         });
+
         const data = await response.json();
         submitBtn.disabled = false;
+
         if (data.success) {
           window.location.reload();
         } else {
           alert(data.message || 'Failed to toggle offer');
         }
       } catch (error) {
-        form.querySelector('.modal-btn-confirm').disabled = false;
-        alert('Error toggling offer');
+        console.error('Error toggling offer:', error);
+        submitBtn.disabled = false;
+        alert('Error toggling offer. Please check the console for details.');
       }
     });
 

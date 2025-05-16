@@ -1,740 +1,241 @@
+<%- include("../partials/user/header") %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fazion Order Details">
-    <title>Order Details - <%= order.orderId %></title>
-
-    <!-- External CSS dependencies -->
+    <title>Fazion - Order Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
-    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
-    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
-    <!-- Font Awesome for wishlist icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        /* General layout styles */
-        .order-details-page {
-            background-color: #f8f9fa;
+        body {
+            background-color: #f5f5f5;
             font-family: 'Nunito Sans', sans-serif;
         }
-
-        .profile {
-            display: flex;
-            width: 100%;
-            min-height: calc(100vh - 160px);
+        .zz-order-details-container {
+            padding: 30px 0;
         }
-
-        .profile-container {
-            display: flex;
-            width: 100%;
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        .content {
-            flex: 1;
-            background-color: #fff;
+        .zz-order-details {
+            background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-            margin-left: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        /* Back button styles */
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            color: #333;
-            font-weight: 600;
+        .zz-order-header {
             margin-bottom: 20px;
-            text-decoration: none;
-            transition: color 0.3s ease;
         }
-
-        .back-button:hover {
-            color: #e53e3e;
-            text-decoration: none;
+        .zz-order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
-
-        .back-button i {
+        .zz-order-item-price .original-price {
+            text-decoration: line-through;
+            color: #777;
+            font-weight: 400;
             margin-right: 8px;
-            font-size: 14px;
         }
-
-        /* Order details header */
-        .order-details-header {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .order-details-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-            margin: 0;
-        }
-
-        /* Order status section */
-        .order-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            display: inline-block;
-        }
-
-        .status-pending {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
-
-        .status-processing {
-            background-color: #e0f2fe;
-            color: #0284c7;
-        }
-
-        .status-shipped {
-            background-color: #dbeafe;
-            color: #2563eb;
-        }
-
-        .status-delivered {
-            background-color: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-returned {
-            background-color: #f3e8ff;
-            color: #7e22ce;
-        }
-
-        .order-date {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* Section titles */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title i {
-            margin-right: 10px;
-            color: #666;
-        }
-
-        /* Shipping info section */
-        .shipping-info {
-            background-color: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-
-        .shipping-address {
-            margin-top: 10px;
-        }
-
-        .address-name {
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .address-details {
-            font-size: 14px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        /* Order items section */
-        .order-items {
-            margin-bottom: 25px;
-        }
-
-        .item-card {
-            position: relative;
-            display: flex;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: box-shadow 0.3s ease;
-        }
-
-        .item-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .item-image {
-            width: 80px;
-            height: 80px;
-            margin-right: 15px;
-            border-radius: 4px;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .item-details {
-            flex: 1;
-            margin-right: 15px;
-        }
-
-        .item-name {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .item-price {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .item-status {
-            font-size: 13px;
-            color: #555;
-        }
-
-        .item-actions {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 10px;
-            min-width: 120px;
-        }
-
-        .action-btn {
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .btn-cancel {
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
-
-        .btn-cancel:hover {
-            background-color: #fecaca;
-        }
-
-        .btn-return {
-            background-color: #e0f2fe;
-            color: #0284c7;
-        }
-
-        .btn-return:hover {
-            background-color: #bae6fd;
-        }
-
-        .btn-disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-disabled:hover {
-            background-color: inherit;
-        }
-
-        /* Order summary section */
-        .order-summary {
-            background-color: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .summary-row.total {
-            font-weight: 700;
-            font-size: 16px;
-            color: #333;
-            border-top: 2px solid #ddd;
-            border-bottom: none;
-            padding-top: 10px;
-            margin-top: 5px;
-        }
-
-        /* Wishlist button styles */
-        .wishlist-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1;
-        }
-
-        .wishlist-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .wishlist-btn i {
-            color: #ccc;
-            transition: color 0.3s ease;
-        }
-
-        .wishlist-btn.active i {
+        .zz-order-item-price .offer-price {
             color: #e74c3c;
+            font-weight: 700;
         }
-
-        /* Responsive styles */
-        @media (max-width: 992px) {
-            .profile-container {
-                flex-direction: column;
-            }
-            
-            .content {
-                margin-left: 0;
-                margin-top: 20px;
-            }
+        .zz-order-item-meta .offer-info {
+            color: #27ae60;
+            font-size: 12px;
         }
-
-        @media (max-width: 768px) {
-            .item-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .item-image {
-                width: 100%;
-                height: 200px;
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-            
-            .item-details {
-                margin-right: 0;
-                margin-bottom: 15px;
-                width: 100%;
-            }
-            
-            .item-actions {
-                width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
-            }
-            
-            .action-btn {
-                flex: 1;
-                margin-right: 10px;
-            }
-            
-            .action-btn:last-child {
-                margin-right: 0;
-            }
-            
-            .order-status {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .order-date {
-                margin-top: 10px;
-            }
+        .zz-order-summary {
+            margin-top: 20px;
+            font-size: 16px;
         }
-
-        @media (max-width: 576px) {
-            .item-actions {
-                flex-direction: column;
-            }
-            
-            .action-btn {
-                margin-right: 0;
-                margin-bottom: 10px;
-                width: 100%;
-            }
-            
-            .action-btn:last-child {
-                margin-bottom: 0;
-            }
+        .zz-action-btn {
+            margin-left: 10px;
         }
     </style>
 </head>
-<body class="order-details-page">
-    <%- include("../partials/user/header") %>
-    
-    <div class="profile-container">
-        <%- include("../partials/user/sidebar", { active: 'orders' }) %>
-        
-        <div class="content">
-            <a href="/order" class="back-button">
-                <i class="fa fa-arrow-left"></i> Back to Orders
-            </a>
-            
-            <div class="order-details-header">
-                <h1>Order #<%= order.orderId %></h1>
+<body>
+    <div class="container zz-order-details-container">
+        <h2 class="zz-checkout-title">Order Details</h2>
+        <div class="zz-order-details">
+            <div class="zz-order-header">
+                <h3>Order ID: <%= order.orderId %></h3>
+                <p>
+                    Placed on: <%= order.createdOn.toLocaleDateString() %>
+                    | Status: <%= order.status %>
+                    | Payment: <%= order.paymentMethod %>
+                </p>
             </div>
-            
-            <div class="order-details-content">
-                <div class="order-status">
-                    <div class="status-badge status-<%= order.status.toLowerCase().replace(' ', '-') %>">
-                        <%= order.status %>
-                    </div>
-                    <div class="order-date">
-                        Order Date: <%= order.createdOn ? new Date(order.createdOn).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' %>
-                    </div>
-                </div>
-                
-                <div class="shipping-info">
-                    <h2 class="section-title">
-                        <i class="fa fa-map-marker"></i> Shipping Address
-                    </h2>
-                    <div class="shipping-address">
-                        <div class="address-name"><%= order.address?.name || 'N/A' %></div>
-                        <div class="address-details">
-                            <%= order.address?.addressType || '' %><br>
-                            <%= order.address?.addressLine || '' %> <%= order.address?.landMark || '' %><br>
-                            <%= order.address?.city || '' %>, <%= order.address?.state || '' %> <%= order.address?.pincode || '' %><br>
-                            Phone: <%= order.address?.phone || 'N/A' %> <%= order.address?.altPhone ? ', Alt: ' + order.address.altPhone : '' %>
+            <div class="zz-order-items">
+                <% order.orderedItems.forEach(item => { %>
+                    <div class="zz-order-item">
+                        <div class="zz-order-item-image">
+                            <img src="/Uploads/product-images/<%= item.product?.productImage[0] || 'placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
                         </div>
-                    </div>
-                </div>
-                
-                <div class="order-items">
-                    <h2 class="section-title">
-                        <i class="fa fa-shopping-bag"></i> Ordered Items
-                    </h2>
-                    
-                    <% order.orderedItems.forEach(item => { %>
-                        <div class="item-card">
-                            <!-- Wishlist button -->
-                            <!-- <span class="wishlist-btn" onclick="addToWishlist('<%= item.product?._id %>')">
-                                <i class="far fa-heart"></i>
-                            </span> -->
-                            <div class="item-image">
-                                <img src="/Uploads/product-images/<%= item.product?.productImage?.[0] || '/images/placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
-                            </div>
-                            <div class="item-details">
-                                <div class="item-name"><%= item.product?.productName || 'Unknown Product' %></div>
-                                <div class="item-price">₹<%= item.price.toFixed(2) %> x Qty: <%= item.quantity %></div>
-                                <div class="item-status">
-                                    Return Status: <%= item.returnStatus %>
-                                    <% if (item.returnStatus === 'Return Requested' || item.returnStatus === 'Returned') { %>
-                                        <br>Reason: <%= item.returnReason || 'Not specified' %>
-                                    <% } %>
-                                    <% if (item.returnStatus === 'Cancelled') { %>
-                                        <br>Reason: <%= item.returnReason || 'Not specified' %>
-                                    <% } %>
-                                </div>
-                            </div>
-                            <div class="item-actions">
-                                <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && order.status !== 'Returned' && item.returnStatus === 'Not Returned') { %>
-                                    <button class="action-btn btn-cancel" onclick="cancelItem('<%= order.orderId %>', '<%= item._id %>')">Cancel Item</button>
-                                <% } else { %>
-                                    <button class="action-btn btn-cancel btn-disabled" disabled>Cancel Item</button>
+                        <div class="zz-order-item-info">
+                            <div class="zz-order-item-name"><%= item.product?.productName || 'Product Not Found' %></div>
+                            <div class="zz-order-item-meta">
+                                <% if (item.size) { %>
+                                    <span>Size: <%= item.size %></span>
                                 <% } %>
-                                <% if (order.status === 'Delivered' && item.returnStatus === 'Not Returned') { %>
-                                    <button class="action-btn btn-return" onclick="returnItem('<%= order.orderId %>', '<%= item._id %>')">Return Item</button>
-                                <% } else if (item.returnStatus === 'Return Requested' || item.returnStatus === 'Returned') { %>
-                                    <button class="action-btn btn-return btn-disabled" disabled>Return <%= item.returnStatus %></button>
-                                <% } else { %>
-                                    <button class="action-btn btn-return btn-disabled" disabled>Return Item</button>
+                                <% if (item.color) { %>
+                                    <span> | Color: <%= item.color %></span>
+                                <% } %>
+                                <span> | Qty: <%= item.quantity %></span>
+                                <% if (item.returnStatus !== 'Not Returned') { %>
+                                    <span> | Status: <%= item.returnStatus %></span>
+                                <% } %>
+                                <% if (item.bestOffer) { %>
+                                    <div class="offer-info">Offer: <%= item.bestOffer.name %> (<%= item.bestOffer.discountAmount %>% off)</div>
                                 <% } %>
                             </div>
+                            <div class="zz-order-item-price">
+                                <% if (item.bestOffer) { %>
+                                    <span class="original-price">₹ <%= (item.bestOffer.originalPrice * item.quantity).toFixed(2) %></span>
+                                    <span class="offer-price">₹ <%= (item.price * item.quantity).toFixed(2) %></span>
+                                <% } else { %>
+                                    ₹ <%= (item.price * item.quantity).toFixed(2) %>
+                                <% } %>
+                            </div>
+                            <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
+                                <button class="zz-action-btn btn btn-danger cancel-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Cancel Item</button>
+                            <% } %>
+                            <% if (order.status === 'Delivered' && item.returnStatus === 'Not Returned') { %>
+                                <button class="zz-action-btn btn btn-warning return-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Return Item</button>
+                            <% } %>
                         </div>
-                    <% }) %>
-                </div>
-                
-                <div class="order-summary">
-                    <h2 class="section-title">
-                        <i class="fa fa-file-text-o"></i> Order Summary
-                    </h2>
-                    <div class="summary-row">
-                        <div>Subtotal</div>
-                        <div>₹<%= order.orderedItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></div>
                     </div>
-                    <div class="summary-row">
-                        <div>Discount</div>
-                        <div>₹<%= order.discount?.toFixed(2) || '0.00' %></div>
-                    </div>
-                    <div class="summary-row">
-                        <div>Shipping</div>
-                        <div>₹0.00</div>
-                    </div>
-                    <div class="summary-row total">
-                        <div>Grand Total</div>
-                        <div>₹<%= order.finalAmount.toFixed(2) %></div>
-                    </div>
-                </div>
+                <% }) %>
             </div>
+            <div class="zz-order-summary">
+                <div><strong>Subtotal:</strong> ₹ <%= order.totalPrice.toFixed(2) %></div>
+                <% if (order.offerDiscount > 0) { %>
+                    <div><strong>Offer Discount:</strong> -₹ <%= order.offerDiscount.toFixed(2) %></div>
+                <% } %>
+                <div><strong>Shipping:</strong> <%= order.shippingCharge ? '₹' + order.shippingCharge.toFixed(2) : 'Free' %></div>
+                <div><strong>Tax:</strong> ₹ <%= order.tax.toFixed(2) %></div>
+                <% if (order.discount > 0) { %>
+                    <div><strong>Coupon Discount:</strong> -₹ <%= order.discount.toFixed(2) %></div>
+                <% } %>
+                <div><strong>Total:</strong> ₹ <%= order.finalAmount.toFixed(2) %></div>
+            </div>
+            <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
+                <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
+            <% } %>
         </div>
     </div>
-    
+
     <%- include("../partials/user/footer") %>
-    
-    <!-- External JS dependencies -->
-    <script src="/js/jquery-3.3.1.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/jquery.nice-select.min.js"></script>
-    <script src="/js/jquery.nicescroll.min.js"></script>
-    <script src="/js/jquery.magnific-popup.min.js"></script>
-    <script src="/js/jquery.countdown.min.js"></script>
-    <script src="/js/jquery.slicknav.js"></script>
-    <script src="/js/mixitup.min.js"></script>
-    <script src="/js/owl.carousel.min.js"></script>
-    <script src="/js/main.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Existing cancelItem function (unchanged)
-        async function cancelItem(orderId, itemId) {
-            const { value: reason } = await Swal.fire({
-                title: 'Cancel Item',
-                input: 'textarea',
-                inputLabel: 'Please provide a reason for cancelling this item:',
-                inputPlaceholder: 'Enter your reason here...',
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#e53e3e',
-                cancelButtonColor: '#718096',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You must provide a reason!';
-                    }
-                }
-            });
-
-            if (reason) {
-                try {
-                    const response = await fetch('/cancel-item', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ orderId, itemId, reason }),
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: result.message,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#2ecc71',
-                            timer: 3000,
-                            timerProgressBar: true
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: result.message,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#e53e3e'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error canceling item:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to cancel item. Please try again.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#e53e3e'
-                    });
-                }
-            }
-        }
-
-        // Existing returnItem function (unchanged)
-        async function returnItem(orderId, itemId) {
-            const { value: reason } = await Swal.fire({
-                title: 'Return Item',
-                input: 'textarea',
-                inputLabel: 'Please provide a reason for returning this item:',
-                inputPlaceholder: 'Enter your reason here...',
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#ed8936',
-                cancelButtonColor: '#718096',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You must provide a reason!';
-                    }
-                }
-            });
-
-            if (reason) {
-                try {
-                    const response = await fetch('/return-item', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ orderId, itemId, reason }),
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: result.message,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#2ecc71',
-                            timer: 3000,
-                            timerProgressBar: true
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: result.message,
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#e53e3e'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error returning item:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to return item. Please try again.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#e53e3e'
-                    });
-                }
-            }
-        }
-
-        // Wishlist functionality (same as shop.ejs)
-        function addToWishlist(productId) {
-            $.ajax({
-                url: '/addToWishlist',
-                method: 'POST',
-                data: { id: productId },
-                success: function(response) {
-                    if (response.status) {
-                        const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
-                        if (response.message.includes('removed')) {
-                            wishlistBtn.classList.remove('active');
-                            wishlistBtn.innerHTML = '<i class="far fa-heart"></i>';
-                        } else {
-                            wishlistBtn.classList.add('active');
-                            wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
-                        }
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message.includes('added') ? 'Added to Wishlist!' : 'Removed from Wishlist!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    } else if (response.redirect) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Authentication Required',
-                            text: response.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.href = response.redirect;
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Failed to Update Wishlist',
-                            text: response.message,
-                            showConfirmButton: true
-                        });
-                    }
-                },
-                error: function(err) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while updating wishlist',
-                        showConfirmButton: true
-                    });
-                }
-            });
-        }
-
-        // Initialize wishlist buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            $.ajax({
-                url: '/getWishlist',
-                method: 'GET',
-                success: function(response) {
-                    if (response.success && response.wishlist) {
-                        response.wishlist.forEach(productId => {
-                            const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
-                            if (wishlistBtn) {
-                                wishlistBtn.classList.add('active');
-                                wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        $(document).ready(function() {
+            $('.cancel-order-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you want to cancel this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/cancel-order',
+                            method: 'POST',
+                            data: { orderId },
+                            success: function(response) {
+                                Swal.fire('Cancelled!', 'Order has been cancelled.', 'success')
+                                    .then(() => window.location.href = '/orders');
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Failed to cancel order.', 'error');
                             }
                         });
                     }
-                },
-                error: function(err) {
-                    console.error('Error fetching wishlist:', err);
-                }
+                });
+            });
+
+            $('.cancel-item-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                const itemId = $(this).data('item-id');
+                Swal.fire({
+                    title: 'Cancel Item',
+                    text: 'Please provide a reason for cancellation:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cancel Item',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/cancel-item',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ orderId, itemId, reason: result.value }),
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire('Cancelled!', response.message, 'success')
+                                        .then(() => window.location.reload());
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Failed to cancel item.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.return-item-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                const itemId = $(this).data('item-id');
+                Swal.fire({
+                    title: 'Return Item',
+                    text: 'Please provide a reason for return:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Request Return',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/return-item',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ orderId, itemId, reason: result.value }),
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire('Requested!', response.message, 'success')
+                                        .then(() => window.location.reload());
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Failed to request return.', 'error');
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

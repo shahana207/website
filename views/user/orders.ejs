@@ -254,7 +254,20 @@
             cursor: not-allowed;
             pointer-events: none;
         }
-        
+        .zz-order-item-price .original-price {
+    text-decoration: line-through;
+    color: #777;
+    font-weight: 400;
+    margin-right: 8px;
+}
+.zz-order-item-price .offer-price {
+    color: #e74c3c;
+    font-weight: 700;
+}
+.zz-order-item-meta .offer-info {
+    color: #27ae60;
+    font-size: 12px;
+}
         @media (max-width: 768px) {
             .profile-container {
                 flex-direction: column;
@@ -351,6 +364,19 @@
                 <% } else { %>
                     <div class="no-orders">No orders found.</div>
                 <% } %>
+                <div class="zz-order-item-meta">
+    <% if (item.bestOffer) { %>
+        <div class="offer-info">Offer: <%= item.bestOffer.name %> (<%= item.bestOffer.discountAmount %>% off)</div>
+    <% } %>
+</div>
+<div class="zz-order-item-price">
+    <% if (item.bestOffer) { %>
+        <span class="original-price">₹ <%= (item.bestOffer.originalPrice * item.quantity).toFixed(2) %></span>
+        <span class="offer-price">₹ <%= (item.price * item.quantity).toFixed(2) %></span>
+    <% } else { %>
+        ₹ <%= (item.price * item.quantity).toFixed(2) %>
+    <% } %>
+</div>
                 
                 <!-- Pagination Controls -->
                 <% if (totalPages > 1) { %>

@@ -2,41 +2,111 @@ const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const Cart = require('../../models/cartSchema');
+const Offer = require('../../models/offerSchema');
 const mongoose = require('mongoose');
+
+// Function to get best offer for a product
+const getBestOffer = async (product) => {
+    try {
+        const currentDate = new Date();
+        
+        // Find all valid offers for the product
+        const productOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Products',
+            applicableTo: product._id
+        });
+
+        // Find all valid offers for the product's brand
+        const brandOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Brands',
+            applicableTo: product.brand
+        });
+
+        // Find all valid offers for the product's category
+        const categoryOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Category',
+            applicableTo: product.category
+        });
+
+        // Combine all offers
+        const allOffers = [...productOffers, ...brandOffers, ...categoryOffers];
+
+        if (allOffers.length === 0) {
+            return null;
+        }
+
+        // Find the offer with highest discount
+        const bestOffer = allOffers.reduce((best, current) => {
+            const currentDiscount = (product.salePrice * current.discountAmount) / 100;
+            const bestDiscount = best ? (product.salePrice * best.discountAmount) / 100 : 0;
+            return currentDiscount > bestDiscount ? current : best;
+        }, null);
+
+        return bestOffer;
+    } catch (error) {
+        console.error('Error finding best offer:', error);
+        return null;
+    }
+};
 
 const loadCart = async (req, res) => {
     try {
-      // console.log('ready');
-      const userId = req.session.user;
-      if (!userId) {
-        return res.redirect('/login'); 
-      }
-      
-      const userData = await User.findById(userId);
-      let cart = await Cart.findOne({ userId }).populate('items.productId'); 
-  
-      if (cart) {
-        cart.items = cart.items.filter(item => item.productId); 
-        cart.shippingCharge = 50;
-        cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0); 
-        cart.total = cart.subtotal + cart.shippingCharge;
-        await cart.save();
-      }
-  
-      console.log(cart, 'cart data');
-  
-      res.render('cart', {
-        user:userData,     
-           cart,
-        userId,
-        profilePicture: userData.profilePicture || null,
-      });
-    } catch (error) {
-      console.error('Cannot render the cart page:', error);
-      res.redirect('/pageNotFound');
-    }
-  };
+        const userId = req.session.user;
+        if (!userId) {
+            return res.redirect('/login'); 
+        }
+        
+        const userData = await User.findById(userId);
+        let cart = await Cart.findOne({ userId }).populate('items.productId'); 
+    
+        if (cart) {
+            cart.items = cart.items.filter(item => item.productId);
+            
+            // Get best offer for each product and calculate offer prices
+            for (let item of cart.items) {
+                const bestOffer = await getBestOffer(item.productId);
+                if (bestOffer) {
+                    const discountAmount = (item.productId.salePrice * bestOffer.discountAmount) / 100;
+                    item.bestOffer = {
+                        name: bestOffer.offerName,
+                        discountAmount: discountAmount,
+                        originalPrice: item.productId.salePrice
+                    };
+                    item.totalPrice = (item.productId.salePrice - discountAmount) * item.quantity;
+                } else {
+                    item.totalPrice = item.productId.salePrice * item.quantity;
+                }
+            }
 
+            cart.shippingCharge = 50;
+            cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+            cart.total = cart.subtotal + cart.shippingCharge;
+            await cart.save();
+        }
+    
+        res.render('cart', {
+            user: userData,     
+            cart,
+            userId,
+            profilePicture: userData.profilePicture || null,
+        });
+    } catch (error) {
+        console.error('Cannot render the cart page:', error);
+        res.redirect('/pageNotFound');
+    }
+};
 
 const addToCart = async (req, res) => {
   try {

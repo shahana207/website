@@ -148,8 +148,12 @@ router.get('/checkout', userAuth, checkoutController.loadCheckout);
 router.post('/save-address', checkoutController.saveAddress);
 
 router.post("/place-order",userAuth,checkoutController.placeOrder);
+
 router.post("/verify-payment",userAuth,checkoutController.verifyPayment)
+
 router.get("/order-success", userAuth, checkoutController.orderSuccess); 
+
+router.get('/payment-failure',userAuth, checkoutController.paymentFailure);
 
 router.get("/download-invoice/:orderId", userAuth, checkoutController.downloadInvoice);
 
@@ -158,6 +162,8 @@ router.get('/available-coupons', userAuth,checkoutController.getAvailableCoupons
 router.post('/apply-coupon', checkoutController.applyCoupon);
 
 router.post('/remove-coupon', checkoutController.removeCoupon);
+
+router.post('/update-order-status', checkoutController.updateOrderStatus);
 
 // //order management
 

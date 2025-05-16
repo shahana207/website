@@ -42,7 +42,7 @@ const offerSchema = new mongoose.Schema({
     },
     offerTypeRef: {
         type: String,
-        enum: ['Category', 'Brand', 'Product'], // Adjusted for dynamic ref
+        enum: ['Category', 'Brand', 'Product'], 
         required: true
     },
     isListed: {

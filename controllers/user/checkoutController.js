@@ -13,6 +13,7 @@ const { generateCustomId } = require("../../utils/helpers");
 const Coupon = require('../../models/couponSchema');
 const Razorpay = require('razorpay');
 const Wallet = require('../../models/walletSchema');
+const crypto = require('crypto');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -168,12 +169,10 @@ const placeOrder = async (req, res) => {
             address: deliveryAddress,
             paymentMethod,
             invoiceDate: new Date(),
-            status: 'pending',
+            status: 'pending', // Always pending until verified
             createdOn: new Date(),
             couponApplied: cart.couponApplied,
         });
-
-        await newOrder.save();
 
         if (paymentMethod === 'Online') {
             const options = {
@@ -182,9 +181,9 @@ const placeOrder = async (req, res) => {
                 receipt: `receipt_${newOrder._id}`,
             };
             const razorpayOrder = await razorpay.orders.create(options);
-
-            // Update cart after order creation
-            await Cart.deleteOne({ userId });
+            
+            // Save the order with pending status until payment is verified
+            await newOrder.save();
 
             return res.json({
                 success: true,
@@ -217,6 +216,11 @@ const placeOrder = async (req, res) => {
             await wallet.save();
         }
 
+        // Finalize order for COD or Wallet
+        newOrder.status = 'processing';
+        await newOrder.save();
+
+        // Update product quantities
         for (const item of cart.items) {
             const product = await Product.findById(item.productId._id);
             if (product) {
@@ -225,6 +229,7 @@ const placeOrder = async (req, res) => {
             }
         }
 
+        // Clear cart
         await Cart.deleteOne({ userId });
 
         req.session.orderId = newOrder.orderId;
@@ -235,7 +240,6 @@ const placeOrder = async (req, res) => {
         return res.status(500).json({ success: false, message: "Failed to place order" });
     }
 };
-
 const verifyPayment = async (req, res) => {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
@@ -246,7 +250,6 @@ const verifyPayment = async (req, res) => {
         }
 
         // Verify payment signature
-        const crypto = require('crypto');
         const body = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -254,14 +257,20 @@ const verifyPayment = async (req, res) => {
             .digest('hex');
 
         if (expectedSignature !== razorpay_signature) {
-            return res.status(400).json({ success: false, message: "Invalid payment signature" });
+            // Update order status to failed if signature verification fails
+            const order = await Order.findByIdAndUpdate(orderId, { status: 'failed' }, { new: true })
+                .populate('orderedItems.product', 'productName salePrice images')
+                .populate('user', 'firstName lastName email');
+            req.session.orderId = order.orderId; // Set session for payment-failure page
+            return res.json({ success: false, message: "Invalid payment signature", redirectUrl: "/payment-failure" });
         }
 
-        // Update order status
+        // Finalize the order since payment is successful
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
+
         order.status = 'processing';
         await order.save();
 
@@ -280,54 +289,96 @@ const verifyPayment = async (req, res) => {
             await wallet.save();
         }
 
+        // Clear cart
+        await Cart.deleteOne({ userId });
+
+        // Update product quantities
+        for (const item of order.orderedItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.quantity -= item.quantity;
+                await product.save();
+            }
+        }
+
         req.session.orderId = order.orderId;
 
         return res.json({ success: true, message: "Payment verified successfully", redirectUrl: "/order-success" });
     } catch (error) {
         console.error("Error in verifyPayment:", error);
-        return res.status(500).json({ success: false, message: "Payment verification failed" });
+        // Update order status to failed on error
+        const order = await Order.findByIdAndUpdate(req.body.orderId, { status: 'failed' }, { new: true })
+            .populate('orderedItems.product', 'productName salePrice images')
+            .populate('user', 'firstName lastName email');
+        req.session.orderId = order.orderId; // Set session for payment-failure page
+        return res.json({ success: false, message: "Payment verification failed", redirectUrl: "/payment-failure" });
     }
 };
 
 const orderSuccess = async (req, res) => {
-
     try {
-        console.log('1111');
-        
         const userId = req.session.user;
         if (!userId) {
             return res.redirect('/login?error=User not authenticated');
         }
- console.log('2222',userId);
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.redirect('/pageNotFound?error=Invalid user ID');
-        }
- console.log('3333',userId);
+
         const orderId = req.session.orderId;
         if (!orderId) {
             return res.redirect('/orders?error=No order ID found in session');
         }
- console.log('4444',userId);
+
         const order = await Order.findOne({ orderId, user: userId })
             .populate('orderedItems.product', 'productName salePrice images')
             .populate('user', 'firstName lastName email');
- console.log('5555',userId);
+
         if (!order) {
             return res.redirect('/orders?error=Order not found');
         }
- console.log('666',userId);
+
         delete req.session.orderId;
 
         res.render('order-success', {
             order,
             userId,
         });
-         console.log('7777',userId);
     } catch (error) {
         console.log(error);
         res.redirect('/pageNotFound?error=Failed to load order success page');
     }
 };
+
+const paymentFailure = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.redirect('/login?error=User not authenticated');
+        }
+
+        const orderId = req.session.orderId;
+        if (!orderId) {
+            return res.redirect('/orders?error=No order ID found in session');
+        }
+
+        const order = await Order.findOne({ orderId, user: userId })
+            .populate('orderedItems.product', 'productName salePrice images')
+            .populate('user', 'firstName lastName email');
+
+        if (!order) {
+            return res.redirect('/orders?error=Order not found');
+        }
+
+        delete req.session.orderId;
+
+        res.render('payment-failure', {
+            order,
+            userId,
+        });
+    } catch (error) {
+        console.log(error);
+        res.redirect('/pageNotFound?error=Failed to load payment failure page');
+    }
+};
+
 
 const downloadInvoice = async (req, res) => {
     const { orderId } = req.params;
@@ -541,7 +592,20 @@ function validateAddress(address) {
     if (!address.phone) errors.phone = "Phone number is required";
 
     return errors;
-}
+};
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId, status } = req.body;
+        const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+        return res.json({ success: true, message: "Order status updated" });
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        return res.status(500).json({ success: false, message: "Failed to update order status" });
+    }
+};
 
 module.exports = {
     loadCheckout,
@@ -549,8 +613,10 @@ module.exports = {
     placeOrder,
     verifyPayment,
     orderSuccess,
+    paymentFailure,
     downloadInvoice,
     getAvailableCoupons,
     applyCoupon,
-    removeCoupon
+    removeCoupon,
+    updateOrderStatus,
 };

@@ -33,6 +33,11 @@ const cartSchema = new Schema({
             type: String,
             default: "none"
         },
+        bestOffer: {
+      name: { type: String },
+      discountAmount: { type: Number },
+      originalPrice: { type: Number },
+    },
     }],
     subtotal: {
         type: Number,
@@ -50,6 +55,10 @@ const cartSchema = new Schema({
         type: Number,
         default: 0
     },
+    offerDiscount: {
+    type: Number,
+    default: 0,
+  },
     shippingCharge: {
         type: Number,
         default: 0

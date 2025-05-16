@@ -164,7 +164,7 @@
                             <div class="mb-3">
                                 <label for="discountValue" class="form-label">Discount Value</label>
                                 <input type="number" class="form-control" id="discountValue" name="discountValue" required min="1" max="1000" step="1">
-                                <div class="error-message" id="discountValueError">Please enter a value between 1 and 1000.</div>
+                                <div class="error-message" id="discountValueError">Enter a value above 1 and below 25% of the minimum purchase.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="startDate" class="form-label">Start Date</label>
@@ -318,9 +318,12 @@
                 isValid = false;
             }
 
+            let minCartValue = minPurchase.value
+            let validAmount = Math.floor((minCartValue*25)/100)
+
             // Discount Value
             const discountValue = form.querySelector("[name='discountValue']");
-            if (!discountValue.value || discountValue.value < 1 || discountValue.value > 1000) {
+            if (!discountValue.value || discountValue.value < 1 || discountValue.value > validAmount) {
                 discountValue.classList.add("is-invalid");
                 document.getElementById(`${discountValue.id}Error`).style.display = "block";
                 isValid = false;
