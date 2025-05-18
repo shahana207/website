@@ -29,7 +29,7 @@ const getAllOffers = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 })
-      .lean(); // Use .lean() for better performance
+      .lean(); 
 
     const count = await Offer.countDocuments(searchCriteria);
     const categories = await Category.find({ isListed: true, isDeleted: false }).select('name _id').lean();
@@ -136,7 +136,7 @@ const addOffer = async (req, res) => {
       applicableTo,
     } = req.body;
 
-    // Simple validation
+  
     const errors = {};
     if (!offerName?.trim()) errors.offerName = 'Offer name is required';
     if (!description?.trim()) errors.description = 'Description is required';
@@ -152,7 +152,6 @@ const addOffer = async (req, res) => {
     if (!['Products', 'Category', 'Brands'].includes(offerType)) errors.offerType = 'Invalid offer type';
     if (!applicableTo) errors.applicableTo = 'Applicable to is required';
 
-    // Validate applicableTo
     let offerTypeRef;
     switch (offerType) {
       case 'Products':
@@ -178,7 +177,6 @@ const addOffer = async (req, res) => {
         break;
     }
 
-    // Check for duplicate offer name
     const existingOffer = await Offer.findOne({
       offerName: { $regex: `^${escapeRegex(offerName?.trim())}$`, $options: 'i' },
       isDeleted: false,
@@ -189,7 +187,7 @@ const addOffer = async (req, res) => {
       return res.status(400).json({ success: false, errors });
     }
 
-    // Create new offer
+   
     const offer = new Offer({
       offerName: offerName.trim(),
       description: description.trim(),
@@ -206,7 +204,7 @@ const addOffer = async (req, res) => {
 
     await offer.save();
 
-    // Update relevant model with offer reference
+ 
     if (offerType === 'Products') {
       await Product.findByIdAndUpdate(applicableTo, {
         productOffer: discountAmount,
@@ -245,7 +243,6 @@ const editOffer = async (req, res) => {
       isListed,
     } = req.body;
 
-    // Simple validation
     const errors = {};
     if (!offerName?.trim()) errors.offerName = 'Offer name is required';
     if (!description?.trim()) errors.description = 'Description is required';
@@ -262,7 +259,6 @@ const editOffer = async (req, res) => {
     if (!applicableTo) errors.applicableTo = 'Applicable to is required';
     if (isListed !== 'true' && isListed !== 'false') errors.isListed = 'Status must be true or false';
 
-    // Validate applicableTo
     let offerTypeRef;
     switch (offerType) {
       case 'Products':
@@ -288,7 +284,6 @@ const editOffer = async (req, res) => {
         break;
     }
 
-    // Check for duplicate offer name
     const existingOffer = await Offer.findOne({
       offerName: { $regex: `^${escapeRegex(offerName?.trim())}$`, $options: 'i' },
       _id: { $ne: offerId },
@@ -300,7 +295,6 @@ const editOffer = async (req, res) => {
       return res.status(400).json({ success: false, errors });
     }
 
-    // Update offer
     const updatedOffer = await Offer.findByIdAndUpdate(
       offerId,
       {
@@ -309,7 +303,7 @@ const editOffer = async (req, res) => {
           description: description.trim(),
           discountType,
           discountAmount: parseFloat(discountAmount),
-          validFrom: new Date(validFrom), // Fixed typo: 'Unidos' to 'validFrom'
+          validFrom: new Date(validFrom), 
           validUpto: new Date(validUpto),
           offerType,
           applicableTo,
@@ -324,7 +318,7 @@ const editOffer = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Offer not found' });
     }
 
-    // Update relevant model with offer reference
+    
     if (offerType === 'Products') {
       await Product.findByIdAndUpdate(applicableTo, {
         productOffer: discountAmount,
@@ -348,14 +342,12 @@ const editOffer = async (req, res) => {
 const toggleOffer = async (req, res) => {
   try {
     const { id, action } = req.body;
-    console.log('Toggling offer:', { id, action }); // Debug log
+    console.log('Toggling offer:', { id, action }); 
 
-    // Validate request
     if (!id || !['list', 'unlist'].includes(action)) {
       return res.status(400).json({ success: false, message: 'Invalid request' });
     }
 
-    // Ensure the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ success: false, message: 'Invalid offer ID' });
     }
@@ -371,7 +363,7 @@ const toggleOffer = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Offer not found' });
     }
 
-    console.log('Offer updated:', offer); // Debug log
+    console.log('Offer updated:', offer); 
     res.json({ success: true, message: `Offer ${action}ed successfully` });
   } catch (error) {
     console.error('Error toggling offer:', error);

@@ -1,6 +1,8 @@
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema');
+const Wallet = require('../../models/walletSchema')
+const {generateCustomId}  = require("../../utils/helpers")
 const mongoose = require('mongoose');
 
 const loadOrders = async (req, res) => {
@@ -36,6 +38,8 @@ const loadOrders = async (req, res) => {
             }
         });
 
+        console.log(orders)
+
         res.render('orders', {
             user: userData,
             orders,
@@ -53,12 +57,11 @@ const cancelOrder = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) {
-            return res.redirect('/login'); 
+            return res.redirect('/login');
         }
 
         const { orderId } = req.body;
 
-   
         const order = await Order.findOne({ orderId, user: userId });
         if (!order) {
             req.flash('error', 'Order not found');
@@ -66,12 +69,42 @@ const cancelOrder = async (req, res) => {
         }
 
        
-        if (order.status === 'Delivered' || order.status === 'Cancelled') {
+        if (['Delivered', 'Cancelled'].includes(order.status)) {
             req.flash('error', 'Order cannot be cancelled');
             return res.redirect('/orders');
         }
 
        
+        if (['Wallet', 'Online'].includes(order.paymentMethod)) {
+            const refundAmount = order.finalAmount; 
+
+           
+            const wallet = await Wallet.findOneAndUpdate(
+                { userId },
+                {
+                    $setOnInsert: { userId },
+                    $inc: { balance: refundAmount },
+                    $push: {
+                        transactions: {
+                            transactionId: generateCustomId("RFD"),
+                            amount: refundAmount,
+                            type: "Credit",
+                            status: "Completed",
+                            method: "Refund",
+                            description: `Refund for cancelled order #${order.orderId}`,
+                            orderId: order._id,
+                            date: new Date()
+                        }
+                    },
+                    $set: { lastUpdated: new Date() }
+                },
+                { upsert: true, new: true }
+            );
+
+            order.refundAmount = (order.refundAmount || 0) + refundAmount;
+        }
+
+     
         order.status = 'Cancelled';
         await order.save();
 
@@ -84,7 +117,7 @@ const cancelOrder = async (req, res) => {
             }
         }
 
-        req.flash('success', 'Order cancelled successfully');
+        req.flash('success', `Order cancelled successfully${['Wallet', 'Online'].includes(order.paymentMethod) ? `. ₹${refundAmount} refunded to wallet.` : ''}`);
         return res.redirect('/orders');
     } catch (error) {
         console.error('Cannot cancel order:', error);
@@ -133,19 +166,15 @@ const cancelItem = async (req, res) => {
 
         const { orderId, itemId, reason } = req.body;
 
-
-       
         const order = await Order.findOne({ orderId, user: userId });
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-       
-        if ( order.status === 'Delivered' || order.status === 'Cancelled'  || order.status === 'Returned' ) {
+        if (['Delivered', 'Cancelled', 'Returned'].includes(order.status)) {
             return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
         }
 
-       
         const item = order.orderedItems.find(i => i._id.toString() === itemId);
         if (!item) {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
@@ -153,16 +182,48 @@ const cancelItem = async (req, res) => {
 
        
         if (item.returnStatus !== 'Not Returned') {
-            return res.status(400).json({ success: false, message: 'Item cannot be cancelled' });
+            return res.status(400).json({ success: false, message: 'Item cannot beee cancelled' });
         }
 
        
         item.returnStatus = 'Cancelled';
         item.returnReason = reason;
 
+        let refundAmount;
+       
+        if (['Wallet', 'Online'].includes(order.paymentMethod)) {
+            refundAmount = item.price * item.quantity;
+
+            
+            const wallet = await Wallet.findOneAndUpdate(
+                { userId },
+                {
+                    $setOnInsert: { userId },
+                    $inc: { balance: refundAmount },
+                    $push: {
+                        transactions: {
+                            transactionId: generateCustomId("RFD"),
+                            amount: refundAmount,
+                            type: "Credit",
+                            status: "Completed",
+                            method: "Refund",
+                            description: `Refund for cancelled item in order #${order.orderId}`,
+                            orderId: order._id,
+                            date: new Date()
+                        }
+                    },
+                    $set: { lastUpdated: new Date() }
+                },
+                { upsert: true, new: true }
+            );
+
+            
+            order.refundAmount = (order.refundAmount || 0) + refundAmount;
+        }
+
+        
         const product = await Product.findById(item.product);
         if (product) {
-            console.log("product:count:" , product , product.quantity)
             product.quantity += item.quantity;
             await product.save();
         }
@@ -172,11 +233,13 @@ const cancelItem = async (req, res) => {
             order.status = 'Cancelled';
         }
 
-      
-
         await order.save();
 
-        return res.json({ success: true, message: 'Item cancelled successfully' });
+        return res.json({
+            success: true,
+            message: 'Item cancelled successfully',
+            refundAmount: ['Wallet', 'Online'].includes(order.paymentMethod) ? refundAmount : 0
+        });
     } catch (error) {
         console.error('Error canceling item:', error);
         return res.status(500).json({ success: false, message: 'Failed to cancel item' });

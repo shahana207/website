@@ -64,6 +64,10 @@ router.get('/',userAuth,userController.loadHomepage);
 
 router.get("/shop",userAuth,userController.loadShoppingPage);
 
+router.get("/referral", userAuth, userController.referralPage);
+
+
+
 
 //product management
 router.get("/productDetails",userAuth,productController.productDetails);

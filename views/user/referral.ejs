@@ -1,0 +1,376 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Referral Program</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Return to Profile Button */
+        .profile-btn {
+            display: inline-block;
+            background-color: #008080;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .profile-btn:hover {
+            background-color: #006666;
+        }
+
+        /* Banner Section */
+        .referral-banner {
+            background: linear-gradient(90deg, #008080, #00a3a3);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .referral-banner h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .referral-banner p {
+            font-size: 16px;
+            margin: 0;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        /* Referral Link/Code Section */
+        .referral-info {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .referral-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1a202c;
+        }
+
+        .referral-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .referral-item:last-child {
+            border-bottom: none;
+        }
+
+        .referral-item p {
+            margin: 0;
+            font-size: 15px;
+            color: #4a5568;
+        }
+
+        .copy-btn {
+            background-color: #008080;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: #006666;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .how-it-works h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a202c;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #008080;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .step-content p {
+            margin: 0;
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .step-content p strong {
+            color: #1a202c;
+        }
+
+        /* Referral History Section */
+        .referral-history {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .referral-history h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a202c;
+        }
+
+        .referral-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .referral-table th,
+        .referral-table td {
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+            color: #4a5568;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .referral-table th {
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .no-referrals {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .no-referrals i {
+            font-size: 28px;
+            color: #a0aec0;
+            margin-bottom: 12px;
+        }
+
+        .no-referrals p {
+            font-size: 15px;
+            color: #4a5568;
+            margin: 0;
+            linenant: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 767px) {
+            .container {
+                padding: 20px;
+            }
+
+            .referral-banner h2 {
+                font-size: 24px;
+            }
+
+            .referral-banner p {
+                font-size: 14px;
+            }
+
+            .referral-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .copy-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .step-icon {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Return to Profile Button -->
+        <a href="/userProfile" class="profile-btn">Return to Profile</a>
+         
+
+        <!-- Referral Banner -->
+        <div class="referral-banner">
+            <h2>Invite Friends & Earn Rewards</h2>
+            <p>Refer friends to Fazion and earn ₹1000 when they join. Your referred friend will also receive ₹500 as a welcome bonus in their wallet!</p>
+        </div>
+
+        <!-- Referral Link/Code -->
+        <div class="referral-info">
+            <!-- <h3>Your Referral Link</h3>
+            <div class="referral-item">
+                <p><%= user.referralLink || 'https://fazion.com/refer?code=USER123' %></p>
+                <button class="copy-btn" onclick="copyToClipboard('<%= user.referralLink || 'https://fazion.com/refer?code=USER123' %>', 'Referral Link')">Copy</button>
+            </div> -->
+            <h3>Your Referral Code</h3>
+            <div class="referral-item">
+                <p><%= user.referralCode %></p>
+                <button class="copy-btn" onclick="copyToClipboard('<%= user.referralCode || 'USER123' %>', 'Referral Code')">Copy</button>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="how-it-works">
+            <h3>How It Works</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">1</div>
+                    <div class="step-content">
+                        <p><strong>Share Code:</strong> Share your unique referral code with friends & family.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">2</div>
+                    <div class="step-content">
+                        <p><strong>Bonus on Sign Up:</strong> Your friend signs up using your referral code during registration.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">3</div>
+                    <div class="step-content">
+                        <p><strong>Get Rewards:</strong> After sign-up, you receive ₹1000 & they get ₹500 in wallet credit!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral History -->
+        <div class="referral-history">
+            <h3>Referral History</h3>
+            <% if (user.referralHistory && user.referralHistory.length > 0) { %>
+                <table class="referral-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Reward</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% user.referralHistory.forEach((referral, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= referral.name %></td>
+                                <td><%= new Date(referral.date).toLocaleDateString() %></td>
+                                <td><%= referral.status %></td>
+                                <td>₹<%= referral.reward %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="no-referrals">
+                    <i class="fas fa-users"></i>
+                    <p>No referrals yet<br>Start sharing your code to earn rewards!</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function copyToClipboard(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: `${label} Copied!`,
+                    text: `${text}`,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }).catch(err => {
+    Swal.fire({
+        icon: 'error',
+        title: 'Copy Failed',
+        text: 'Unable to copy to clipboard.',
+        showConfirmButton: false,
+        timer: 1500
+    });
+            }).catch(err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Copy Failed',
+                    text: 'Unable to copy to clipboard.',
+                    showConfirmButton: true
+                });
+            });
+        }
+    </script>
+</body>
+</html>

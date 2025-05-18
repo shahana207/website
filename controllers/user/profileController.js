@@ -698,14 +698,6 @@ const deleteAddress = async (req, res) => {
     }
   };
 
-const loadCartPage = async (req,res)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
-};
-
 const getWalletPage = async (req, res , next) => {
     try {
     

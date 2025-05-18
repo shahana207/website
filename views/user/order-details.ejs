@@ -115,7 +115,7 @@
                     <div><strong>Offer Discount:</strong> -₹ <%= order.offerDiscount.toFixed(2) %></div>
                 <% } %>
                 <div><strong>Shipping:</strong> <%= order.shippingCharge ? '₹' + order.shippingCharge.toFixed(2) : 'Free' %></div>
-                <div><strong>Tax:</strong> ₹ <%= order.tax.toFixed(2) %></div>
+
                 <% if (order.discount > 0) { %>
                     <div><strong>Coupon Discount:</strong> -₹ <%= order.discount.toFixed(2) %></div>
                 <% } %>

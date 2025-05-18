@@ -1500,6 +1500,12 @@
 
             const paymentObject = new window.Razorpay(options);
             paymentObject.open();
+
+            paymentObject.on('payment.failed', function (response) {
+            const errorMessage = encodeURIComponent(response.error.description)
+            window.location.href = `/payment-failure?error=${errorMessage}`;
+        });
+
         } else if (result.success) {
             Swal.fire({
                 icon: 'success',

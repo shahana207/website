@@ -480,30 +480,13 @@
                                                     <span> | Color: <%= item.productId.color %></span>
                                                 <% } %>
                                             </div>
-                                            <% if (item.productId.sizes && item.productId.sizes.length > 0) { %>
-                                                <div class="size-selector" style="margin-top: 10px;">
-                                                    <label for="size-<%= item.productId._id %>" style="font-size: 14px; color: #555;">Size:</label>
-                                                    <select 
-                                                        id="size-<%= item.productId._id %>" 
-                                                        class="size-select" 
-                                                        data-product-id="<%= item.productId._id %>"
-                                                        style="margin-left: 8px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;"
-                                                    >
-                                                        <% item.productId.sizes.forEach(size => { %>
-                                                            <option value="<%= size %>" <%= item.size === size ? 'selected' : '' %>><%= size %></option>
-                                                        <% }); %>
-                                                    </select>
-                                                </div>
-                                            <% } %>
                                         </td>
                                         <td data-title="Price" class="zz-item-price">
                                             <% if (item.bestOffer) { %>
                                                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= item.bestOffer.originalPrice.toFixed(2) %></span>
                                                 <br>
                                                 <span style="color: #28a745; font-weight: 600;">₹ <%= (item.bestOffer.originalPrice - item.bestOffer.discountAmount).toFixed(2) %></span>
-                                                <div style="font-size: 0.8em; color: #28a745;">
-                                                    <i class="fa fa-tag"></i> <%= item.bestOffer.name %>
-                                                </div>
+                                               
                                             <% } else { %>
                                                 ₹ <%= item.productId.salePrice.toFixed(2) %>
                                             <% } %>
@@ -655,7 +638,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 updateCartSummary(data.cart);
                 updateItemPrice(document.querySelector(`.zz-cart-item[data-product-id="${productId}"]`));
-               
+                window.location.reload()
             } else {
                 // Handle errors (e.g., stock limit exceeded)
                 let errorMessage = 'There was an issue updating your cart.';
@@ -673,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.value = data.cart.items.find(item => item.productId._id.toString() === productId)?.quantity || 1;
             }
         }).then(()=>{
-          window.location.reload()
+
         })
         .catch(error => {
             console.error('Error updating cart:', error);
@@ -826,56 +809,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     });
                 }
-            });
-        });
-    });
-
-    // Add size change handler
-    const sizeSelects = document.querySelectorAll('.size-select');
-    sizeSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            const productId = this.getAttribute('data-product-id');
-            const newSize = this.value;
-            
-            fetch('/update-cart-size', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    productId: productId,
-                    size: newSize
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Size Updated',
-                        text: 'Product size has been updated successfully!',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Update Failed',
-                        text: data.message || 'Failed to update size',
-                        confirmButtonText: 'OK'
-                    });
-                    // Revert to previous size
-                    this.value = data.previousSize || this.options[0].value;
-                }
-            })
-            .catch(error => {
-                console.error('Error updating size:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred. Please try again later.'
-                });
             });
         });
     });

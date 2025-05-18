@@ -5,12 +5,11 @@ const Cart = require('../../models/cartSchema');
 const Offer = require('../../models/offerSchema');
 const mongoose = require('mongoose');
 
-// Function to get best offer for a product
+
 const getBestOffer = async (product) => {
     try {
         const currentDate = new Date();
-        
-        // Find all valid offers for the product
+      
         const productOffers = await Offer.find({
             isListed: true,
             isDeleted: false,
@@ -20,7 +19,7 @@ const getBestOffer = async (product) => {
             applicableTo: product._id
         });
 
-        // Find all valid offers for the product's brand
+       
         const brandOffers = await Offer.find({
             isListed: true,
             isDeleted: false,
@@ -30,7 +29,6 @@ const getBestOffer = async (product) => {
             applicableTo: product.brand
         });
 
-        // Find all valid offers for the product's category
         const categoryOffers = await Offer.find({
             isListed: true,
             isDeleted: false,
@@ -40,14 +38,12 @@ const getBestOffer = async (product) => {
             applicableTo: product.category
         });
 
-        // Combine all offers
         const allOffers = [...productOffers, ...brandOffers, ...categoryOffers];
 
         if (allOffers.length === 0) {
             return null;
         }
 
-        // Find the offer with highest discount
         const bestOffer = allOffers.reduce((best, current) => {
             const currentDiscount = (product.salePrice * current.discountAmount) / 100;
             const bestDiscount = best ? (product.salePrice * best.discountAmount) / 100 : 0;
@@ -74,7 +70,6 @@ const loadCart = async (req, res) => {
         if (cart) {
             cart.items = cart.items.filter(item => item.productId);
             
-            // Get best offer for each product and calculate offer prices
             for (let item of cart.items) {
                 const bestOffer = await getBestOffer(item.productId);
                 if (bestOffer) {
@@ -127,7 +122,7 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found or price missing' });
     }
 
-    // Check if requested quantity exceeds available stock
+    
     if (quantity > product.quantity) {
       return res.status(400).json({
         success: false,
@@ -142,7 +137,7 @@ const addToCart = async (req, res) => {
 
     const existingItem = cart.items.find(item => item.productId.toString() === id);
     if (existingItem) {
-      // Check if updated quantity exceeds stock
+      
       const newQuantity = existingItem.quantity + quantity;
       if (newQuantity > product.quantity) {
         return res.status(400).json({

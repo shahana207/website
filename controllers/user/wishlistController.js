@@ -14,11 +14,10 @@ const loadWishlist = async (req, res) => {
             return res.redirect("/login");
         }
 const product= await Product.find({})
-        // Initialize wishlist if undefined 
+      
         const wishlist=await Wishlist .findOne({userId}).populate("products.productId")
 
-        // const products = await Product.find({ _id: { $in: user.wishlist } }).populate('category');
-
+       
         res.render('wishlist', {
             user: user,
             wishlist
@@ -45,7 +44,7 @@ const addToWishList = async (req, res) => {
         }
 
         let  wishlist= await Wishlist .findOne({userId})
-        // Initialize wishlist if undefined
+       
         if (!wishlist) {
             wishlist =new Wishlist ({
                 userId,
@@ -105,39 +104,33 @@ const getWishlist = async (req, res) => {
     }
 };
 
-// New endpoint for removing from wishlist (used by wishlist.ejs)
 const removeFromWishlist = async (req, res) => {
     try {
         const { productId } = req.body;
         const userId = req.session.user;
 
-        // Check if user is logged in
         if (!userId) {
             return res.status(401).json({ success: false, message: "Please log in", redirect: "/login" });
         }
 
-        // Verify user exists
         const user = await User.findById(userId);
         if (!user) {
             return res.status(401).json({ success: false, message: "User not found", redirect: "/login" });
         }
 
-        // Find the user's wishlist
         let wishlist = await Wishlist.findOne({ userId });
         if (!wishlist) {
             return res.status(404).json({ success: false, message: "Wishlist not found" });
         }
 
-        // Check if product exists in wishlist
+       
         const productExists = wishlist.products.some(item => item.productId.toString() === productId);
         if (!productExists) {
             return res.status(404).json({ success: false, message: "Product not in wishlist" });
         }
 
-        // Remove the product from the wishlist
         wishlist.products = wishlist.products.filter(item => item.productId.toString() !== productId);
 
-        // Save the updated wishlist
         await wishlist.save();
 
         return res.status(200).json({ success: true, message: "Product removed from wishlist" });

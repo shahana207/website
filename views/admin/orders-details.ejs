@@ -430,7 +430,7 @@
                             </div>
                             <div class="item-actions">
                                 <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
-                                    <button class="action-btn cancel-item-btn" onclick="cancelItem('<%= item._id %>')">Cancel Item</button>
+                                    <!-- <button class="action-btn cancel-item-btn" onclick="cancelItem('<%= item._id %>')">Cancel Item</button> -->
                                 <% } %>
                                 <% if (item.returnStatus === 'Return Requested') { %>
                                     <button class="action-btn approve-return-btn" onclick="handleReturnRequest('<%= item._id %>', 'approve')">Approve Return</button>

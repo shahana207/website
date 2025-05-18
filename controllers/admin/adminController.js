@@ -92,13 +92,13 @@ const getSalesReport = async (req, res) => {
             query.status = status;
         }
 
-        // Fetch orders with pagination
+        
         const orders = await Order.find(query)
             .skip(skip)
             .limit(limit)
             .sort({ createdOn: -1 });
 
-        // Calculate summary metrics
+        
         const allOrders = await Order.find(query);
         const summary = {
             grossSales: allOrders.reduce((sum, order) => sum + order.totalPrice, 0),
@@ -160,7 +160,6 @@ const exportSalesReport = async (req, res) => {
             const rowHeight = 20;
             let y = tableTop;
 
-            // Table Headers
             doc.font('Helvetica-Bold');
             doc.text('Order ID', 50, y);
             doc.text('Amount', 150, y);
@@ -173,7 +172,7 @@ const exportSalesReport = async (req, res) => {
             doc.moveTo(50, y).lineTo(750, y).stroke();
             y += 5;
 
-            // Table Rows
+          
             doc.font('Helvetica');
             orders.forEach(order => {
                 doc.text(order.orderId, 50, y);

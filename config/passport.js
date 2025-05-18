@@ -21,10 +21,12 @@ async (accessToken,refreshToken,profile,done)=>{
 
             return done(null,user);
          }else{
+            const referralCode = generateReferralCode()
             user = new User({
                 name: profile.displayName,
                 email:profile.emails[0].value,
                 googleId:profile.id,
+                referralCode
             });
             await user.save();
             return done(null,user);
@@ -51,6 +53,15 @@ passport.deserializeUser(async(id,done)=>{
      done(err,null)
  }
  })
+
+ const generateReferralCode = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return code;
+};
 
 
 module.exports = passport;

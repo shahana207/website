@@ -44,7 +44,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <% wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(transaction => { %>
+                      <% wallet.transactions.forEach(transaction => { %>
                         <tr class="transition-all">
                           <td class="py-3 ps-4">
                             <%= new Date(transaction.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
@@ -80,6 +80,40 @@
                     </tbody>
                   </table>
                 </div>
+                <!-- Pagination -->
+                <% if (count > limit) { %>
+                  <nav aria-label="Transaction history pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                      <!-- Previous Button -->
+                      <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+                        <a class="page-link rounded-pill px-3 py-2 transition-all" href="/wallet?page=<%= page - 1 %>&limit=<%= limit %>" aria-label="Previous">
+                          <span aria-hidden="true">&laquo; Previous</span>
+                        </a>
+                      </li>
+                      <!-- Page Numbers -->
+                      <% 
+                        const totalPages = Math.ceil(count / limit);
+                        const maxPagesToShow = 5;
+                        let startPage = Math.max(1, page - Math.floor(maxPagesToShow / 2));
+                        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+                        if (endPage - startPage + 1 < maxPagesToShow) {
+                          startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                        }
+                      %>
+                      <% for (let i = startPage; i <= endPage; i++) { %>
+                        <li class="page-item <%= page == i ? 'active' : '' %>">
+                          <a class="page-link rounded-pill px-3 py-2 transition-all" href="/wallet?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                        </li>
+                      <% } %>
+                      <!-- Next Button -->
+                      <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+                        <a class="page-link rounded-pill px-3 py-2 transition-all" href="/wallet?page=<%= page + 1 %>&limit=<%= limit %>" aria-label="Next">
+                          <span aria-hidden="true">Next &raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                <% } %>
               <% } else { %>
                 <div class="text-center p-5 bg-light rounded-3">
                   <i class="fas fa-wallet fa-4x mb-3 text-primary opacity-75"></i>
@@ -193,6 +227,27 @@
   .form-control:focus {
     border-color: #252627;
     box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.1);
+  }
+
+  /* Pagination Styling */
+  .pagination .page-link {
+    color: #0056b3;
+    border: none;
+    margin: 0 5px;
+  }
+  .pagination .page-link:hover {
+    background-color: #e9ecef;
+    color: #003d82;
+  }
+  .pagination .page-item.active .page-link {
+    background-color: #0056b3;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+  }
+  .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    cursor: not-allowed;
   }
 </style>
 

@@ -60,17 +60,48 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  referalCode: {
-    type: String
-    // required: true
+  referralCode: {
+    type: String,
+    unique: true,
+        sparse: true 
   },
+  referralLink: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
   redeemed: {
-    type: Boolean
+    type: Boolean,
+    default:false
   },
   redeemedUsers: [{
     type: Schema.Types.ObjectId,
     ref: "User"
   }],
+   referralHistory: [{  
+        referredUser: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+        name: { 
+            type: String,
+            required: true
+        },
+        date: {
+            type: Date,
+            default: Date.now
+        },
+        status: { 
+            type: String,
+            enum: ["Pending", "Completed", "Failed"],
+            default: "Pending"
+        },
+        reward: { 
+            type: Number,
+            default: 0
+        }
+    }],
   searchHistory: [{
     category: {
       type: Schema.Types.ObjectId,

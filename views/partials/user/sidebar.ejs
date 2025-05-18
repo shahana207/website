@@ -78,6 +78,7 @@
 </style>
 
 <!-- Sidebar HTML --> 
+<!-- Sidebar Partial: views/partials/user/sidebar.ejs -->
 <div class="sidebar">
     <div class="menu-item <%= active === 'profile' ? 'active' : '' %>" data-route="/userProfile">
         <i class="fa fa-user"></i> My Profile
@@ -93,6 +94,9 @@
     </a>
     <div class="menu-item <%= active === 'wishlist' ? 'active' : '' %>" data-route="/wishlist">
         <i class="fa fa-heart"></i> My Wishlist
+    </div>
+    <div class="menu-item <%= active === 'referral' ? 'active' : '' %>" data-route="/referral">
+        <i class="fa fa-share-alt"></i> Referral
     </div>
     
     <button type="button" class="logout-btn"><i class="fa fa-sign-out"></i> Logout</button>
@@ -121,5 +125,5 @@
                 redirectToRoute('/logout');
             });
         }
-    });
+    });
 </script>
