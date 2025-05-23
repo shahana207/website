@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Existing styles unchanged */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #333;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(94, 114, 235, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 5%, rgba(37, 99, 235, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 10% 90%, rgba(99, 102, 241, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 80% 90%, rgba(99, 102, 241, 0.07) 0%, transparent 15%);
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 850px;
+            position: relative;
+        }
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.15) 100%);
+            top: -50px;
+            left: -70px;
+        }
+        .circle-2 {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(240, 171, 252, 0.1) 0%, rgba(217, 70, 239, 0.15) 100%);
+            top: 20%;
+            right: -40px;
+        }
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.15) 100%);
+            bottom: 10%;
+            left: -50px;
+        }
+        .success-card {
+            background-color: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .success-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+        .confetti-1 {
+            background-color: #ffdd00;
+            top: 10%;
+            left: 10%;
+            transform: rotate(15deg);
+        }
+        .confetti-2 {
+            background-color: #ff5252;
+            top: 20%;
+            right: 20%;
+            transform: rotate(45deg);
+            width: 15px;
+            height: 15px;
+        }
+        .confetti-3 {
+            background-color: #00e676;
+            bottom: 30%;
+            left: 30%;
+            transform: rotate(30deg);
+            width: 8px;
+            height: 8px;
+        }
+        .confetti-4 {
+            background-color: #2979ff;
+            bottom: 10%;
+            right: 15%;
+            transform: rotate(10deg);
+            width: 12px;
+            height: 12px;
+        }
+        .confetti-5 {
+            background-color: #e040fb;
+            top: 40%;
+            left: 15%;
+            transform: rotate(25deg);
+            width: 12px;
+            height: 12px;
+        }
+        .confetti-6 {
+            background-color: #ffab40;
+            top: 30%;
+            right: 35%;
+            transform: rotate(60deg);
+            width: 8px;
+            height: 8px;
+        }
+        .header-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            background-image: 
+                linear-gradient(45deg, #ffffff 25%, transparent 25%),
+                linear-gradient(-45deg, #ffffff 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ffffff 75%),
+                linear-gradient(-45deg, transparent 75%, #ffffff 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .success-icon-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 25px;
+        }
+        .success-icon-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .success-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 15px;
+            left: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+        .success-icon i {
+            color: #4f46e5;
+            font-size: 36px;
+        }
+        .success-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .success-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .order-summary {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px;
+            position: relative;
+            border: 1px dashed #e2e8f0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+        }
+        .summary-decoration {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px dashed #e2e8f0;
+            z-index: 1;
+        }
+        .dec-1 { top: -15px; left: 30px; }
+        .dec-2 { top: -15px; right: 30px; }
+        .dec-3 { bottom: -15px; left: 30px; }
+        .dec-4 { bottom: -15px; right: 30px; }
+        .summary-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+        .summary-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #3b82f6);
+            border-radius: 2px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            position: relative;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s ease;
+        }
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+        .detail-label i {
+            margin-right: 6px;
+            font-size: 14px;
+            color: #4f46e5;
+        }
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .status-section {
+            padding: 30px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1e293b;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #3b82f6);
+            border-radius: 2px;
+        }
+        .progress-tracker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 50px;
+            position: relative;
+            padding: 0 20px;
+        }
+        .progress-tracker::before {
+            content: '';
+            position: absolute;
+            height: 3px;
+            background-color: #e2e8f0;
+            top: 26px;
+            left: 50px;
+            right: 50px;
+            border-radius: 3px;
+        }
+        .progress-tracker::after {
+            content: '';
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #3b82f6);
+            top: 26px;
+            left: 50px;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+        .tracker-loaded .progress-tracker::after {
+            width: 23%;
+        }
+        .progress-step {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .progress-step i {
+            color: white;
+            font-size: 20px;
+        }
+        .progress-step.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            border-color: #4f46e5;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+            transform: scale(1.1);
+        }
+        .progress-step.pending {
+            background-color: white;
+        }
+        .step-label {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .progress-step.active + .step-label {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .table-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        .items-table th {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+            color: #64748b;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: left;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .items-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 15px;
+        }
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2),
+        .items-table th:nth-child(3),
+        .items-table td:nth-child(3) {
+            text-align: center;
+        }
+        .product-name {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .product-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        .product-icon i {
+            color: #4f46e5;
+            font-size: 16px;
+        }
+        .summary-row td {
+            padding-top: 12px;
+            color: #64748b;
+            border-bottom: none;
+        }
+        .summary-row.total td {
+            padding-top: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 16px;
+            background-color: #f8fafc;
+        }
+        .price-highlight {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .actions-card {
+            background-color: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .btn {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+        }
+        .btn-secondary {
+            text-decoration: none;
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+            background-color: #e2e8f0;
+        }
+        .btn-tertiary {
+            text-decoration: none;
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            color: white;
+        }
+        .btn-tertiary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; gap: 15px; }
+            .actions-card { flex-direction: column; }
+            .success-header { padding: 30px 20px; }
+            .order-summary { margin: 20px; padding: 20px; }
+            .status-section { padding: 20px; }
+            .progress-tracker { padding: 0; }
+            .progress-tracker::before, .progress-tracker::after { left: 25px; right: 25px; }
+            .progress-step { width: 40px; height: 40px; }
+            .progress-step i { font-size: 16px; }
+            .step-label { font-size: 11px; top: 50px; }
+            .items-table th, .items-table td { padding: 12px 10px; font-size: 14px; }
+            .product-icon { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container tracker-loaded">
+        <div class="decorative-circle circle-1"></div>
+        <div class="decorative-circle circle-2"></div>
+        <div class="decorative-circle circle-3"></div>
+        
+        <div class="success-card">
+            <div class="success-header">
+                <div class="header-pattern"></div>
+                <div class="confetti confetti-1"></div>
+                <div class="confetti confetti-2"></div>
+                <div class="confetti confetti-3"></div>
+                <div class="confetti confetti-4"></div>
+                <div class="confetti confetti-5"></div>
+                <div class="confetti confetti-6"></div>
+                
+                <div class="success-icon-wrapper">
+                    <div class="success-icon-bg"></div>
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <h1>Order Successful!</h1>
+                <p>Thank you for your purchase. Your order has been confirmed.</p>
+            </div>
+            
+            <div class="order-summary">
+                <div class="summary-decoration dec-1"></div>
+                <div class="summary-decoration dec-2"></div>
+                <div class="summary-decoration dec-3"></div>
+                <div class="summary-decoration dec-4"></div>
+                
+                <h3 class="summary-title">Order Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-hashtag"></i> Order ID</span>
+                        <span class="detail-value"><%= order.orderId %></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar"></i> Order Date</span>
+                        <span class="detail-value"><%= order.createdOn.toLocaleDateString() %></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-info-circle"></i> Status</span>
+                        <span class="detail-value"><%= order.status %></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-credit-card"></i> Payment Method</span>
+                        <span class="detail-value"><%= order.paymentMethod %></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-section">
+                <h2 class="section-title">Order Status</h2>
+                
+                <div class="progress-tracker">
+                    <div class="progress-step <%= order.status === 'pending' || order.status === 'processing' || order.status === 'Shipped' || order.status === 'Delivered' ? 'active' : '' %>">
+                        <i class="fas fa-check"></i>
+                        <span class="step-label">Confirmed</span>
+                    </div>
+                    <div class="progress-step <%= order.status === 'processing' || order.status === 'Shipped' || order.status === 'Delivered' ? 'active' : 'pending' %>">
+                        <span class="step-label">Processing</span>
+                    </div>
+                    <div class="progress-step <%= order.status === 'Shipped' || order.status === 'Delivered' ? 'active' : 'pending' %>">
+                        <span class="step-label">Shipped</span>
+                    </div>
+                    <div class="progress-step <%= order.status === 'Delivered' ? 'active' : 'pending' %>">
+                        <span class="step-label">Delivered</span>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Order Summary</h2>
+                
+                <div class="table-container">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.orderedItems.forEach(item => { %>
+                                <tr>
+                                    <td class="product-name">
+                                        <div class="product-icon">
+                                            <i class="fas fa-laptop"></i>
+                                        </div>
+                                        <%= item.product ? item.product.productName : 'Product Not Found' %>
+                                    </td>
+                                    <td><%= item.quantity %></td>
+                                    <td>₹<%= item.price.toFixed(2) %></td>
+                                    <td class="price-highlight">₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                                </tr>
+                            <% }); %>
+                            <tr class="summary-row">
+                                <td colspan="3">Subtotal</td>
+                                <td>₹<%= order.totalPrice.toFixed(2) %></td>
+                            </tr>
+                            <% if (order.couponApplied && order.discount > 0) { %>
+                                <tr class="summary-row">
+                                    <td colspan="3">Coupon Discount</td>
+                                    <td>-₹<%= order.discount.toFixed(2) %></td>
+                                </tr>
+                            <% } %>
+                            <tr class="summary-row">
+                                <td colspan="3">Offer Discount</td>
+                                <td>₹0.00</td>
+                            </tr>
+                            <tr class="summary-row">
+                                <td colspan="3">Shipping Charge</td>
+                                <td>₹<%= order.shippingCharge.toFixed(2) %></td>
+                            </tr>
+                            <tr class="summary-row total">
+                                <td colspan="3">Total Amount</td>
+                                <td class="price-highlight">₹<%= order.finalAmount.toFixed(2) %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions-card">
+            <button class="btn btn-primary download-invoice" data-order-id="<%= order.orderId %>">
+                <i class="fas fa-download"></i> Download Invoice
+            </button>
+            <a href="/shop" class="btn btn-secondary">
+                <i class="fas fa-shopping-cart"></i> Continue Shopping
+            </a>
+            <a href="/order-details/<%= order.orderId %>" class="btn btn-tertiary">
+                <i class="fas fa-eye"></i> View Order Details
+            </a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error,
+            confirmButtonColor: '#4f46e5',
+            timer: 3000
+        });
+    }
+
+    setTimeout(function() {
+        document.querySelector('.container').classList.add('tracker-loaded');
+    }, 500);
+
+    // Attach event listeners to all download buttons
+    document.querySelectorAll('.download-invoice').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            fetch(`/download-invoice/${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                console.log('Response Status:', response.status); // Debug status
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Failed to download invoice'); });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Invoice_${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error downloading invoice:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to download invoice. Please try again.',
+                    confirmButtonColor: '#4f46e5',
+                });
+            });
+        });
+    });
+});
+    </script>
+</body>
+</html>

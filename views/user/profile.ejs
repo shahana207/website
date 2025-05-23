@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Fazion User Profile">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>User Profile - Fazion</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+   
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .profile-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: white;
+        }
+        
+        .greeting {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .preview-image {
+            width: 123px;
+            height: 121px;
+            object-fit: cover;
+            border-radius: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-label {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            background-color: #f5f5f5;
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .edit-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .edit-btn:hover {
+            background-color: #000000;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .change-password-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .change-password-btn:hover {
+            background-color: #000000;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* New styles for login details layout */
+        .login-details-container {
+            margin-top: 20px;
+        }
+        
+        .login-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        
+        .login-column {
+            flex: 1;
+            margin-right: 30px;
+        }
+        
+        .login-column:last-child {
+            margin-right: 0;
+        }
+        
+        .login-button-container {
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .login-row {
+                flex-direction: column;
+            }
+            
+            .login-column {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/user/header") %>
+    
+    <div class="profile-container">
+        <%- include("../partials/user/sidebar", {active: 'profile'}) %>
+        
+        <div class="content">
+            <div id="greeting" class="greeting">Hi <%= name %></div>
+            
+            <% if (profilePicture) { %>
+                <img src="<%= profilePicture %>" class="preview-image" alt="Profile Picture">
+            <% } else { %>
+                <img src="/Uploads/profile-pictures/profile icon.jpeg" class="preview-image" alt="Default Picture">
+            <% } %>
+            
+            
+            <!-- Personal Information -->
+            <div class="info-container">
+                <div class="info-label">Full Name</div>
+                <div id="name-value" class="info-value"><%= name %></div>
+                
+                <div class="info-label">Phone Number</div>
+                <div id="phone-value" class="info-value"><%= phone %></div>
+                
+                <div style="text-align: right;">
+                    <a href="/getEditProfile" class="edit-btn"><i class="fa fa-pencil"></i> Edit</a>
+                </div>
+            </div>
+            
+            <!-- Login Details Section - Modified to match image layout -->
+            <div class="section-header">Login Details</div>
+            <div class="login-details-container">
+                <!-- Username row -->
+                <div class="login-row">
+                    <div class="login-column">
+                        <div class="info-label">Email</div>
+                        <div id="username-value" class="info-value"><%= email %></div>
+                        <div class="login-button-container">
+                            <a href="/change-email" class="change-password-btn">Change Email</a>
+                        </div>
+                    </div>
+                    
+                    <div class="login-column">
+                        <div class="info-label">Password</div>
+                        <div id="password-value" class="info-value">••••••••••••</div>
+                        <div class="login-button-container">
+                            <a href="/change-password" class="change-password-btn">Change Password</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.nice-select.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/jquery.countdown.min.js"></script>
+    <script src="js/jquery.slicknav.js"></script>
+    <script src="js/mixitup.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

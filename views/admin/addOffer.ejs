@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Offer</title>
+    <!-- SweetAlert2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: #111827;
+            position: fixed;
+            left: 0;
+            top: 0;
+            color: white;
+            padding: 1.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #374151;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .menu-item {
+            margin-bottom: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .menu-item:hover {
+            background-color: #1f2937;
+        }
+        
+        .menu-item.active {
+            background-color: #1f2937;
+        }
+        
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #111827;
+        }
+        
+        /* Form Styles */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            background-color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background-color: #9ca3af;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6b7280;
+        }
+        
+        .btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .form-row {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <%- include('../partials/admin/header') %>
+    </div>
+    
+    <!-- Overlay for mobile -->
+    <div class="overlay"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button class="toggle-sidebar">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>Add New Offer</h1>
+        </div>
+        
+        <div class="card">
+            <form id="offerForm">
+                <div class="form-group">
+                    <label for="offerName" class="form-label">Offer Name</label>
+                    <input type="text" id="offerName" class="form-control" placeholder="Enter offer name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" class="form-control" placeholder="Enter offer description" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="discountType" class="form-label">Discount Type</label>
+                    <select id="discountType" class="form-select" required>
+                        <option value="percentage">Percentage</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="discountAmount" class="form-label">Discount Amount (%)</label>
+                    <input type="number" id="discountAmount" class="form-control" placeholder="Enter discount percentage" min="0" max="100" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="validFrom" class="form-label">Valid From</label>
+                        <input type="date" id="validFrom" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="validUntil" class="form-label">Valid Until</label>
+                        <input type="date" id="validUntil" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="offerType" class="form-label">Offer Type</label>
+                    <select id="offerType" class="form-select" required>
+                        <option value="" disabled selected>-- Select Offer Type --</option>
+                        <option value="Products">Products</option>
+                        <option value="Category">Category</option>
+                        <option value="Brands">Brands</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applyTo" class="form-label">Apply To</label>
+                    <select id="applyTo" class="form-select" required>
+                        <option value="" disabled selected>-- Select Item --</option>
+                    </select>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Offer
+                    </button>
+                    <button type="button" id="backBtn" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Set today's date as default for Valid From
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        let mm = today.getMonth() + 1;
+        let dd = today.getDate();
+        
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        
+        const formattedToday = yyyy + '-' + mm + '-' + dd;
+        document.getElementById('validFrom').value = formattedToday;
+        
+        // Set default end date (7 days from now)
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7);
+        
+        const nextWeekYYYY = nextWeek.getFullYear();
+        let nextWeekMM = nextWeek.getMonth() + 1;
+        let nextWeekDD = nextWeek.getDate();
+        
+        if (nextWeekDD < 10) nextWeekDD = '0' + nextWeekDD;
+        if (nextWeekMM < 10) nextWeekMM = '0' + nextWeekMM;
+        
+        const formattedNextWeek = nextWeekYYYY + '-' + nextWeekMM + '-' + nextWeekDD;
+        document.getElementById('validUntil').value = formattedNextWeek;
+        
+        // Mobile sidebar functionality
+        const toggleBtn = document.querySelector('.toggle-sidebar');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.overlay');
+        
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+        
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+        
+        // Back button functionality
+        document.getElementById('backBtn').addEventListener('click', () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Any unsaved changes will be lost!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6366f1',
+                cancelButtonColor: '#9ca3af',
+                confirmButtonText: 'Yes, go back'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/admin/offerss';
+                }
+            });
+        });
+        
+        // Dynamic population of Apply To dropdown
+        document.getElementById('offerType').addEventListener('change', async (e) => {
+            const offerType = e.target.value;
+            const applyToSelect = document.getElementById('applyTo');
+            
+            // Clear existing options
+            applyToSelect.innerHTML = '<option value="" disabled selected>-- Select Item --</option>';
+            
+            if (offerType) {
+                try {
+                    const response = await fetch(`/admin/applicable-items?offerType=${offerType}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        data.items.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;
+                            option.textContent = item.name;
+                            applyToSelect.appendChild(option);
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonColor: '#6366f1'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to load items',
+                        icon: 'error',
+                        confirmButtonColor: '#6366f1'
+                    });
+                }
+            }
+        });
+        
+        // Form submission with AJAX
+        document.getElementById('offerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                offerName: document.getElementById('offerName').value,
+                description: document.getElementById('description').value,
+                discountType: document.getElementById('discountType').value,
+                discountAmount: document.getElementById('discountAmount').value,
+                validFrom: document.getElementById('validFrom').value,
+                validUpto: document.getElementById('validUntil').value,
+                offerType: document.getElementById('offerType').value,
+                applicableTo: document.getElementById('applyTo').value
+            };
+            
+            try {
+                const response = await fetch('/admin/addOffer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => {
+                        document.getElementById('offerForm').reset();
+                        document.getElementById('validFrom').value = formattedToday;
+                        document.getElementById('validUntil').value = formattedNextWeek;
+                        document.getElementById('applyTo').innerHTML = '<option value="" disabled selected>-- Select Item --</option>';
+                    });
+                    window.location.href="/admin/offers"
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message || 'Failed to create offer',
+                        icon: 'error',
+                        confirmButtonColor: '#6366f1'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Server error while creating offer',
+                    icon: 'error',
+                    confirmButtonColor: '#6366f1'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

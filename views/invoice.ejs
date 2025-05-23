@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .close-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .invoice-details {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        .billing-section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .billing-info {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #f8f8f8;
+            text-align: left;
+            padding: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .amount-column {
+            text-align: right;
+        }
+        .totals-table td {
+            border: none;
+            padding: 5px 10px;
+        }
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .download-button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .print-button {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .footer-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .footer-support {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .download-icon {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div>
+                <h1 class="invoice-title">INVOICE</h1>
+                <p class="invoice-details">Order ID: <%= orderId %></p>
+                <p class="invoice-details">Date: <%= orderDate %></p>
+            </div>
+            <div class="close-button">×</div>
+        </div>
+
+        <div class="billing-section">
+            <h2 class="section-title">BILLED TO</h2>
+            <div class="billing-info">
+                <%= customer.name %><br>
+                home: <%= customer.address.city %>, <%= customer.address.state %> <%= customer.address.zipcode %><br>
+                <%= customer.address.line2 %><br>
+                Email: <%= customer.email %>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th class="amount-column">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach(function(item) { %>
+                <tr>
+                    <td><%= item.name %></td>
+                    <td><%= item.quantity %></td>
+                    <td>₹<%= item.unitPrice.toFixed(2) %></td>
+                    <td class="amount-column">₹<%= item.amount.toFixed(2) %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <table class="totals-table" style="width: 50%; margin-left: auto;">
+            <tr>
+                <td>Subtotal</td>
+                <td class="amount-column">₹<%= subtotal.toFixed(2) %></td>
+            </tr>
+            <tr>
+                <td>Shipping</td>
+                <td class="amount-column">₹<%= shipping.toFixed(2) %></td>
+            </tr>
+            <tr class="total-row">
+                <td>TOTAL</td>
+                <td class="amount-column">₹<%= total.toFixed(2) %></td>
+            </tr>
+        </table>
+
+        <div class="buttons">
+            <!-- <button class="download-button">
+                <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                </svg>
+                Download Invoice
+            </button> -->
+            <button class="print-button">Print</button>
+        </div>
+
+        <p class="footer-text">Thank you for your business!</p>
+        <p class="footer-support">IF YOU HAVE ANY QUESTIONS ABOUT THIS INVOICE, PLEASE CONTACT OUR CUSTOMER SUPPORT.</p>
+    </div>
+</body>
+</html>

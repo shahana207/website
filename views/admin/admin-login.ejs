@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #333333;
+        }
+        .error-message {
+            color: #d9534f;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .server-error {
+            color: #d9534f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .forgot-password a {
+            color: #000000;
+            text-decoration: none;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        
+        <% if (locals.errorMessage) { %>
+            <div class="server-error">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+        
+        <form action="/admin/login" method="POST" id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email"
+                    required
+                    <% if (locals.email) { %>value="<%= email %>"<% } %>
+                >
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <button type="submit" id="submitButton">Login</button>
+        </form>
+        
+        <div class="forgot-password">
+            <a href="/admin/forgot-password">Forgot password?</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Email validation regex
+            const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
+
+            // Function to show error message
+            function showError(element, message) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+
+            // Function to clear error messages
+            function clearErrors() {
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
+            }
+
+            // Form submit event listener
+            form.addEventListener('submit', function (event) {
+                // Clear previous error messages
+                clearErrors();
+
+                // Get input values
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                // Validation flags
+                let isValid = true;
+
+                // Validate email
+                if (!email) {
+                    showError(emailError, 'Email is required');
+                    isValid = false;
+                } else if (!emailRegex.test(email)) {
+                    showError(emailError, 'Please enter a valid email');
+                    isValid = false;
+                }
+
+                // Validate password
+                if (!password) {
+                    showError(passwordError, 'Password is required');
+                    isValid = false;
+                } else if (password.length < 6) {
+                    showError(passwordError, 'Password must be at least 6 characters');
+                    isValid = false;
+                }
+
+                // Prevent form submission if validation fails
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

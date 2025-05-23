@@ -1,0 +1,818 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Shopping Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Base Styles */
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        
+        /* Breadcrumb Styles */
+        .zz-breadcrumb-area {
+            background-color: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+        }
+        
+        .zz-breadcrumb {
+            margin-bottom: 0;
+            padding: 0;
+            background: none;
+        }
+        
+        .zz-breadcrumb-item a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .zz-breadcrumb-item a:hover {
+            color: #007bff;
+        }
+        
+        .zz-breadcrumb-item.active {
+            color: #007bff;
+        }
+        
+        /* Cart Styles */
+        .zz-cart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .zz-cart-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .zz-cart-empty {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .zz-cart-empty i {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .zz-cart-empty h3 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .zz-cart-empty p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+        
+        .zz-cart-table {
+            width: 100%;
+        }
+        
+        .zz-cart-table th {
+            font-weight: 600;
+            color: #555;
+            background-color: #f9f9f9;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .zz-cart-item {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .zz-cart-item td {
+            padding: 15px 12px;
+            vertical-align: middle;
+        }
+        
+        .zz-item-image {
+            width: 90px;
+            height: 90px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .zz-item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .zz-item-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .zz-item-info h4 a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .zz-item-info h4 a:hover {
+            color: #007bff;
+        }
+        
+        .zz-item-meta {
+            font-size: 13px;
+            color: #777;
+        }
+        
+        .zz-item-price {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Quantity Widget */
+        .zz-quantity-widget {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            width: 110px;
+        }
+        
+        .zz-quantity-btn {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .zz-quantity-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .zz-quantity-input {
+            width: 40px;
+            height: 35px;
+            text-align: center;
+            border: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        .zz-item-total {
+            font-weight: 700;
+            color: #1f0264;
+        }
+        
+        .zz-item-remove a {
+            color: #ccc;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+        
+        .zz-item-remove a:hover {
+            color: #007bff;
+        }
+        
+        /* Cart Actions */
+        .zz-cart-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-continue-shopping {
+            display: inline-flex;
+            align-items: center;
+            color: #555;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .zz-continue-shopping i {
+            margin-right: 8px;
+        }
+        
+        .zz-continue-shopping:hover {
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .zz-update-cart {
+            background-color: #000;
+            border: 1px solid #ddd;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .zz-update-cart:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* Cart Summary */
+        .zz-cart-summary {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .zz-summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            padding-bottom: 15px;
+        }
+        
+        .zz-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .zz-summary-label {
+            color: #555;
+        }
+        
+        .zz-summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .zz-summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-total-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .zz-total-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #007bff;
+        }
+        
+        .zz-checkout-btn {
+            display: block;
+            width: 100%;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .zz-checkout-btn:hover {
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .zz-payment-options {
+            margin-top: 20px;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-payment-options p {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        .zz-payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .zz-payment-icons img {
+            height: 30px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .zz-payment-icons img:hover {
+            opacity: 1;
+        }
+        
+       
+        
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .zz-cart-summary {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .zz-cart-table thead {
+                display: none;
+            }
+            
+            .zz-cart-table, 
+            .zz-cart-table tbody, 
+            .zz-cart-table tr, 
+            .zz-cart-table td {
+                display: block;
+                width: 100%;
+            }
+            
+            .zz-cart-item {
+                padding: 15px 0;
+                position: relative;
+            }
+            
+            .zz-cart-item td {
+                text-align: right;
+                padding-left: 35%;
+                position: relative;
+                border-bottom: none;
+                padding-bottom: 8px;
+                padding-top: 8px;
+            }
+            
+            .zz-cart-item td:before {
+                content: attr(data-title);
+                position: absolute;
+                left: 0;
+                width: 30%;
+                font-weight: 600;
+                color: #555;
+                text-align: left;
+            }
+            
+            .zz-item-image {
+                margin: 0 auto;
+            }
+            
+            .zz-item-remove {
+                position: absolute;
+                top: 15px;
+                right: 0;
+            }
+            
+            .zz-cart-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .zz-quantity-widget {
+                margin-left: auto;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+</head>
+<body>
+    <!-- Pass userId to JavaScript -->
+    <script>
+        const userId = '<%= userId %>';
+    </script>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="zz-breadcrumb-area">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb zz-breadcrumb">
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Shopping Cart</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Cart Container -->
+    <div class="container">
+        <div class="row">
+            <!-- Cart Items Section -->
+            <div class="col-lg-8">
+                <div class="zz-cart-container">
+                    <h2 class="zz-cart-title">Your Cart</h2>
+                    
+                    <% if (!cart || cart.items.length === 0) { %>
+                        <!-- Empty Cart Message -->
+                        <div class="zz-cart-empty">
+                            <i class="fa fa-shopping-cart"></i>
+                            <h3>Your cart is empty</h3>
+                            <p>Looks like you haven't added any products to your cart yet.</p>
+                            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+                        </div>
+                    <% } else { %>
+                        <!-- Cart Items Table -->
+                        <table class="zz-cart-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Image</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th></th> <!-- For Remove button -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% cart.items.forEach(item => { 
+                                    if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+                                %>
+                                    <tr class="zz-cart-item" data-product-id="<%= item.productId._id %>">
+                                        <td data-title="Image">
+                                            <div class="zz-item-image">
+                                                <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+                                            </div>
+                                        </td>
+                                        <td data-title="Product" class="zz-item-info">
+                                            <h4><a href="/productDetails?id=<%= item.productId._id %>"><%= item.productId.productName %></a></h4>
+                                            <div class="zz-item-meta">
+                                                <% if (item.productId.brand && item.productId.brand.name) { %>
+                                                    <span>Brand: <%= item.productId.brand.name %></span>
+                                                <% } %>
+                                                <% if (item.productId.color) { %>
+                                                    <span> | Color: <%= item.productId.color %></span>
+                                                <% } %>
+                                            </div>
+                                        </td>
+                                        <td data-title="Price" class="zz-item-price">
+                                            <% if (item.bestOffer) { %>
+                                                <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= item.bestOffer.originalPrice %></span>
+                                                <br>
+                                                <span style="color: #28a745; font-weight: 600;">₹ <%= (item.bestOffer.originalPrice - item.bestOffer.discountAmount).toFixed(2) %></span>
+                                               
+                                            <% } else { %>
+                                                ₹ <%= item.productId.salePrice %>
+                                            <% } %>
+                                        </td>
+                                        <td data-title="Quantity">
+                                            <div class="zz-quantity-widget">
+                                                <button type="button" class="zz-quantity-btn decrease-qty">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                                <input type="number" class="zz-quantity-input quantity-input" value="<%= item.quantity %>" min="1" max="<%= Math.min(item.productId.quantity, 3) %>">
+                                                <button type="button" class="zz-quantity-btn increase-qty">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td data-title="Total" class="zz-item-total">
+                                            <% if (item.bestOffer ) { %>
+                                                <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= (item.bestOffer.originalPrice * item.quantity).toFixed(2) %></span>
+                                                <br>
+                                                <span style="color: #28a745; font-weight: 600;">₹ <%= item.totalPrice.toFixed(2) %></span>
+                                            <% } else { %>
+                                                ₹ <%= (item.productId.salePrice * item.quantity).toFixed(2) %>
+                                            <% } %>
+                                        </td>
+                                        <td data-title="Remove" class="zz-item-remove">
+                                            <a href="#" class="remove-item" data-product-id="<%= item.productId._id %>" title="Remove this item">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                        
+                        <!-- Cart Actions -->
+                        <div class="zz-cart-actions">
+                            <a href="/shop" class="zz-continue-shopping">
+                                <i class="fa fa-arrow-left"></i> Continue Shopping
+                            </a>
+                            
+                        </div>
+                    <% } %>
+                </div>
+
+               
+            </div>
+
+            <!-- Cart Summary Section -->
+            <div class="col-lg-4">
+                <div class="zz-cart-summary">
+                    <h3 class="zz-summary-title">Order Summary</h3>
+                    <% if (cart && cart.items && cart.items.length > 0) { %>
+                        <% cart.items.forEach(item => { 
+                            if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+                        %>
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div class="zz-item-image" style="margin-right: 15px;">
+                                    <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 16px; margin: 0;"><%= item.productId.productName %></h4>
+                                    <p style="font-size: 14px; color: #777; margin: 5px 0;">Qty <%= item.quantity %></p>
+                                    <p style="font-weight: 600; color: #333; margin: 0;">₹ <%= (item.productId.salePrice * item.quantity).toFixed(2) %></p>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>Your cart is empty.</p>
+                    <% } %>
+                    
+                    
+                    <div class="zz-summary-item">
+                        <span class="zz-summary-label">Subtotal</span>
+                        <span class="zz-summary-value">₹ <%= cart && cart.items.length && cart.subtotal ? cart.subtotal.toFixed(2) : '0.00' %></span>
+                    </div>
+                    
+                    <div class="zz-summary-item">
+                        <span class="zz-summary-label">Shipping</span>
+                        <span class="zz-summary-value">₹ <%= cart && cart.items.length && cart.shipping != null ? cart.shipping.toFixed(2) : '50.00' %></span>
+                    </div>
+                    
+                    <div class="zz-summary-item">
+                        <span class="zz-summary-label">Tax</span>
+                        <span class="zz-summary-value">₹ 0.00</span>
+                    </div>
+                    
+                    <% if (cart && cart.discount > 0) { %>
+                        <div class="zz-summary-item">
+                            <span class="zz-summary-label">Discount</span>
+                            <span class="zz-summary-value">- ₹ <%= cart.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    
+                    <div class="zz-summary-total">
+                        <span class="zz-total-label">Total</span>
+                        <span class="zz-total-value">₹ <%= cart && cart.items.length && cart.total ? cart.total.toFixed(2) : '0.00' %></span>
+                    </div>
+                    
+                    <a href="<%= cart && cart.items.length > 0 ? '/checkout' : '#' %>" class="zz-checkout-btn <%= cart && cart.items.length > 0 ? '' : 'disabled' %>">
+                        Proceed to Checkout
+                    </a>
+                    
+                    <div class="zz-payment-options">
+                        <p>Secure Payment Gateway</p>
+                        <div class="zz-payment-icons">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Visa_Logo.png" alt="Visa">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/PayPal_Logo.png" alt="PayPal">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const decreaseBtns = document.querySelectorAll('.decrease-qty');
+    const increaseBtns = document.querySelectorAll('.increase-qty');
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    const removeButtons = document.querySelectorAll('.remove-item');
+
+    // Function to update server-side cart
+    function updateCartItem(productId, quantity) {
+        fetch('/update-cart', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId,
+                updates: [{ productId, quantity }]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Cart Updated',
+                    text: 'Your cart has been updated successfully!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                updateCartSummary(data.cart);
+                updateItemPrice(document.querySelector(`.zz-cart-item[data-product-id="${productId}"]`));
+                window.location.reload()
+            } else {
+                // Handle errors (e.g., stock limit exceeded)
+                let errorMessage = 'There was an issue updating your cart.';
+                if (data.errors && data.errors.length > 0) {
+                    errorMessage = data.errors.map(e => e.message).join('\n');
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: errorMessage,
+                    confirmButtonText: 'OK'
+                });
+                // Revert input to previous valid value (optional)
+                const input = document.querySelector(`.zz-cart-item[data-product-id="${productId}"] .quantity-input`);
+                input.value = data.cart.items.find(item => item.productId._id.toString() === productId)?.quantity || 1;
+            }
+        }).then(()=>{
+
+        })
+        .catch(error => {
+            console.error('Error updating cart:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred. Please try again later.'
+            });
+        });
+    }
+
+    // Function to update cart summary totals
+    function updateCartSummary(cart) {
+        const subtotalElement = document.querySelector('.zz-summary-item .zz-summary-value');
+        const shippingElement = document.querySelectorAll('.zz-summary-item .zz-summary-value')[1];
+        const totalElement = document.querySelector('.zz-total-value');
+
+        subtotalElement.innerText = `₹ ${cart.subtotal.toFixed(2)}`;
+        shippingElement.innerText = `₹ ${cart.shippingCharge.toFixed(2)}`;
+        totalElement.innerText = `₹ ${cart.total.toFixed(2)}`;
+    }
+
+    // Function to update item price calculation based on quantity
+    function updateItemPrice(cartItem) {
+        const priceElement = cartItem.querySelector('.zz-item-price');
+        const price = parseFloat(priceElement.innerText.replace('₹ ', ''));
+        const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
+        const totalElement = cartItem.querySelector('.zz-item-total');
+
+        const total = price * quantity;
+        totalElement.innerText = `₹ ${total.toFixed(2)}`;
+    }
+
+    // Decrease quantity
+    decreaseBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.quantity-input');
+            const currentValue = parseInt(input.value);
+            const productId = this.closest('.zz-cart-item').getAttribute('data-product-id');
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                updateCartItem(productId, currentValue - 1);
+            }
+        });
+    });
+
+    // Increase quantity
+    increaseBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.quantity-input');
+            const currentValue = parseInt(input.value);
+            const maxValue = parseInt(input.getAttribute('max'));
+            const productId = this.closest('.zz-cart-item').getAttribute('data-product-id');
+
+            if (currentValue < maxValue) {
+                input.value = currentValue + 1;
+                updateCartItem(productId, currentValue + 1);
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Stock Limit Reached',
+                    text: `Only ${maxValue} items available in stock.`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    });
+
+    // Validate quantity input
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const value = parseInt(this.value);
+            const min = parseInt(this.getAttribute('min'));
+            const max = parseInt(this.getAttribute('max'));
+            const productId = this.closest('.zz-cart-item').getAttribute('data-product-id');
+
+            if (isNaN(value) || value < min) {
+                this.value = min;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Quantity',
+                    text: 'Quantity must be at least 1.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else if (value > max) {
+                this.value = max;
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Stock Limit Reached',
+                    text: `Only ${max} items available in stock.`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+
+            updateCartItem(productId, parseInt(this.value));
+        });
+    });
+
+    // Remove item from cart
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.getAttribute('data-product-id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to remove this item from your cart?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, remove it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/removeFromCart/${productId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed',
+                                text: 'Item removed from cart.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed',
+                                text: data.message || 'Failed to remove item',
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred. Please try again.'
+                        });
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

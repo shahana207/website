@@ -1,0 +1,300 @@
+<!-- This is a proper header.ejs that should replace your current one -->
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fazion</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.css" />
+    <link rel="stylesheet" href="/style/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/style/css/style.css" type="text/css">
+
+    <style>
+        /* Ensure search form is styled consistently */
+        .search-model {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+
+        .search-model-form {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-model-form input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .search-close-switch {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cart-link {
+            position: relative;
+            display: inline-block;
+            padding: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .cart-link:hover {
+            transform: scale(1.1);
+        }
+
+        .shopping-cart {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #333;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
+
+        .cart-link:hover .shopping-cart {
+            stroke: #ff6f61; /* Hover color */
+        }
+
+        /* Profile Image and Dropdown Styling */
+        .header__profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .header__profile-img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sign-in-link {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .sign-in-link:hover {
+            color: #ff6f61;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            min-width: 120px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            z-index: 1000;
+            right: 0;
+            top: 100%;
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f8f9fa;
+            color: #ff6f61;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Adjust for offcanvas menu (mobile view) */
+        .offcanvas__option .header__profile-img {
+            width: 28px;
+            height: 28px;
+            margin-right: 6px;
+        }
+
+        .offcanvas__option .dropdown-content {
+            position: static;
+            box-shadow: none;
+            background-color: transparent;
+            margin-left: 40px;
+        }
+
+        .offcanvas__option .dropdown-content a {
+            color: #666;
+            padding: 5px 0;
+        }
+
+        .offcanvas__option .dropdown-content a:hover {
+            background-color: transparent;
+            color: #ff6f61;
+        }
+        
+        /* Wishlist icon styling */
+        .wishlist-icon {
+            margin-right: 15px;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+        
+        .wishlist-icon:hover {
+            transform: scale(1.1);
+            color: #ff6f61;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Offcanvas Menu Begin -->
+    <div class="offcanvas-menu-overlay"></div>
+    <div class="offcanvas-menu-wrapper">
+        <div class="offcanvas__option">
+            <div class="offcanvas__links">
+                <% if (locals.user) { %>
+                    <div class="dropdown">
+                        <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/img/default-profile.png' %>">
+                        
+                        <a href="#" class="sign-in-link"><%= locals.user.name %></a>
+                        <div class="dropdown-content">
+                            <a href="/userProfile">Profile</a>
+                            <a href="/logout">Logout</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="sign-in-link">Sign in</a>
+                    <a href="/signup" class="sign-in-link">Sign up</a>
+                <% } %>
+                <a href="#">FAQs</a>
+            </div>
+        </div>
+        <div class="offcanvas__nav__option">
+            <a href="/wishlist"><i class="fa fa-heart"></i></a>
+            <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
+            <a href="/cart"><i class="fa fa-shopping-cart"></i></a>
+        </div>
+        <div id="mobile-menu-wrap"></div>
+        <div class="offcanvas__text">
+            <p>Free shipping, 30-day return or refund guarantee.</p>
+        </div>
+    </div>
+    <!-- Offcanvas Menu End -->
+
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-7">
+                        <div class="header__top__left">
+                            <p>Free shipping, 30-day return or refund guarantee.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-5">
+                        <div class="header__top__right">
+                            <div class="header__top__links">
+                                <% if (locals.user) { %>
+                                    <div class="dropdown">
+                                        <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/img/default-profile.png' %>">
+                                        <a href="#" class="sign-in-link"><%= locals.user.name %></a>
+                                        <div class="dropdown-content">
+                                            <a href="/userProfile">Profile</a>
+                                            <a href="/logout">Logout</a>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <a href="/login" class="sign-in-link">Sign in</a>
+                                    <a href="/signup" class="sign-in-link">Sign up</a>
+                                <% } %>
+                                <a href="#">FAQs</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3">
+                    <div class="header__logo">
+                        <a href="/" style="color: black; font-weight: 700; font-size: 24px; font-family: 'Initial', sans-serif; text-decoration: none;">
+                            Fazion
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/shop">Shop</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <div class="col-lg-3 col-md-3">
+                    <div class="header__nav__option">
+                        <a href="/wishlist" class="wishlist-icon" style="color: #333;"><i class="fa fa-heart"></i></a>
+                        <a href="/cart" style="color: #333;"><i class="fa fa-shopping-cart"></i></a>
+                        <a href="#" class="search-switch"><img src="/style/img/icon/search.png" alt="Search"></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="canvas__open"><i class="fa fa-bars"></i></div>
+        </div>
+    </header>
+    <!-- Header Section End -->

@@ -1,0 +1,1456 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css"> -->
+    <!-- <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css"> -->
+    <link rel="stylesheet" href="\style\css\font-awesome.min.css">
+    <link rel="stylesheet" href="\style\css\bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="/css/style.css" type="text/css"> -->
+    <link rel="stylesheet" href="\style\css\style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Base Styles */
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        
+        /* Breadcrumb Styles */
+        .zz-breadcrumb-area {
+            background-color: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+        }
+        
+        .zz-breadcrumb {
+            margin-bottom: 0;
+            padding: 0;
+            background: none;
+        }
+        
+        .zz-breadcrumb-item a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .zz-breadcrumb-item a:hover {
+            color: #007bff;
+        }
+        
+        .zz-breadcrumb-item.active {
+            color: #007bff;
+        }
+        
+        /* Checkout Styles */
+        .zz-checkout-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .zz-checkout-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .zz-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        /* Form Styles */
+        .zz-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .zz-form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .zz-form-control {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .zz-form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        .zz-form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .zz-form-col {
+            padding-left: 10px;
+            padding-right: 10px;
+            flex: 1;
+        }
+        
+        /* Payment Method Styles */
+        .zz-payment-methods {
+            margin-top: 20px;
+        }
+        
+        .zz-payment-method {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .zz-payment-method:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .zz-payment-method.active {
+            border-color: #007bff;
+            background-color: #f0f7ff;
+        }
+        
+        .zz-payment-radio {
+            margin-right: 10px;
+        }
+        
+        .zz-payment-label {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .zz-payment-icon {
+            margin-left: auto;
+            font-size: 24px;
+            color: #555;
+        }
+        
+        /* Order Review Styles */
+        .zz-order-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .zz-order-item-image {
+            width: 80px;
+            height: 80px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .zz-order-item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .zz-order-item-info {
+            flex: 1;
+        }
+        
+        .zz-order-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .zz-order-item-meta {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .zz-order-item-price {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* Summary Styles */
+        .zz-checkout-summary {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        
+        .zz-summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .zz-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .zz-summary-label {
+            color: #555;
+        }
+        
+        .zz-summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .zz-summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-total-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .zz-total-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #007bff;
+        }
+        
+        .zz-place-order-btn {
+            display: block;
+            width: 100%;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .zz-place-order-btn:hover {
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .zz-coupon-applied {
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .zz-coupon-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .zz-coupon-icon {
+            color: #27ae60;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .zz-coupon-text {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .zz-coupon-remove {
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .zz-coupon-remove:hover {
+            color: #c0392b;
+        }
+        
+        .zz-payment-info {
+            margin-top: 20px;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .zz-payment-info p {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        .zz-payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .zz-payment-icons i {
+            font-size: 24px;
+            color: #555;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .zz-payment-icons i:hover {
+            opacity: 1;
+        }
+        
+        /* Address Section */
+        .zz-address-section {
+            margin-bottom: 30px;
+        }
+        
+        .address-item {
+            background-color: #f5f7fc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .address-item.active {
+            border-color: #007bff;
+            background-color: #f0f7ff;
+        }
+        
+        .address-details {
+            flex-grow: 1;
+        }
+        
+        .address-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .address-text, .address-phone {
+            color: #666;
+            margin: 3px 0;
+            font-size: 14px;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .edit-btn {
+            background-color: #136a26;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .edit-btn:hover {
+            background-color: #0f4d1c;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .add-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .add-btn:hover {
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .no-address-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px dashed #d4d4d4;
+            margin-bottom: 20px;
+        }
+        
+        .no-address-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .address-checkbox {
+            margin-right: 10px;
+        }
+        
+        /* Coupon Section */
+        .zz-coupon-section {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .zz-coupon-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .zz-coupon-form {
+            display: flex;
+        }
+        
+        .zz-coupon-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+        
+        .zz-apply-coupon {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 5px 5px 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .zz-apply-coupon:hover {
+            background-color: #333;
+        }
+        
+        .zz-view-coupons-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .zz-view-coupons-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Coupon Modal */
+        .zz-coupon-modal .modal-content {
+            border-radius: 8px;
+        }
+        
+        .zz-coupon-modal .modal-header {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .zz-coupon-modal .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .zz-coupon-modal .modal-body {
+            padding: 20px;
+        }
+        
+        .zz-coupon-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .zz-coupon-details {
+            flex: 1;
+        }
+        
+        .zz-coupon-code {
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .zz-coupon-desc {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .zz-coupon-validity {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .zz-coupon-apply-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .zz-coupon-apply-btn:hover {
+            background-color: #218838;
+        }
+        .zz-wallet-balance {
+        font-size: 12px;
+        padding:10px;
+        color: #0e9712;
+        margin-top: 4px; /* Adds a small gap between "Wallet" and the balance */
+        font-weight: 400; /* Keeps the text light */
+    }
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .zz-checkout-summary {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .zz-form-row {
+                flex-direction: column;
+            }
+            
+            .zz-form-col {
+                margin-bottom: 15px;
+            }
+            
+            .address-item {
+                flex-direction: column;
+            }
+            
+            .button-container {
+                margin-top: 10px;
+                justify-content: flex-start;
+            }
+            
+            .zz-coupon-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .zz-coupon-apply-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="currentUserId" value="<%= user._id %>">
+
+    <!-- Breadcrumb Navigation -->
+    <div class="zz-breadcrumb-area">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb zz-breadcrumb">
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/cart">Shopping Cart</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Checkout</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Checkout Container -->
+    <div class="container">
+        <div class="row">
+            <!-- Checkout Form Section -->
+            <div class="col-lg-8">
+                <div class="zz-checkout-container">
+                    <h2 class="zz-checkout-title">Checkout</h2>
+                    <div class="zz-checkout-section">
+                        <!-- Shipping Address Section -->
+                        <div class="zz-address-section">
+                            <h3 class="zz-section-title">Shipping Address</h3>
+                            <div class="address-container">
+                                <% if (addresses && addresses.length > 0) { %>
+                                    <% addresses.forEach((address, index) => { %>
+                                        <div class="address-item <%= index === 0 ? 'active' : '' %>" data-address-id="<%= address._id %>">
+                                            <div class="address-details">
+                                                <div class="form-check">
+                                                    <input class="form-check-input address-checkbox" type="radio" name="selectedAddress" id="address-<%= address._id %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                                    <label class="form-check-label address-name" for="address-<%= address._id %>">
+                                                        <%= address.name %>
+                                                    </label>
+                                                </div>
+                                                <div class="address-text">
+                                                    <%= address.landMark %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+                                                </div>
+                                                <div class="address-phone">
+                                                    Phone: <%= address.phone %>
+                                                    <% if (address.altPhone) { %>
+                                                        <br>Alternate: <%= address.altPhone %>
+                                                    <% } %>
+                                                </div>
+                                                <div class="address-type"><%= address.addressType %></div>
+                                            </div>
+                                            <div class="button-container">
+                                                <!-- <button class="edit-btn" data-toggle="modal" data-target="#editAddressModal" data-address-id="<%= address._id %>">Edit</button> -->
+                                                 <a href="/edit-address?id=<%= address._id %>" class="edit-btn">Edit</a>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <div class="no-address-container">
+                                        <div class="no-address-message">You haven't added any address yet.</div>
+                                    </div>
+                                <% } %>
+                                <div style="text-align: left;">
+                                    <a href="#" class="add-btn" id="add-new-address">Add New Address</a>
+                                </div>
+                            </div>
+                            <div class="zz-new-address-form" id="new-address-form" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                                <form action="/save-address" id="addAdress" method="POST">
+                                    <div class="zz-form-group">
+                                        <label class="zz-form-label" for="name-new">Full Name*</label>
+                                        <input type="text" class="zz-form-control" id="name-new" name="name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="zz-form-group">
+                                        <label>Address Type</label><br>
+                                        <label>
+                                            <input type="radio" name="addressType" value="home"> Home
+                                        </label><br>
+                                        <label>
+                                            <input type="radio" name="addressType" value="work"> Work
+                                        </label><br>
+                                        <label>
+                                            <input type="radio" name="addressType" value="other"> Other
+                                        </label>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="zz-form-group">
+                                        <label class="zz-form-label" for="landmark-new">Landmark*</label>
+                                        <input type="text" class="zz-form-control" id="landmark-new" name="landMark">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="zz-form-row">
+                                        <div class="zz-form-col">
+                                            <div class="zz-form-group">
+                                                <label class="zz-form-label" for="city-new">City*</label>
+                                                <input type="text" class="zz-form-control" id="city-new" name="city">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zz-form-col">
+                                            <div class="zz-form-group">
+                                                <label class="zz-form-label" for="state-new">State*</label>
+                                                <input type="text" class="zz-form-control" id="state-new" name="state">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zz-form-col">
+                                            <div class="zz-form-group">
+                                                <label class="zz-form-label" for="pincode-new">Pincode*</label>
+                                                <input type="text" class="zz-form-control" id="pincode-new" name="pincode">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="zz-form-row">
+                                        <div class="zz-form-col">
+                                            <div class="zz-form-group">
+                                                <label class="zz-form-label" for="phone-new">Phone Number*</label>
+                                                <input type="tel" class="zz-form-control" id="phone-new" name="phone">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zz-form-col">
+                                            <div class="zz-form-group">
+                                                <label class="zz-form-label" for="alt-phone-new">Alternate Phone</label>
+                                                <input type="tel" class="zz-form-control" id="alt-phone-new" name="altPhone">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="zz-form-group">
+                                        <button type="button" class="btn btn-secondary" id="cancel-new-address">Cancel</button>
+                                        <button type="submit" class="btn btn-primary" id="save-new-address">Save Address</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                      <!-- Payment Methods Section -->
+<div class="zz-payment-section">
+    <h3 class="zz-section-title">Payment Method</h3>
+    <div class="zz-payment-methods">
+        <div class="zz-payment-method active">
+            <input type="radio" name="paymentMethod" id="payment-cod" value="COD" class="zz-payment-radio" checked>
+            <label for="payment-cod" class="zz-payment-label">Cash On Delivery</label>
+            <div class="zz-payment-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+        </div>
+        <div class="zz-payment-method">
+            <input type="radio" name="paymentMethod" id="payment-wallet" value="Wallet" class="zz-payment-radio">
+            <label for="payment-wallet" class="zz-payment-label">
+                Wallet
+                <div class="zz-wallet-balance">Available Balance: ₹<%= walletBalance.toFixed(2) %></div>
+            </label>
+            <div class="zz-payment-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+        </div>
+        <div class="zz-payment-method">
+            <input type="radio" name="paymentMethod" id="online" value="Online" class="zz-payment-radio">
+            <label for="online" class="zz-payment-label">Razorpay</label>
+            <div class="zz-payment-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+        </div>        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <!-- Order Summary Section -->
+<div class="col-lg-4">
+    <div class="zz-checkout-summary">
+        <h3 class="zz-summary-title">Order Summary</h3>
+        <!-- Applied Coupon Section -->
+        <% if (cart && cart.coupon && cart.coupon.code) { %>
+            <div class="zz-coupon-applied">
+                <div class="zz-coupon-info">
+                    <i class="fas fa-check-circle zz-coupon-icon"></i>
+                    <span class="zz-coupon-text">Coupon "<%= cart.coupon.code %>" applied</span>
+                </div>
+                <span class="zz-coupon-remove" id="remove-coupon">
+                    <i class="fas fa-times"></i> Remove
+                </span>
+            </div>
+        <% } %>
+        <!-- Order Items List -->
+        <div class="zz-order-items">
+            <% let hasInvalidPrice = false; %> <!-- Declare hasInvalidPrice here -->
+            <% if (cart && cart.items && cart.items.length > 0) { %>
+                <% cart.items.forEach(item => { 
+                    if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+                    const itemPrice = Number(item.price);
+                    const itemTotal = Number(item.totalPrice);
+                    if (isNaN(itemPrice) || itemPrice <= 0 || isNaN(itemTotal) || itemTotal <= 0) {
+                        hasInvalidPrice = true;
+                        return;
+                    }
+                %>
+                    <div class="zz-order-item">
+                        <div class="zz-order-item-image">
+                            <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+                        </div>
+                        <div class="zz-order-item-info">
+                            <div class="zz-order-item-name"><%= item.productId.productName %></div>
+                            <div class="zz-order-item-meta">
+                                <% if (item.productId.brand && item.productId.brand.name) { %>
+                                    <span>Brand: <%= item.productId.brand.name %></span>
+                                <% } %>
+                                <% if (item.size) { %>
+                                    <span> | Size: <%= item.size %></span>
+                                <% } %>
+                                <% if (item.color) { %>
+                                    <span> | Color: <%= item.color %></span>
+                                <% } %>
+                                <span> | Qty: <%= item.quantity %></span>
+                            </div>
+                            <div class="zz-order-item-price">
+                                ₹<%= item.totalPrice.toFixed(2) %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+                <% if (hasInvalidPrice) { %>
+                    <div style="color: #e74c3c; font-size: 14px; text-align: center; margin: 15px 0;">
+                        Some items have invalid prices. Please update your cart.
+                    </div>
+                <% } %>
+            <% } else { %>
+                <p>No items in the cart.</p>
+            <% } %>
+        </div>
+        <!-- Summary Breakdown -->
+        <div class="zz-summary-details">
+            <% 
+                const subtotal = cart && cart.subtotal && !isNaN(cart.subtotal) && cart.subtotal >= 0 ? cart.subtotal : 0;
+                const shippingCharge = cart && cart.shippingCharge && !isNaN(cart.shippingCharge) ? cart.shippingCharge : 0;
+                const discount = cart && cart.discount && !isNaN(cart.discount) ? cart.discount : 0;
+                const tax = cart && cart.tax && !isNaN(cart.tax) ? cart.tax : 0;
+                const total = subtotal + shippingCharge + tax - discount;
+                const isValidSummary = !isNaN(total) && total >= 0 && !hasInvalidPrice;
+            %>
+            <% if (isValidSummary) { %>
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Subtotal</span>
+                    <span class="zz-summary-value">₹<%= subtotal.toFixed(2) %></span>
+                </div>
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Shipping</span>
+                    <span class="zz-summary-value"><%= shippingCharge > 0 ? '₹' + shippingCharge.toFixed(2) : 'Free' %></span>
+                </div>
+                <% if (discount > 0) { %>
+                    <div class="zz-summary-item">
+                        <span class="zz-summary-label">Coupon Discount</span>
+                        <span class="zz-summary-value">-₹<%= discount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Tax</span>
+                    <span class="zz-summary-value">₹<%= tax.toFixed(2) %></span>
+                </div>
+                <div class="zz-summary-total">
+                    <span class="zz-total-label">Total</span>
+                    <span class="zz-total-value">₹<%= total.toFixed(2) %></span>
+                </div>
+            <% } else { %>
+                <div style="color: #e74c3c; font-size: 14px; text-align: center; margin: 15px 0;">
+                    Unable to calculate total due to invalid cart data. Please review your cart.
+                </div>
+            <% } %>
+        </div>
+        <!-- Coupon Section -->
+        <!-- ... (rest of the code remains unchanged) -->
+    
+
+        <!-- Coupon Section -->
+        <div class="zz-coupon-section">
+            <div class="zz-coupon-title">
+                <span>Have a coupon?</span>
+                <button class="zz-view-coupons-btn" data-bs-toggle="modal" data-bs-target="#couponModal">View Available Coupons</button>
+            </div>
+            <form class="zz-coupon-form">
+                <input type="text" class="zz-coupon-input" id="couponCode" placeholder="Enter coupon code" <% if (cart && cart.coupon && cart.coupon.code) { %>disabled<% } %>>
+                <button type="button" class="zz-apply-coupon" id="apply-coupon-btn" <% if (cart && cart.coupon && cart.coupon.code) { %>disabled<% } %>>Apply</button>
+            </form>
+        </div>
+        <!-- Place Order Button -->
+        <button class="zz-place-order-btn" id="place-order" <%= isValidSummary ? '' : 'disabled' %>>Place Order</button>
+        <!-- Payment Information -->
+        <div class="zz-payment-info">
+            <p>Secure Payment Gateway</p>
+            <div class="zz-payment-icons">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-amex"></i>
+                <i class="fab fa-cc-paypal"></i>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- Edit Address Modal -->
+    <div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-address-form">
+                        <input type="hidden" id="edit-address-id" name="addressId">
+                        <div class="zz-form-group">
+                            <label class="zz-form-label" for="edit-name">Full Name*</label>
+                            <input type="text" class="zz-form-control" id="edit-name" name="name">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="zz-form-group">
+                            <label>Address Type</label><br>
+                            <label class="address-type-option">
+                                <input type="radio" name="addressType" id="homeType" value="home"> Home
+                            </label>
+                            <label class="address-type-option">
+                                <input type="radio" name="addressType" id="workType" value="work"> Work
+                            </label>
+                            <label class="address-type-option">
+                                <input type="radio" name="addressType" id="otherType" value="other"> Other
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="zz-form-group">
+                            <label class="zz-form-label" for="edit-landmark">Landmark*</label>
+                            <input type="text" class="zz-form-control" id="edit-landmark" name="landMark">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="zz-form-row">
+                            <div class="zz-form-col">
+                                <div class="zz-form-group">
+                                    <label class="zz-form-label" for="edit-city">City*</label>
+                                    <input type="text" class="zz-form-control" id="edit-city" name="city">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="zz-form-col">
+                                <div class="zz-form-group">
+                                    <label class="zz-form-label" for="edit-state">State*</label>
+                                    <input type="text" class="zz-form-control" id="edit-state" name="state">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="zz-form-col">
+                                <div class="zz-form-group">
+                                    <label class="zz-form-label" for="edit-pincode">Pincode*</label>
+                                    <input type="text" class="zz-form-control" id="edit-pincode" name="pincode">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="zz-form-row">
+                            <div class="zz-form-col">
+                                <div class="zz-form-group">
+                                    <label class="zz-form-label" for="edit-phone">Phone Number*</label>
+                                    <input type="tel" class="zz-form-control" id="edit-phone" name="phone">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="zz-form-col">
+                                <div class="zz-form-group">
+                                    <label class="zz-form-label" for="edit-alt-phone">Alternate Phone</label>
+                                    <input type="tel" class="zz-form-control" id="edit-alt-phone" name="altPhone">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-edit-address">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coupon Modal -->
+    <div class="modal fade zz-coupon-modal" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="couponModalLabel">Available Coupons</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="coupon-list">
+                    <!-- Coupons will be dynamically loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <script>
+    const addAdressForm = document.getElementById('addAdress');
+
+addAdressForm.addEventListener('submit', function (e) {
+    e.preventDefault(); // prevent default form submit
+    const form = this;
+
+    const address = {
+        addressType: $(form).find('input[name="addressType"]:checked').val(),
+        name: $(form).find('#name-new').val().trim(),
+        landMark: $(form).find('#landmark-new').val().trim(),
+        city: $(form).find('#city-new').val().trim(),
+        state: $(form).find('#state-new').val().trim(),
+        pincode: $(form).find('#pincode-new').val().trim(),
+        phone: $(form).find('#phone-new').val().trim(),
+        altPhone: $(form).find('#alt-phone-new').val().trim()
+    };
+
+    const errors = validateAddress(address);
+    if (errors) {
+        displayFormErrors(form, errors);
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please correct the errors in the form.',
+            confirmButtonColor: '#000000'
+        });
+        return;
+    }
+
+    // Use fetch to send data to backend
+    fetch('/save-address', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(address)
+    })
+    .then(res => res.json()) // Expect JSON response from backend
+    .then(data => {
+        console.log(data,'data')
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Address saved!',
+                text: data.message,
+                confirmButtonColor: '#000000'
+            });
+            form.reset(); // Clear form
+            // Optionally close modal here
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to save',
+                text: data.message || 'Something went wrong.',
+                confirmButtonColor: '#000000'
+            });
+        }
+    })
+    
+});
+
+
+        function validateAddress(address) {
+            console.log('dskajfdksahfjksahfjk')
+            let errors = {};
+            if (!address.addressType) {
+                errors.addressType = "Select address type";
+            } else if (!["home", "work", "other"].includes(address.addressType)) {
+                errors.addressType = "Invalid address type";
+            }
+
+            if (!address.name) {
+                errors.name = "Name required";
+            } else if (address.name.length < 2 || address.name.length > 50) {
+                errors.name = "Name must be 2-50 characters";
+            } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s.]*[a-zA-Z]$/.test(address.name)) {
+                errors.name = "Name can only have letters, spaces, periods";
+            }
+
+            if (!address.landMark) {
+                errors.landMark = "Landmark required";
+            } else if (address.landMark.length < 3 || address.landMark.length > 50) {
+                errors.landMark = "Landmark must be 3-50 characters";
+            } else if (!/^(?=.*[a-zA-Z0-9])(?!.*\s{3,})[a-zA-Z0-9][-.,&()a-zA-Z0-9\s]*[a-zA-Z0-9]$/.test(address.landMark)) {
+                errors.landMark = "Landmark can only have letters, numbers, -.,&()";
+            }
+
+            if (!address.city) {
+                errors.city = "City required";
+            } else if (address.city.length < 3 || address.city.length > 50) {
+                errors.city = "City must be 3-50 characters";
+            } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s-]*[a-zA-Z]$/.test(address.city)) {
+                errors.city = "City can only have letters, spaces, hyphens";
+            }
+
+            if (!address.state) {
+                errors.state = "State required";
+            } else if (address.state.length < 2 || address.state.length > 50) {
+                errors.state = "State must be 2-50 characters";
+            }
+
+            if (!address.pincode) {
+                errors.pincode = "PIN code required";
+            } else if (address.pincode.length !== 6) {
+                errors.pincode = "PIN code must be 6 digits";
+            } else if (!/^\d+$/.test(address.pincode)) {
+                errors.pincode = "PIN code must be digits only";
+            }
+
+            if (!address.phone) {
+                errors.phone = "Phone number required";
+            } else if (address.phone.length !== 10) {
+                errors.phone = "Phone must be 10 digits";
+            } else if (!/^[6-9][0-9]{9}$/.test(address.phone)) {
+                errors.phone = "Phone must start with 6, 7, 8, or 9";
+            }
+
+            if (address.altPhone) {
+                if (address.altPhone.length !== 10) {
+                    errors.altPhone = "Alt phone must be 10 digits";
+                } else if (!/^[6-9][0-9]{9}$/.test(address.altPhone)) {
+                    errors.altPhone = "Alt phone must start with 6, 7, 8, or 9";
+                }
+            }
+            return Object.keys(errors).length > 0 ? errors : null;
+        }
+
+        function displayFormErrors(form, errors) {
+            clearErrors(form);
+            if (errors && typeof errors === 'object') {
+                Object.entries(errors).forEach(([field, message]) => {
+                    const input = form.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        input.classList.add('is-invalid');
+                        const feedback = input.nextElementSibling;
+                        if (feedback?.classList.contains('invalid-feedback')) {
+                            feedback.textContent = message;
+                        }
+                    }
+                });
+            }
+        }
+
+        function clearErrors(form) {
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        }
+
+        // Update Order Summary
+        function updateOrderSummary(cart) {
+            const summaryDetails = document.querySelector('.zz-summary-details');
+            summaryDetails.innerHTML = `
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Subtotal</span>
+                    <span class="zz-summary-value">₹${cart.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Shipping</span>
+                    <span class="zz-summary-value">${cart.shippingCharge ? '₹' + cart.shippingCharge.toFixed(2) : 'Free'}</span>
+                </div>
+                ${cart.discount ? `
+                    <div class="zz-summary-item">
+                        <span class="zz-summary-label">Coupon Discount</span>
+                        <span class="zz-summary-value">-₹${cart.discount.toFixed(2)}</span>
+                    </div>
+                ` : ''}
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Tax</span>
+                    <span class="zz-summary-value">₹${cart.tax ? cart.tax.toFixed(2) : '0.00'}</span>
+                </div>
+                <div class="zz-summary-total">
+                    <span class="zz-total-label">Total</span>
+                    <span class="zz-total-value">₹${cart.total.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        // Load Razorpay Script
+        function loadRazorpayScript() {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.onload = () => resolve(true);
+                script.onerror = () => resolve(false);
+                document.body.appendChild(script);
+            });
+        }
+
+     $(document).ready(function() {
+    // Existing code...
+
+    // Handle Payment Method Selection with COD restriction
+    $('.zz-payment-method').on('click', function() {
+        $('.zz-payment-method').removeClass('active');
+        $(this).addClass('active');
+        $(this).find('input').prop('checked', true);
+
+        const totalAmount = Number($('.zz-total-value').text().replace('₹', '')) || 0;
+        const paymentMethod = $(this).find('input[name="paymentMethod"]').val();
+
+        // Check if COD is selected and total is above ₹1000
+        if (paymentMethod === 'COD' && totalAmount > 1000) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Restricted Payment Method',
+                text: 'Order above ₹1000 should not be allowed for Cash on Delivery (COD). Please select another payment method.',
+                confirmButtonColor: '#000000',
+                timer: 3000,
+                showConfirmButton: true
+            }).then(() => {
+                // Revert to a default payment method (e.g., Wallet or Razorpay) or uncheck COD
+                $('.zz-payment-method input[value="COD"]').prop('checked', false);
+                $('.zz-payment-method').removeClass('active');
+                // Optionally, select another payment method by default
+                const walletMethod = $('.zz-payment-method input[value="Wallet"]').closest('.zz-payment-method');
+                const onlineMethod = $('.zz-payment-method input[value="Online"]').closest('.zz-payment-method');
+                if (walletMethod.length && <%= walletBalance %> >= totalAmount) {
+                    walletMethod.addClass('active').find('input').prop('checked', true);
+                } else if (onlineMethod.length) {
+                    onlineMethod.addClass('active').find('input').prop('checked', true);
+                }
+            });
+        }
+    });
+
+    // Existing code for other functionalities...
+
+    // Place Order with COD restriction
+    $('#place-order').on('click', async function(e) {
+        e.preventDefault();
+        const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+        const selectedAddress = $('input[name="selectedAddress"]:checked').val();
+        const totalAmount = Number($('.zz-total-value').text().replace('₹', '')) || 0;
+
+        // Check if COD is selected and total is above ₹1000
+        if (paymentMethod === 'COD' && totalAmount > 1000) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Restricted Payment Method',
+                text: 'Order above ₹1000 should not be allowed for Cash on Delivery (COD). Please select another payment method.',
+                confirmButtonColor: '#000000',
+                timer: 3000,
+                showConfirmButton: true
+            });
+            return;
+        }
+
+        if (!selectedAddress) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a shipping address',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            return;
+        }
+        if (!paymentMethod) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a payment method',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        const orderData = {
+            paymentMethod,
+            addressId: selectedAddress,
+            totalAmount
+        };
+
+        try {
+            const response = await fetch('/place-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            const result = await response.json();
+
+            if (result.success && paymentMethod === 'Online') {
+                const isScriptLoaded = await loadRazorpayScript();
+                if (!isScriptLoaded) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load Razorpay SDK.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/payment-failure';
+                    });
+                    return;
+                }
+
+                const options = {
+                    key: '<%= process.env.RAZORPAY_KEY_ID %>',
+                    amount: result.razorpayOrder.amount,
+                    currency: result.razorpayOrder.currency,
+                    name: 'Fazion',
+                    description: 'Order Payment',
+                    order_id: result.razorpayOrder.id,
+                    handler: async function(response) {
+                        try {
+                            const verifyResponse = await fetch('/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: result.orderId
+                                })
+                            });
+                            const verifyResult = await verifyResponse.json();
+                            if (verifyResult.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: verifyResult.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = verifyResult.redirectUrl;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: verifyResult.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = verifyResult.redirectUrl;
+                                });
+                            }
+                        } catch (error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Payment verification failed.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = '/payment-failure';
+                            });
+                        }
+                    },
+                    prefill: {
+                        name: '<%= user.name %>',
+                        email: '<%= user.email %>',
+                        contact: '<%= user.phone %>'
+                    },
+                    theme: {
+                        color: '#007bff'
+                    },
+                    modal: {
+                        ondismiss: async function() {
+                            try {
+                                await fetch('/update-order-status', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orderId: result.orderId, status: 'failed' })
+                                });
+                                window.location.href = '/payment-failure';
+                            } catch (error) {
+                                console.error('Error updating order status:', error);
+                                window.location.href = '/payment-failure';
+                            }
+                        }
+                    }
+                };
+
+                let paymentObject = new window.Razorpay(options);
+                paymentObject.on('payment.failed', function(response) {
+                    console.error("Payment Failed:", response.error);
+                    window.location.href = `/payment-failure?error=${encodeURIComponent(response.error.description)}`;
+                });
+                paymentObject.open();
+
+            } else if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: result.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = result.redirectUrl;
+                });
+            } else if (result.redirect) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Authentication Required',
+                    text: 'Please sign in to place order.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = result.redirect;
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to place order.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while placing the order.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
+});
+    </script>
+</body>
+</html>

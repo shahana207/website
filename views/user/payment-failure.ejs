@@ -1,0 +1,216 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Payment Failed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+
+        .zz-breadcrumb-area {
+            background-color: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+        }
+
+        .zz-breadcrumb {
+            margin-bottom: 0;
+            padding: 0;
+            background: none;
+        }
+
+        .zz-breadcrumb-item a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .zz-breadcrumb-item a:hover {
+            color: #007bff;
+        }
+
+        .zz-breadcrumb-item.active {
+            color: #007bff;
+        }
+
+        .zz-failure-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .zz-failure-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #e74c3c; /* Red color for failure */
+        }
+
+        .zz-failure-message {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .zz-order-details {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .zz-order-details h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .zz-order-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .zz-order-detail-label {
+            color: #555;
+        }
+
+        .zz-order-detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .zz-action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .zz-orders-btn {
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            background-color: #555;
+            color: white;
+            border: none;
+        }
+
+        .zz-orders-btn:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        .zz-failure-icon {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 767px) {
+            .zz-failure-container {
+                padding: 20px;
+            }
+
+            .zz-action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .zz-orders-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="currentUserId" value="<%= userId %>">
+
+    <!-- Breadcrumb Navigation -->
+    <div class="zz-breadcrumb-area">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb zz-breadcrumb">
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/cart">Shopping Cart</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item"><a href="/checkout">Checkout</a></li>
+                    <li class="breadcrumb-item zz-breadcrumb-item active" aria-current="page">Payment Failed</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Payment Failure Container -->
+    <div class="container">
+        <div class="zz-failure-container">
+            <i class="fas fa-times-circle zz-failure-icon"></i>
+            <h2 class="zz-failure-title">Payment Failed</h2>
+            <p class="zz-failure-message">
+                We're sorry, but your payment could not be processed at this time. Please try placing a new order with a different payment method.
+            </p>
+
+            <!-- Order Details -->
+            <% if (order) { %>
+                <div class="zz-order-details">
+                    <h4>Order Details</h4>
+                    <div class="zz-order-detail-item">
+                        <span class="zz-order-detail-label">Order ID:</span>
+                        <span class="zz-order-detail-value"><%= order.orderId %></span>
+                    </div>
+                    <div class="zz-order-detail-item">
+                                               <span class="zz-order-detail-value">₹<%= order.finalAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="zz-order-detail-item">
+                        <span class="zz-order-detail-label">Payment Method:</span>
+                        <span class="zz-order-detail-value"><%= order.paymentMethod %></span>
+                    </div>
+                    <div class="zz-order-detail-item">
+                        <span class="zz-order-detail-label">Status:</span>
+                        <span class="zz-order-detail-value"><%= order.status %></span>
+                    </div>
+                </div>
+            <% } else { %>
+                <p class="zz-failure-message">No order details available.</p>
+            <% } %>
+
+            <!-- Action Buttons -->
+            <div class="zz-action-buttons">
+                <a href="/checkout" class="zz-orders-btn">Retry Payment</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // No additional JavaScript needed since there's no retry functionality
+    </script>
+</body>
+</html>

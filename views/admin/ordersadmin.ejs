@@ -1,0 +1,458 @@
+<%- include('../partials/admin/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/style/css/adminheader.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            padding: 100px 20px 20px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .content-wrapper.collapsed {
+            margin-left: 80px;
+        }
+
+        @media (max-width: 992px) {
+            .content-wrapper {
+                margin-left: 0;
+                padding-top: 80px;
+            }
+        }
+
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .orders-title {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .orders-title:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 300px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-button {
+            background: linear-gradient(135deg, #4b6cb7, #182848);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .search-button:hover {
+            background: linear-gradient(135deg, #182848, #4b6cb7);
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .orders-table th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+
+        .orders-table td {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .status-processing {
+            background-color: #f28c38;
+            color: #333;
+        }
+
+        .status-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .status-returned {
+            background-color: #20c997;
+            color: white;
+        }
+
+        .view-details {
+            background: linear-gradient(135deg, #4b6cb7, #182848);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .view-details i {
+            margin-right: 5px;
+        }
+
+        .view-details:hover {
+            background: linear-gradient(135deg, #182848, #4b6cb7);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .no-orders {
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #4b6cb7;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pagination a:hover {
+            background: linear-gradient(135deg, #4b6cb7, #182848);
+            color: white;
+            border-color: transparent;
+        }
+
+        .pagination a.active {
+            background: linear-gradient(135deg, #4b6cb7, #182848);
+            color: white;
+            border-color: transparent;
+        }
+
+        .pagination a.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .orders-container {
+                padding: 20px;
+            }
+
+            .search-container {
+                justify-content: center;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .orders-table th {
+                font-size: 14px;
+            }
+
+            .view-details {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .pagination a {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .orders-title {
+                font-size: 24px;
+            }
+
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="orders-container">
+            <h2 class="orders-title">Manage Orders</h2>
+
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="orderSearch" class="search-input" placeholder="Search by order ID, customer...">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+
+            <% if (orders && orders.length > 0) { %>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order.orderId %></td>
+                                <td><%= order.user?.name || 'Unknown' %> (<%= order.user?.email || 'N/A' %>)</td>
+                                <td><%= order.createdOn ? order.createdOn.toLocaleDateString('en-GB') : 'N/A' %></td>
+                                <td>₹<%= order.finalAmount.toFixed(2) %></td>
+                                <td>
+                                    <span class="status-badge <%= order.status === 'Delivered' ? 'status-delivered' : order.status === 'Cancelled' ? 'status-cancelled' : order.status === 'Returned' ? 'status-returned' : 'status-processing' %>">
+                                        <%= order.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="view-details" data-order-id="<%= order.orderId %>">View Details</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+
+                <!-- Pagination Controls -->
+                <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (typeof currentPage !== 'undefined' && currentPage > 1) { %>
+                            <a href="?page=<%= currentPage - 1 %>">Previous</a>
+                        <% } else { %>
+                            <a class="disabled">Previous</a>
+                        <% } %>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                        <% } %>
+                        
+                        <% if (typeof currentPage !== 'undefined' && currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %>">Next</a>
+                        <% } else { %>
+                            <a class="disabled">Next</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="no-orders">No orders found.</div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // View Details Functionality
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    window.location.href = `/admin/order-details/${orderId}`;
+                });
+            });
+
+            // Search Functionality
+            const searchInput = document.getElementById('orderSearch');
+            const searchButton = document.querySelector('.search-button');
+            const orderRows = document.querySelectorAll('#ordersTableBody tr');
+
+            function performSearch() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                
+                orderRows.forEach(row => {
+                    const orderId = row.cells[0].textContent.toLowerCase();
+                    const customer = row.cells[1].textContent.toLowerCase();
+                    const date = row.cells[2].textContent.toLowerCase();
+                    const status = row.cells[4].textContent.toLowerCase();
+                    
+                    if (orderId.includes(searchTerm) || 
+                        customer.includes(searchTerm) || 
+                        date.includes(searchTerm) || 
+                        status.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Sidebar and layout adjustments
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const contentWrapper = document.querySelector('.content-wrapper');
+
+            function updateLayout() {
+                if (window.innerWidth <= 992) {
+                    contentWrapper.classList.remove('collapsed');
+                    contentWrapper.style.marginLeft = '0';
+                } else {
+                    contentWrapper.classList.toggle('collapsed', sidebar.classList.contains('collapsed'));
+                    contentWrapper.style.marginLeft = sidebar.classList.contains('collapsed') ? '80px' : '280px';
+                }
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.toggle('mobile-visible');
+                    } else {
+                        sidebar.classList.toggle('collapsed');
+                        updateLayout();
+                    }
+                });
+            }
+
+            window.addEventListener('resize', updateLayout);
+            updateLayout();
+        });
+    </script>
+</body>
+</html>

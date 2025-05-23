@@ -1,0 +1,136 @@
+
+<%-include("../../views/partials/user/header")%>
+    <!-- Header Section End -->
+<!-- Category css -->
+    <style>
+        .shop-now-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #000000; /* Example color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.shop-now-button:hover {
+    background-color: #000000; 
+}
+        .categories {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .category {
+            text-align: center;
+            padding: 20px;
+            width: 30%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .category:hover {
+            transform: scale(1.05);
+        }
+        .category img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .category h3 {
+            margin: 10px 0;
+            color: #333;
+        }
+        .category button {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .category button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <!-- Category css -->
+</style>
+    <!-- Hero Section Begin -->
+    <section class="hero">
+        <div class="hero__slider owl-carousel">
+            <div class="hero__items set-bg" data-setbg="/style/img/hero/banner1.jpg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Timeless Fashion</h6>
+                                <h2>Consicious Choices</h2>
+                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
+                                commitment to exceptional quality.</p>
+                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <div class="hero__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__items set-bg" data-setbg="/style/img/hero/hero-2.jpg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Summer Collection</h6>
+                                <h2>Fall - Winter Collections 2030</h2>
+                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
+                                commitment to exceptional quality.</p>
+                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <div class="hero__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+  
+    <!-- Category Section Begin -->
+    <div class="categories">
+        <div class="category">
+            <img src="/style/img/category/green1.jpg" alt="Women">
+            <h3>Women</h3>
+            <a href="http://localhost:4000/shop?cat=68089fc659694ff7b7024c2c" class="shop-now-button">Shop Now</a>
+           
+        </div>
+        <div class="category">
+            <img src="/style/img/category/men1.jpg" alt="Men">
+            <h3>Men</h3>
+            <a href="http://localhost:4000/shop?cat=68089f9dc454fa7ec93a07d6" class="shop-now-button">Shop Now</a>
+           
+        </div>
+        <div class="category">
+            <img src="/style/img/category/kids1.jpg" alt="Kids">
+            <h3>Kids</h3>
+            <a href="http://localhost:4000/shop?cat=67fe336339404f4c703b573b" class="shop-now-button">Shop Now</a>
+        </div>
+    </div>
+ 
+     
+
+  
+
+   <%-include("../../views/partials/user/footer")%>

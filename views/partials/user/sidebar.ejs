@@ -1,0 +1,129 @@
+<!-- Sidebar Partial: views/partials/user/sidebar.ejs -->  
+<!-- Sidebar Styles --> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .sidebar {
+        width: 250px;
+        background-color: white;
+        padding: 30px 20px;
+        border-right: 1px solid #eee;
+        flex-shrink: 0;
+        height: 100%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .menu-item {
+        color: #bccef4;
+        padding: 12px 5px;
+        margin-bottom: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        border-left: 3px solid transparent;
+        text-decoration: none;
+    }
+    
+    .menu-item:hover {
+        color: #333;
+    }
+    
+    .menu-item.active {
+        color: #333;
+        border-left: 3px solid #000000;
+        padding-left: 7px;
+        font-weight: 600;
+    }
+    
+    .menu-item i {
+        margin-right: 10px;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .logout-btn {
+        background-color: #000000;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        margin-top: 30px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .logout-btn i {
+        margin-right: 8px;
+    }
+    
+    .logout-btn:hover {
+        background-color: #1a2530;
+    }
+    
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #eee;
+            padding: 20px;
+        }
+    }
+</style>
+
+<!-- Sidebar HTML --> 
+<!-- Sidebar Partial: views/partials/user/sidebar.ejs -->
+<div class="sidebar">
+    <div class="menu-item <%= active === 'profile' ? 'active' : '' %>" data-route="/userProfile">
+        <i class="fa fa-user"></i> My Profile
+    </div>
+    <div class="menu-item <%= active === 'orders' ? 'active' : '' %>" data-route="/order">
+        <i class="fa fa-shopping-bag"></i> My Orders
+    </div>
+    <div class="menu-item <%= active === 'wallet' ? 'active' : '' %>" data-route="/wallet">
+        <i class="fas fa-wallet"></i> Wallet
+    </div>
+    <a href="/address" class="menu-item <%= active === 'addresses' ? 'active' : '' %>" data-route="/addresses">
+        <i class="fa fa-map-marker"></i> My Addresses
+    </a>
+    <div class="menu-item <%= active === 'wishlist' ? 'active' : '' %>" data-route="/wishlist">
+        <i class="fa fa-heart"></i> My Wishlist
+    </div>
+    <div class="menu-item <%= active === 'referral' ? 'active' : '' %>" data-route="/referral">
+        <i class="fa fa-share-alt"></i> Referral
+    </div>
+    
+    <button type="button" class="logout-btn"><i class="fa fa-sign-out"></i> Logout</button>
+</div>
+
+<!-- Sidebar JavaScript -->
+<script>
+    function redirectToRoute(route) {
+        if (route && window.location.pathname !== route) {
+            window.location.href = route;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuItems = document.querySelectorAll('.sidebar .menu-item:not(a)');
+        menuItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                const route = this.getAttribute('data-route');
+                redirectToRoute(route);
+            });
+        });
+        
+        const logoutBtn = document.querySelector('.sidebar .logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                redirectToRoute('/logout');
+            });
+        }
+    });
+</script>

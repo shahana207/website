@@ -1,0 +1,646 @@
+<%- include("../partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazion - Order Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+     -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 0;
+        }
+
+        .zz-container {
+            display: flex;
+            padding: 30px 15px;
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+        }
+
+        /* Sidebar alignment */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* Order Details Container */
+        .zz-order-details-container {
+            flex: 1;
+            background: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-left: 20px;
+        }
+
+        .zz-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .zz-order-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+
+        .zz-order-header p {
+            font-size: 14px;
+            color: #777;
+            margin: 5px 0 0;
+        }
+
+        .zz-order-status {
+            color: #e67e22;
+            font-weight: 600;
+        }
+
+        .zz-back-btn {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .zz-back-btn:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .zz-cancel-order-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .zz-cancel-order-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .zz-cancel-order-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Shipping Address Section */
+        .zz-shipping-address {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .zz-shipping-address h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .zz-shipping-address p {
+            font-size: 14px;
+            color: #555;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        /* Order Items Section */
+        .zz-order-items-section {
+            margin-bottom: 25px;
+        }
+
+        .zz-order-items-section .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .zz-order-items-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: #333;
+        }
+
+        .zz-order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            background-color: #fafafa;
+            transition: box-shadow 0.3s;
+        }
+
+        .zz-order-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .zz-order-item-image {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .zz-order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .zz-order-item-info {
+            flex: 1;
+        }
+
+        .zz-order-item-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .zz-order-item-meta {
+            font-size: 13px;
+            color: #777;
+            line-height: 1.5;
+        }
+
+        .zz-order-item-meta .status-cancelled {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .zz-order-item-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: #333;
+            margin-top: 6px;
+        }
+
+        .zz-action-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .zz-action-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .zz-action-btn.return {
+            background-color: #f39c12;
+        }
+
+        .zz-action-btn.return:hover {
+            background-color: #e08e0b;
+        }
+
+        /* Order Summary Section */
+        .zz-order-summary {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .zz-order-summary h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .zz-summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        .zz-summary-item.total {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .zz-container {
+                flex-direction: column;
+                padding: 20px 10px;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .zz-order-details-container {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .zz-order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .zz-order-items-section .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .zz-order-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .zz-order-item-image {
+                margin-right: 0;
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container zz-container">
+        <!-- Include Sidebar Partial -->
+        <%- include("../partials/user/sidebar", { active: 'orders' }) %>
+
+        <!-- Order Details -->
+        <div class="zz-order-details-container">
+            <div class="zz-order-header">
+                <div>
+                    <h3>Order Details <%= order.orderId %></h3>
+                    <p>
+                        <span class="zz-order-status"><%= order.status %></span> | 
+                        Order Date: <%= order.createdOn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                    </p>
+                </div>
+                <div>
+                    <a href="/order" class="zz-back-btn">Back to Orders</a>
+                    <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
+                        <button class="zz-cancel-order-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="zz-shipping-address">
+                <h4><i class="fas fa-map-marker-alt"></i> Shipping Address</h4>
+                <p><%= order.address.name %></p>
+                <p><%= order.address.landMark %>, <%= order.address.city %>, <%= order.address.state %> - <%= order.address.pincode %></p>
+                <p>Phone: <%= order.address.phone %><%= order.address.altPhone ? ', Alt: ' + order.address.altPhone : '' %></p>
+            </div>
+
+            <!-- Order Items -->
+            <div class="zz-order-items-section">
+                <div class="header">
+                    <h4><i class="fas fa-shopping-bag"></i> Order Items</h4>
+                    <div>
+                        <% if (order.orderedItems.length >= 2 && order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
+                            <button class="zz-action-btn cancel-items-btn" style="display: none;">Cancel Selected Products</button>
+                            <!-- <button class="zz-action-btn cancel-all-btn" style="margin-left: 10px;">Cancel All Products</button> -->
+                        <% } %>
+                    </div>
+                </div>
+                <% order.orderedItems.forEach(item => { %>
+                    <div class="zz-order-item">
+                        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
+                            <input type="checkbox" class="zz-item-checkbox" data-item-id="<%= item._id %>" style="margin-right: 10px;">
+                        <% } %>
+                        <div class="zz-order-item-image">
+                            <img src="/Uploads/product-images/<%= item.product?.productImage[0] || 'placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
+                        </div>
+                        <div class="zz-order-item-info">
+                            <div class="zz-order-item-name"><%= item.product?.productName || 'Product Not Found' %></div>
+                            <div class="zz-order-item-meta">
+                                <% if (item.size) { %>
+                                    <span>Size: <%= item.size %></span>
+                                <% } %>
+                                <% if (item.color) { %>
+                                    <span> | Color: <%= item.color %></span>
+                                <% } %>
+                                <span> | Qty: <%= item.quantity %></span>
+                                <% if (item.returnStatus !== 'Not Returned') { %>
+                                    <span class="status-cancelled"> | Status: <%= item.returnStatus %></span>
+                                <% } %>
+                            </div>
+                            <div class="zz-order-item-price">₹ <%= (item.price * item.quantity).toFixed(2) %></div>
+                        </div>
+                        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
+                            <button class="zz-action-btn cancel-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Cancel Product</button>
+                        <% } %>
+                        <% if (order.status === 'Delivered' && item.returnStatus === 'Not Returned') { %>
+                            <button class="zz-action-btn return return-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Return Product</button>
+                        <% } %>
+                    </div>
+                <% }) %>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="zz-order-summary">
+                <h4><i class="fas fa-file-invoice"></i> Order Summary</h4>
+                <div class="zz-summary-item">
+                    <span>Subtotal</span>
+                    <span>₹ <%= order.totalPrice.toFixed(2) %></span>
+                </div>
+                <% if (order.discount > 0) { %>
+                    <div class="zz-summary-item">
+                        <span>Discount</span>
+                        <span>-₹ <%= order.discount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                <div class="zz-summary-item">
+                    <span>Shipping</span>
+                    <span><%= order.shippingCharge ? '₹' + order.shippingCharge.toFixed(2) : 'Free' %></span>
+                </div>
+                <div class="zz-summary-item total">
+                    <span>Grand Total</span>
+                    <span>₹ <%= order.finalAmount.toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle checkbox selection to show/hide "Cancel Selected Products" button
+            $('.zz-item-checkbox').on('change', function() {
+                const selectedItems = $('.zz-item-checkbox:checked').length;
+                if (selectedItems > 0) {
+                    $('.cancel-items-btn').show();
+                } else {
+                    $('.cancel-items-btn').hide();
+                }
+            });
+
+            // Handle bulk cancellation of selected items
+            $('.cancel-items-btn').on('click', function() {
+                const selectedItems = $('.zz-item-checkbox:checked').map(function() {
+                    return $(this).data('item-id');
+                }).get();
+
+                if (selectedItems.length === 0) {
+                    Swal.fire('Error', 'Please select at least one item to cancel.', 'error');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Cancel Selected Items',
+                    text: 'Please provide a reason for cancellation:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cancel Items',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const orderId = '<%= order.orderId %>';
+                        fetch('/cancel-items', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, itemIds: selectedItems, reason: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Cancelled!', data.message, 'success')
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Failed to cancel items.', 'error');
+                        });
+                    }
+                });
+            });
+
+            // Handle cancellation of all products
+            $('.cancel-all-btn').on('click', function() {
+                const allItems = $('.zz-item-checkbox').map(function() {
+                    return $(this).data('item-id');
+                }).get();
+
+                Swal.fire({
+                    title: 'Cancel All Items',
+                    text: 'Are you sure you want to cancel all items in this order? Please provide a reason:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cancel All Items',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const orderId = '<%= order.orderId %>';
+                        fetch('/cancel-items', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, itemIds: allItems, reason: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Cancelled!', data.message, 'success')
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Failed to cancel all items.', 'error');
+                        });
+                    }
+                });
+            });
+
+            // Handle entire order cancellation
+            $('.zz-cancel-order-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                Swal.fire({
+                    title: 'Cancel Order',
+                    text: 'Please provide a reason for cancelling this order:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cancel Order',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/cancel-order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, reason: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Cancelled!', data.message, 'success')
+                                    .then(() => window.location.href = '/order');
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            const message = error.message || 'Failed to cancel order';
+                            Swal.fire('Error', message, 'error');
+                        });
+                    }
+                });
+            });
+
+            // Handle single item cancellation
+            $('.cancel-item-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                const itemId = $(this).data('item-id');
+                Swal.fire({
+                    title: 'Cancel Item',
+                    text: 'Please provide a reason for cancellation:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cancel Item',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/cancel-item', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, itemId, reason: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Cancelled!', data.message, 'success')
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Failed to cancel item.', 'error');
+                        });
+                    }
+                });
+            });
+
+            // Handle item return
+            $('.return-item-btn').on('click', function() {
+                const orderId = $(this).data('order-id');
+                const itemId = $(this).data('item-id');
+                Swal.fire({
+                    title: 'Return Item',
+                    text: 'Please provide a reason for return:',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Request Return',
+                    cancelButtonText: 'Close',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('Reason is required');
+                        }
+                        return reason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/return-item', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, itemId, reason: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Requested!', data.message, 'success')
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Failed to request return.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

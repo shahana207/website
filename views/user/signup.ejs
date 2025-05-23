@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create an Account</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .container {
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .image-container {
+        flex: 1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.8;
+      }
+
+      .form-header {
+        margin-bottom: 30px;
+      }
+
+      .form-header h1 {
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .form-header p {
+        color: #666;
+        font-size: 16px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      .form-control:focus {
+        border-color: #667eea;
+        outline: none;
+      }
+
+      .password-container {
+        position: relative;
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #00020b 0%, #030006 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 15px;
+        transition: all 0.3s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      }
+
+      .alternative-signin {
+        margin-top: 25px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+      }
+
+      .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-weight: 500;
+        color: #555;
+        background-color: white;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+      }
+
+      .google-btn:hover {
+        background-color: #f5f5f5;
+      }
+
+      .google-icon {
+        margin-right: 10px;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+      }
+
+      .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .image-container {
+          height: 200px;
+          order: -1;
+        }
+
+        .form-container {
+          padding: 30px 20px;
+        }
+      }
+
+      .error-message {
+        color: red;
+        font-size: 0.75rem;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <div class="form-header">
+          <h1>Create an Account</h1>
+          <p>Join us today and start your journey</p>
+          <% if (typeof message !== 'undefined' && message) { %>
+          <p style="color: red; text-align: center;" ><%= message %></p>
+          <% } %>
+        </div>
+
+        <form action="/signup" method="POST" id="signform">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              placeholder="Enter your full name"
+            />
+            <div id="error1" class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="Enter your email"
+            />
+            <div id="error2" class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-control"
+              placeholder="Enter your phone number"
+            />
+            <div id="error3" class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="referralCode">Referral Code (Optional)</label>
+            <input
+              type="text"
+              id="referralCode"
+              name="referralCode"
+              class="form-control"
+              placeholder="Enter referral code if you have one"
+            />
+            <div id="error6" class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Create a strong password"
+              />
+              <span
+                class="toggle-password"
+                onclick="togglePasswordVisibility('password')"
+                >👁️</span
+              >
+              <div id="error4" class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                class="form-control"
+                placeholder="Confirm your password"
+              />
+              <span
+                class="toggle-password"
+                onclick="togglePasswordVisibility('confirmPassword')"
+                >👁️</span
+              >
+              <div id="error5" class="error-message"></div>
+            </div>
+          </div>
+          <button type="submit" class="btn">Create Account</button>
+        </form>
+
+        <div class="alternative-signin">
+          <button class="google-btn">
+            <span class="google-icon"> </span>
+            <a href="/auth/google" class="google-btn">
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google"
+                class="google-icon"
+              />Continue with Google
+            </a>
+          </button>
+        </div>
+
+        <div class="login-link">
+          Already have an account? <a href="/login">Sign in</a>
+        </div>
+      </div>
+
+      <div class="image-container">
+        <img src="/style/img/hero/image18.jpg" alt="Sign up illustration" />
+      </div>
+    </div>
+
+    <script>
+      function togglePasswordVisibility(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        passwordInput.type =
+          passwordInput.type === "password" ? "text" : "password";
+      }
+
+      const nameid = document.getElementById("name");
+      const emailid = document.getElementById("email");
+      const phoneid = document.getElementById("phone");
+      const passid = document.getElementById("password");
+      const cpassid = document.getElementById("confirmPassword");
+
+      const error1 = document.getElementById("error1");
+      const error2 = document.getElementById("error2");
+      const error3 = document.getElementById("error3");
+      const error4 = document.getElementById("error4");
+      const error5 = document.getElementById("error5");
+
+      const signform = document.getElementById("signform");
+
+      function nameValidateChecking() {
+        const nameval = nameid.value.trim();
+        const namepattern = /^[A-Za-z\s]+$/;
+        if (nameval === "") {
+          error1.style.display = "block";
+          error1.innerHTML = "Please enter a valid name";
+        } else if (!namepattern.test(nameval)) {
+          error1.style.display = "block";
+          error1.innerHTML = "Name can only contain alphabets and spaces";
+        } else {
+          error1.style.display = "none";
+          error1.innerHTML = "";
+        }
+      }
+
+      function emailValidateChecking() {
+        const emailval = emailid.value.trim();
+        const emailpattern = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailpattern.test(emailval)) {
+          error2.style.display = "block";
+          error2.innerHTML = "Invalid email format";
+        } else {
+          error2.style.display = "none";
+          error2.innerHTML = "";
+        }
+      }
+
+      function phoneValidateChecking() {
+        const phoneval = phoneid.value.trim();
+        if (phoneval === "") {
+          error3.style.display = "block";
+          error3.innerHTML = "Enter a valid phone number";
+        } else if (!/^[6-9]\d{9}$/.test(phoneval)) {
+          error3.style.display = "block";
+          error3.innerHTML = "Enter a valid 10-digit Indian phone number";
+        } else {
+          error3.style.display = "none";
+          error3.innerHTML = "";
+        }
+      }
+
+      function passValidateChecking() {
+        const passval = passid.value.trim();
+        const cpassval = cpassid.value.trim();
+        const alphanumeric = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+        if (passval.length < 8) {
+          error4.style.display = "block";
+          error4.innerHTML = "Password should be at least 8 characters";
+        } else if (!alphanumeric.test(passval)) {
+          error4.style.display = "block";
+          error4.innerHTML = "Password must contain both letters and numbers";
+        } else {
+          error4.style.display = "none";
+          error4.innerHTML = "";
+        }
+
+        if (passval !== cpassval) {
+          error5.style.display = "block";
+          error5.innerHTML = "Passwords do not match";
+        } else {
+          error5.style.display = "none";
+          error5.innerHTML = "";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        signform.addEventListener("submit", function (e) {
+          nameValidateChecking();
+          emailValidateChecking();
+          phoneValidateChecking();
+          passValidateChecking();
+
+          if (
+            error1.innerHTML ||
+            error2.innerHTML ||
+            error3.innerHTML ||
+            error4.innerHTML ||
+            error5.innerHTML
+          ) {
+            e.preventDefault();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

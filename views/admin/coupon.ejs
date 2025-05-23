@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Management - Fazio Admin</title>
+    <link rel="stylesheet" href="/style/css/adminheader.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .main-content {
+            padding: 20px;
+            margin-left: 280px;
+            transition: margin-left 0.3s;
+        }
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        .coupon-table th, .coupon-table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .action-btns .btn {
+            margin: 0 5px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .flatpickr-input {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        .status-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            cursor: default;
+            transition: transform 0.2s;
+        }
+        .status-btn.active {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-btn.disabled {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-btn:hover {
+            transform: scale(1.05);
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .is-invalid ~ .error-message {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/admin/header") %>
+
+    <div class="main-content">
+        <h2>Coupon Management</h2>
+        
+        <!-- Search and Add Coupon -->
+        <div class="d-flex justify-content-between mb-3">
+            <form class="d-flex" method="GET" action="/admin/coupon">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search by coupon code" value="<%= search %>" aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </form>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
+        </div>
+
+        <!-- Coupon Table -->
+        <table class="table table-bordered coupon-table">
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Discount</th>
+                    <th>Min Purchase</th>
+                    <th>Valid From</th>
+                    <th>Valid Until</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (coupons && coupons.length > 0) { %>
+                    <% coupons.forEach(coupon => { %>
+                        <tr>
+                            <td><%= coupon.couponCode %></td>
+                            <td><%= coupon.discountValue %></td>
+                            <td><%= coupon.minPurchase %></td>
+                            <td><%= coupon.startDate.toLocaleDateString() %></td>
+                            <td><%= coupon.endDate.toLocaleDateString() %></td>
+                            <td>
+                                <button class="status-btn <%= coupon.status === 'Active' ? 'active' : 'disabled' %>">
+                                    <%= coupon.status %>
+                                </button>
+                            </td>
+                            <td class="action-btns">
+                                <button class="btn btn-sm btn-warning edit-btn" data-id="<%= coupon._id %>" data-bs-toggle="modal" data-bs-target="#editCouponModal">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-btn" data-id="<%= coupon._id %>" data-code="<%= coupon.couponCode %>">Delete</button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7" class="text-center">No coupons found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
+                    </li>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        <% } %>
+
+        <!-- Add Coupon Modal -->
+        <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCouponModalLabel">Add New Coupon</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCouponForm" novalidate>
+                            <div class="mb-3">
+                                <label for="couponCode" class="form-label">Coupon Code</label>
+                                <input type="text" class="form-control" id="couponCode" name="couponCode" required pattern="[A-Za-z0-9]{4,10}" title="Alphanumeric code, 4-10 characters">
+                                <div class="error-message" id="couponCodeError">Please enter a valid coupon code (4-10 alphanumeric characters).</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="minPurchase" class="form-label">Minimum Purchase</label>
+                                <input type="number" class="form-control" id="minPurchase" name="minPurchase" required min="100" step="1">
+                                <div class="error-message" id="minPurchaseError">Please enter a value of at least 100.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="discountValue" class="form-label">Discount Value</label>
+                                <input type="number" class="form-control" id="discountValue" name="discountValue" required min="1" max="1000" step="1">
+                                <div class="error-message" id="discountValueError">Enter a value above 1 and below 25% of the minimum purchase.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="text" class="form-control flatpickr" id="startDate" name="startDate" required>
+                                <div class="error-message" id="startDateError">Please select a valid start date.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="text" class="form-control flatpickr" id="endDate" name="endDate" required>
+                                <div class="error-message" id="endDateError">Please select an end date after the start date.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                                <div class="error-message" id="descriptionError">Description cannot exceed 200 characters.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="" disabled selected>Select status</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Disabled">Disabled</option>
+                                </select>
+                                <div class="error-message" id="statusError">Please select a status.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Add Coupon</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Coupon Modal -->
+        <div class="modal fade" id="editCouponModal" tabindex="-1" aria-labelledby="editCouponModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCouponModalLabel">Edit Coupon</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCouponForm" novalidate>
+                            <input type="hidden" id="editCouponId" name="couponId">
+                            <div class="mb-3">
+                                <label for="editCouponCode" class="form-label">Coupon Code</label>
+                                <input type="text" class="form-control" id="editCouponCode" name="couponCode" required pattern="[A-Za-z0-9]{4,10}" title="Alphanumeric code, 4-10 characters">
+                                <div class="error-message" id="editCouponCodeError">Please enter a valid coupon code (4-10 alphanumeric characters).</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMinPurchase" class="form-label">Minimum Purchase</label>
+                                <input type="number" class="form-control" id="editMinPurchase" name="minPurchase" required min="100" step="1">
+                                <div class="error-message" id="editMinPurchaseError">Please enter a value of at least 100.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDiscountValue" class="form-label">Discount Value</label>
+                                <input type="number" class="form-control" id="editDiscountValue" name="discountValue" required min="1" max="1000" step="1">
+                                <div class="error-message" id="editDiscountValueError">Please enter a value between 1 and 1000.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editStartDate" class="form-label">Start Date</label>
+                                <input type="text" class="form-control flatpickr" id="editStartDate" name="startDate" required>
+                                <div class="error-message" id="editStartDateError">Please select a valid start date.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEndDate" class="form-label">End Date</label>
+                                <input type="text" class="form-control flatpickr" id="editEndDate" name="endDate" required>
+                                <div class="error-message" id="editEndDateError">Please select an end date after the start date.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="editDescription" name="description" rows="4"></textarea>
+                                <div class="error-message" id="editDescriptionError">Description cannot exceed 200 characters.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editStatus" class="form-label">Status</label>
+                                <select class="form-select" id="editStatus" name="status" required>
+                                    <option value="" disabled>Select status</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Disabled">Disabled</option>
+                                </select>
+                                <div class="error-message" id="editStatusError">Please select a status.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="editSubmitBtn">Update Coupon</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Initialize Flatpickr for add modal
+        const addStartDatePicker = flatpickr("#startDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) {
+                    addEndDatePicker.set("minDate", selectedDates[0]);
+                }
+            }
+        });
+
+        const addEndDatePicker = flatpickr("#endDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today"
+        });
+
+        // Initialize Flatpickr for edit modal
+        const editStartDatePicker = flatpickr("#editStartDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) {
+                    editEndDatePicker.set("minDate", selectedDates[0]);
+                }
+            }
+        });
+
+        const editEndDatePicker = flatpickr("#editEndDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today"
+        });
+
+        // Form validation function (shared for add and edit)
+        function validateForm(form) {
+            let isValid = true;
+
+            // Reset error states
+            form.querySelectorAll(".form-control, .form-select").forEach(input => {
+                input.classList.remove("is-invalid");
+                const errorElement = document.getElementById(`${input.id}Error`);
+                if (errorElement) errorElement.style.display = "none";
+            });
+
+            // Coupon Code
+            const couponCode = form.querySelector("[name='couponCode']");
+            if (!couponCode.value.match(/^[A-Za-z0-9]{4,10}$/)) {
+                couponCode.classList.add("is-invalid");
+                document.getElementById(`${couponCode.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            // Minimum Purchase
+            const minPurchase = form.querySelector("[name='minPurchase']");
+            if (!minPurchase.value || minPurchase.value < 100) {
+                minPurchase.classList.add("is-invalid");
+                document.getElementById(`${minPurchase.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            let minCartValue = minPurchase.value
+            let validAmount = Math.floor((minCartValue*25)/100)
+
+            // Discount Value
+            const discountValue = form.querySelector("[name='discountValue']");
+            if (!discountValue.value || discountValue.value < 1 || discountValue.value > validAmount) {
+                discountValue.classList.add("is-invalid");
+                document.getElementById(`${discountValue.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            // Start Date
+            const startDate = form.querySelector("[name='startDate']");
+            if (!startDate.value) {
+                startDate.classList.add("is-invalid");
+                document.getElementById(`${startDate.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            // End Date
+            const endDate = form.querySelector("[name='endDate']");
+            const startDateValue = new Date(startDate.value);
+            const endDateValue = new Date(endDate.value);
+            if (!endDate.value || (startDate.value && endDateValue <= startDateValue)) {
+                endDate.classList.add("is-invalid");
+                document.getElementById(`${endDate.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            // Description
+            const description = form.querySelector("[name='description']");
+            if (description.value.length > 200) {
+                description.classList.add("is-invalid");
+                document.getElementById(`${description.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            // Status
+            const status = form.querySelector("[name='status']");
+            if (!status.value) {
+                status.classList.add("is-invalid");
+                document.getElementById(`${status.id}Error`).style.display = "block";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Handle add coupon form submission
+        const addForm = document.getElementById("addCouponForm");
+        const addSubmitBtn = document.getElementById("submitBtn");
+
+        addForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if (!validateForm(addForm)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Validation Error",
+                    text: "Please correct the errors in the form."
+                });
+                return;
+            }
+
+            addSubmitBtn.disabled = true;
+            addSubmitBtn.textContent = "Adding...";
+
+            const formData = new FormData(addForm);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch("/admin/coupon/add", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: result.message
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to add coupon. Please try again."
+                });
+            } finally {
+                addSubmitBtn.disabled = false;
+                addSubmitBtn.textContent = "Add Coupon";
+            }
+        });
+
+        // Handle edit coupon form submission
+        const editForm = document.getElementById("editCouponForm");
+        const editSubmitBtn = document.getElementById("editSubmitBtn");
+
+        editForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if (!validateForm(editForm)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Validation Error",
+                    text: "Please correct the errors in the form."
+                });
+                return;
+            }
+
+            editSubmitBtn.disabled = true;
+            editSubmitBtn.textContent = "Updating...";
+
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData);
+            const couponId = document.getElementById("editCouponId").value;
+
+            try {
+                const response = await fetch(`/admin/coupon/edit/${couponId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: result.message
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to update coupon. Please try again."
+                });
+            } finally {
+                editSubmitBtn.disabled = false;
+                editSubmitBtn.textContent = "Update Coupon";
+            }
+        });
+
+        // Populate edit modal with coupon data
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const couponId = btn.dataset.id;
+
+                try {
+                    const response = await fetch(`/admin/coupon/${couponId}`);
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch coupon data");
+                    }
+                    const coupon = await response.json();
+
+                    // Populate edit form
+                    document.getElementById("editCouponId").value = coupon._id;
+                    document.getElementById("editCouponCode").value = coupon.couponCode;
+                    document.getElementById("editMinPurchase").value = coupon.minPurchase;
+                    document.getElementById("editDiscountValue").value = coupon.discountValue;
+                    document.getElementById("editStartDate").value = coupon.startDate.split('T')[0];
+                    document.getElementById("editEndDate").value = coupon.endDate.split('T')[0];
+                    document.getElementById("editDescription").value = coupon.description || "";
+                    document.getElementById("editStatus").value = coupon.status;
+
+                    // Update Flatpickr minDate for end date
+                    editStartDatePicker.setDate(coupon.startDate);
+                    editEndDatePicker.set("minDate", coupon.startDate.split('T')[0]);
+                } catch (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Failed to load coupon data."
+                    });
+                }
+            });
+        });
+
+        // Handle delete coupon
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const couponId = btn.dataset.id;
+                const couponCode = btn.dataset.code;
+
+                const result = await Swal.fire({
+                    icon: "warning",
+                    title: "Are you sure?",
+                    text: `You are about to delete the coupon "${couponCode}". This action cannot be undone.`,
+                    showCancelButton: true,
+                    confirmButtonColor: "#dc3545",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: "Delete",
+                    cancelButtonText: "Cancel"
+                });
+
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/admin/coupon/delete/${couponId}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                text: result.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: result.message
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Failed to delete coupon. Please try again."
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
