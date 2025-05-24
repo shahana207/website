@@ -99,6 +99,16 @@
   font-weight: bold;
   cursor: default;
 }
+size-variants-list {
+        max-width: 150px;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .size-variants-list:hover {
+        overflow: visible;
+        white-space: normal;
+    }
 
 /* Responsive (Optional) */
 @media (max-width: 576px) {
@@ -151,59 +161,68 @@
 
     <div class="table-responsive">
       <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Image</th>
-            <th>Brand</th>
-            <th>Category</th>
-            <th>Colors</th>
-            <th>Regular Price</th>
-            <th>Sale Price</th>
-            <th>Quantity</th>
-            <th>Size</th>
-            <th>Status</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="productTableBody">
-          <% data.forEach(product => { %>
-          <tr data-product-id="<%= product._id %>">
-            <td><%= product.productName %></td>
-            <td>
-              <% if (product.productImage && product.productImage.length > 0) { %>
+        <!-- Update the table header -->
+<thead>
+    <tr>
+        <th>Product Name</th>
+        <th>Image</th>
+        <th>Brand</th>
+        <th>Category</th>
+        <th>Colors</th>
+        <th>Regular Price</th>
+        <th>Sale Price</th>
+        <th>Quantity</th>
+        <th>Size Variants</th>
+        <th>Status</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+</thead>
+<tbody id="productTableBody">
+    <% data.forEach(product => { %>
+    <tr data-product-id="<%= product._id %>">
+        <td><%= product.productName %></td>
+        <td>
+            <% if (product.productImage && product.productImage.length > 0) { %>
                 <img src="/Uploads/product-images/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
-              <% } else { %>
+            <% } else { %>
                 <img src="/Uploads/product-images/placeholder.jpg" alt="No Image" class="product-image">
-              <% } %>
-            </td>
-            <td><%= product.brand ? product.brand.name : 'N/A' %></td>
-            <td><%= product.category ? product.category.name : 'N/A' %></td>
-            <td class="color-list">
-              <%= product.color && product.color.length > 0 ? product.color.join(', ') : 'N/A' %>
-            </td>
-           
-            <td>₹<%= product.regularPrice.toFixed(2) %></td>
-            <td>₹<%= product.salePrice.toFixed(2) %></td>
-            <td><%= product.quantity %></td>
-            <td class="color-list">
-              <%= product.sizes && product.sizes.length > 0 ? product.sizes.join(', ') : 'N/A' %>
-          </td>
-            <td>
-              <button class="btn btn-sm <%= product.isBlocked ? 'btn-danger' : 'btn-success' %> toggle-block-btn">
+            <% } %>
+        </td>
+        <td><%= product.brand ? product.brand.name : 'N/A' %></td>
+        <td><%= product.category ? product.category.name : 'N/A' %></td>
+        
+        <td class="color-list">
+            <%= product.color && product.color.length > 0 ? product.color.join(', ') : 'N/A' %>
+        </td>
+        <td>₹<%= product.regularPrice.toFixed(2) %></td>
+        <td>₹<%= product.salePrice.toFixed(2) %></td>
+        <td><%= product.quantity %></td>
+        <td class="color-list">
+            <% if (product.sizeVariants && product.sizeVariants.length > 0) { %>
+                <% product.sizeVariants.forEach(variant => { %>
+                    <%= variant.size %>: <%= variant.quantity %><br>
+                <% }) %>
+            <% } else if (product.sizes && product.sizes.length > 0) { %>
+                <%= product.sizes.join(', ') %>
+            <% } else { %>
+                N/A
+            <% } %>
+        </td>
+        <td>
+            <button class="btn btn-sm <%= product.isBlocked ? 'btn-danger' : 'btn-success' %> toggle-block-btn">
                 <%= product.isBlocked ? 'Unblock' : 'Block' %>
-              </button>
-            </td>
-            <td>
-              <a href="/admin/editProduct?id=<%= product._id %>" class="btn btn-success btn-sm">Edit</a>
-            </td>
-            <td>
-              <button class="btn btn-danger btn-sm delete-btn">Delete</button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
+            </button>
+        </td>
+        <td>
+            <a href="/admin/editProduct?id=<%= product._id %>" class="btn btn-success btn-sm">Edit</a>
+        </td>
+        <td>
+            <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+        </td>
+    </tr>
+    <% }) %>
+</tbody>
       </table>
     </div>
 

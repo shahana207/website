@@ -2,9 +2,11 @@ const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
+const Wallet=require("../../models/walletSchema");
 const dotenv = require("dotenv").config(); 
 const nodemailer = require("nodemailer");
 const Offer = require("../../models/offerSchema");
+const { generateCustomId } = require("../../utils/helpers");
 const bcrypt = require("bcrypt");
 
 const generateReferralCode = () => {
@@ -151,8 +153,7 @@ const verifyOtp = async (req, res) => {
             }
 
             const hashedPass = await bcrypt.hash(userData.password, 10);
-
-            const referralCode = generateReferralCode()
+            const referralCode = generateReferralCode();
 
             const newUser = new User({
                 name: userData.name,
@@ -164,29 +165,74 @@ const verifyOtp = async (req, res) => {
 
             await newUser.save();
 
-            
+            // Initialize Wallet for the new user
+            let newUserWallet = await Wallet.findOne({ userId: newUser._id });
+            if (!newUserWallet) {
+                newUserWallet = new Wallet({
+                    userId: newUser._id,
+                    balance: 0,
+                    transactions: []
+                });
+            }
+
+            // Handle referral rewards if a valid referral code was provided
             if (userData.referralCode) {
                 const referrer = await User.findOne({ referralCode: userData.referralCode });
                 if (referrer) {
-                 
-                    referrer.redeemedUsers.push(newUser._id);
-
+                    // Update referrer's referral history
                     referrer.referralHistory.push({
                         referredUser: newUser._id,
                         name: newUser.name,
                         status: "Completed",
-                        reward: 1000 
+                        reward: 1000
                     });
 
-                    referrer.wallet = (referrer.wallet || 0) + 1000;
+                    // Find or create referrer's wallet
+                    let referrerWallet = await Wallet.findOne({ userId: referrer._id });
+                    if (!referrerWallet) {
+                        referrerWallet = new Wallet({
+                            userId: referrer._id,
+                            balance: 0,
+                            transactions: []
+                        });
+                    }
 
-                    
+                    // Credit ₹1000 to referrer's wallet
+                    referrerWallet.balance += 1000;
+                    referrerWallet.transactions.push({
+                        transactionId: generateCustomId("TNX"),
+                        amount: 1000,
+                        type: "Credit",
+                        method: "Referral",
+                        status: "Completed",
+                        description: `Referral reward for referring ${newUser.name}`,
+                        date: new Date()
+                    });
+
+                    // Credit ₹500 to new user's wallet
+                    newUserWallet.balance += 500;
+                    newUserWallet.transactions.push({
+                        transactionId: generateCustomId("TNX"),
+                        amount: 500,
+                        type: "Credit",
+                        method: "Signup",
+                        status: "Completed",
+                        description: "Signup bonus via referral",
+                        date: new Date()
+                    });
+
+                    // Mark new user as redeemed
                     newUser.redeemed = true;
-                    newUser.wallet = (newUser.wallet || 0) + 500; 
 
+                    // Save both wallets and referrer
+                    await referrerWallet.save();
+                    await newUserWallet.save();
                     await referrer.save();
                     await newUser.save();
                 }
+            } else {
+                // Save new user's wallet even if no referral
+                await newUserWallet.save();
             }
 
             req.session.userOtp = null;
@@ -290,58 +336,61 @@ const logout = async (req, res) => {
 
 const getBestOffer = async (product) => {
     try {
-        const currentDate = new Date();
-        let bestOffer = null;
-        let bestDiscount = 0;
+        if (!product || product.isBlocked || product.isDeleted) {
+            return null;
+        }
 
-        const productOffers = await Offer.find({
+        let productOffer = null;
+        const productOfferData = await Offer.findOne({
             offerType: 'Products',
             applicableTo: product._id,
-            validFrom: { $lte: currentDate },
-            validUpto: { $gte: currentDate },
             isListed: true,
-            isDeleted: false
+            isDeleted: false,
+            validFrom: { $lte: new Date() },
+            validUpto: { $gte: new Date() },
         });
 
-        const categoryOffers = await Offer.find({
-            offerType: 'Category',
-            applicableTo: product.category,
-            validFrom: { $lte: currentDate },
-            validUpto: { $gte: currentDate },
-            isListed: true,
-            isDeleted: false
-        });
+        if (productOfferData) {
+            productOffer = {
+                name: productOfferData.offerName,
+                discount: productOfferData.discountAmount,
+                originalPrice: product.salePrice,
+                offerPrice: product.salePrice * (1 - productOfferData.discountAmount / 100),
+            };
+        }
 
-        const brandOffers = await Offer.find({
-            offerType: 'Brands',
-            applicableTo: product.brand,
-            validFrom: { $lte: currentDate },
-            validUpto: { $gte: currentDate },
-            isListed: true,
-            isDeleted: false
-        });
+        let categoryOffer = null;
+        if (product.category) {
+            const categoryOfferData = await Offer.findOne({
+                offerType: 'Category',
+                applicableTo: product.category._id,
+                isListed: true,
+                isDeleted: false,
+                validFrom: { $lte: new Date() },
+                validUpto: { $gte: new Date() },
+            });
 
-        const allOffers = [...productOffers, ...categoryOffers, ...brandOffers];
-
-        for (const offer of allOffers) {
-            if (offer.discountType === 'percentage') {
-                const discountAmount = (product.salePrice * offer.discountAmount) / 100;
-                if (discountAmount > bestDiscount) {
-                    bestDiscount = discountAmount;
-                    bestOffer = {
-                        name: offer.offerName,
-                        offerPrice: product.salePrice - discountAmount,
-                        originalPrice: product.salePrice,
-                        discountAmount: offer.discountAmount,
-                        discountType: offer.discountType
-                    };
-                }
+            if (categoryOfferData) {
+                categoryOffer = {
+                    name: categoryOfferData.offerName,
+                    discount: categoryOfferData.discountAmount,
+                    originalPrice: product.salePrice,
+                    offerPrice: product.salePrice * (1 - categoryOfferData.discountAmount / 100),
+                };
             }
         }
 
-        return bestOffer;
+        if (productOffer && categoryOffer) {
+            return productOffer.discount >= categoryOffer.discount ? productOffer : categoryOffer;
+        } else if (productOffer) {
+            return productOffer;
+        } else if (categoryOffer) {
+            return categoryOffer;
+        } else {
+            return null;
+        }
     } catch (error) {
-        console.error('Error finding best offer:', error);
+        console.error('Error in getBestOffer:', error);
         return null;
     }
 };
@@ -466,15 +515,18 @@ const referralPage = async (req, res) => {
             return res.redirect("/login");
         }
 
-        let user = await User.findById(userId._id);
+        const user = await User.findById(userId._id);
         if (!user) {
             return res.status(404).send("User not found");
         }
 
-        user.referralHistory = user.referralHistory || [];
+        const wallet = await Wallet.findOne({ userId: user._id }) || { balance: 0, transactions: [] };
 
-        res.render("referral", { user: user,
-        active: 'referral' });
+        res.render("referral", {
+            user,
+            wallet, // Pass wallet data to the view
+            active: 'referral'
+        });
     } catch (error) {
         console.log("Error from referralPage:", error);
         res.status(500).send("Server error");

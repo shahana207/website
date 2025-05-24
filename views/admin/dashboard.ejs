@@ -6,173 +6,10 @@
     <title>Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f7fa;
-            margin: 0;
-            padding: 0;
-            color: #1a202c;
-        }
-        .main-content {
-            margin-left: 280px;
-            padding: 20px;
-            transition: margin-left 0.3s ease;
-        }
-        .admin-header {
-            background: linear-gradient(90deg, #2b6cb0 0%, #2c5282 100%);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            padding: 16px 24px;
-            position: fixed;
-            top: 0;
-            left: 280px;
-            right: 0;
-            z-index: 1000;
-            transition: left 0.3s ease;
-        }
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .logo-section h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #ffffff;
-            margin: 0;
-            letter-spacing: -0.025em;
-        }
-        .logo-section h1 span {
-            font-weight: 300;
-            font-size: 1.25rem;
-            opacity: 0.9;
-        }
-        .account-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .account-section .admin-profile-img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid #ffffff;
-            transition: transform 0.2s ease;
-        }
-        .account-section .admin-profile-img:hover {
-            transform: scale(1.1);
-        }
-        .account-section .admin-name {
-            font-weight: 500;
-            font-size: 1rem;
-            color: #ffffff;
-            opacity: 0.95;
-        }
-        .dashboard-section {
-            margin-top: 80px;
-        }
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-        }
-        .card h3 {
-            font-size: 1.1rem;
-            color: #718096;
-            margin: 0 0 10px 0;
-        }
-        .card p {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin: 0;
-        }
-        .chart-section, .best-selling-section, .recent-orders-section, .ledger-section {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        .chart-section h2, .best-selling-section h2, .recent-orders-section h2, .ledger-section h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin: 0 0 20px 0;
-        }
-        .filter-select {
-            float: right;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            color: #2d3748;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        canvas {
-            max-width: 100%;
-        }
-        .best-selling-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        .best-selling-item h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin: 0 0 15px 0;
-        }
-        .progress-bar {
-            background-color: #edf2f7;
-            border-radius: 6px;
-            height: 20px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        .progress {
-            height: 100%;
-            background-color: #4299e1;
-            border-radius: 6px;
-            transition: width 0.3s ease;
-        }
-        .pie-chart {
-            max-width: 300px;
-            margin: 0 auto;
-        }
-        .recent-orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .recent-orders-table th, .recent-orders-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.9rem;
-        }
-        .recent-orders-table th {
-            background-color: #f7fafc;
-            color: #718096;
-            font-weight: 500;
-        }
-        .recent-orders-table td {
-            color: #2d3748;
         }
         .status-pending { background-color: #f6ad55; }
         .status-processing { background-color: #ecc94b; }
@@ -189,144 +26,102 @@
             font-weight: 500;
             color: #ffffff;
         }
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            color: #718096;
+        .card-highlight {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            transform: scale(1.02);
         }
-        .pagination a {
-            padding: 6px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #2d3748;
+        .progress-bar {
             background-color: #edf2f7;
-            transition: background-color 0.2s ease;
-        }
-        .pagination a:hover:not(.disabled) {
-            background-color: #e2e8f0;
-        }
-        .pagination a.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .pagination a.active {
-            background-color: #4299e1;
-            color: #ffffff;
-        }
-        .ledger-section button {
-            background-color: #4299e1;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
+            height: 8px;
+            overflow: hidden;
         }
-        .ledger-section button:hover {
-            background-color: #3182ce;
-        }
-        @media (max-width: 992px) {
-            .main-content {
-                margin-left: 0;
-            }
-            .admin-header {
-                left: 0;
-            }
-            .stats-cards, .best-selling-grid {
-                grid-template-columns: 1fr;
-            }
-            .header-container {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .recent-orders-table th, .recent-orders-table td {
-                font-size: 0.85rem;
-                padding: 10px;
-            }
+        .progress {
+            height: 100%;
+            background-color: #3b82f6;
+            border-radius: 6px;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100">
     <%- include('../partials/admin/header') %>
-    <div class="main-content">
-        <div class="admin-header">
-            <div class="header-container">
-                <div class="logo-section">
-                    <h1>Admin Dashboard <span>Control Center</span></h1>
+    <div class="ml-0 md:ml-64 p-6 transition-all duration-300">
+        <div class="fixed top-0 left-0 md:left-64 right-0 bg-gradient-to-r from-blue-600 to-indigo-800 shadow-lg p-4 z-10">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">Admin Dashboard <span class="font-light text-lg opacity-80">Control Center</span></h1>
                 </div>
-                <div class="account-section">
-                    <img src="https://via.placeholder.com/40" alt="Admin Profile" class="admin-profile-img">
-                    <span class="admin-name">Admin User</span>
+                <div class="flex items-center gap-3">
+                    <img src="https://via.placeholder.com/40" alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white transform hover:scale-110 transition-transform">
+                    <span class="text-white font-medium">Admin User</span>
                 </div>
             </div>
         </div>
-        <div class="dashboard-section">
+
+        <div class="mt-20">
             <!-- Stats Cards -->
-            <div class="stats-cards">
-                <div class="card">
-                    <h3>Today's Sales</h3>
-                    <p>₹<%= todaySales.toLocaleString('en-IN') %></p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-highlight">
+                    <h3 class="text-sm font-medium text-gray-200">Today's Sales</h3>
+                    <p class="text-3xl font-bold mt-2">₹<%= todaySales.toLocaleString('en-IN') %></p>
                 </div>
-                <div class="card">
-                    <h3>Yesterday's Sales</h3>
-                    <p>₹<%= yesterdaySales.toLocaleString('en-IN') %></p>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Yesterday's Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= yesterdaySales.toLocaleString('en-IN') %></p>
                 </div>
-                <div class="card">
-                    <h3>Monthly Sales</h3>
-                    <p>₹<%= monthlySales.toLocaleString('en-IN') %></p>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Monthly Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= monthlySales.toLocaleString('en-IN') %></p>
                 </div>
-                <div class="card">
-                    <h3>Yearly Sales</h3>
-                    <p>₹<%= yearlySales.toLocaleString('en-IN') %></p>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Yearly Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= yearlySales.toLocaleString('en-IN') %></p>
                 </div>
             </div>
 
             <!-- Sales Overview Chart -->
-            <div class="chart-section">
-                <h2>Sales Overview <select class="filter-select" id="timePeriod" onchange="updateChart()">
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                </select></h2>
-                <canvas id="salesChart"></canvas>
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Sales Overview</h2>
+                    <select class="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500" id="timePeriod" onchange="updateChart()">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+                <canvas id="salesChart" class="max-h-96"></canvas>
             </div>
 
             <!-- Best Selling Sections -->
-            <div class="best-selling-section">
-                <h2>Best Selling</h2>
-                <div class="best-selling-grid">
-                    <!-- Best Selling Products -->
-                    <div class="best-selling-item">
-                        <h3>Top 10 Products by Units Sold</h3>
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Best Selling</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Products by Units Sold</h3>
                         <% if (topProducts && topProducts.length > 0) { %>
                             <% topProducts.forEach(product => { %>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: <%= (product.quantity / topProducts[0].quantity) * 100 %>%;"></div>
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-700 mb-1"><%= product.productName %> - <%= product.quantity %> units</p>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: <%= (product.quantity / topProducts[0].quantity) * 100 %>%;"></div>
+                                    </div>
                                 </div>
-                                <p><%= product.productName %> - <%= product.quantity %> units</p>
                             <% }) %>
                         <% } else { %>
-                            <p>No products sold yet.</p>
+                            <p class="text-gray-500">No products sold yet.</p>
                         <% } %>
                     </div>
-
-                    <!-- Best Selling Categories -->
-                    <div class="best-selling-item">
-                        <h3>Top 10 Categories by Revenue</h3>
-                        <div class="pie-chart">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Categories by Revenue</h3>
+                        <div class="max-w-xs mx-auto">
                             <canvas id="categoryChart"></canvas>
                         </div>
                     </div>
-
-                    <!-- Best Selling Brands -->
-                    <div class="best-selling-item">
-                        <h3>Top 10 Brands by Revenue</h3>
-                        <div class="pie-chart">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Brands by Revenue</h3>
+                        <div class="max-w-xs mx-auto">
                             <canvas id="brandChart"></canvas>
                         </div>
                     </div>
@@ -334,27 +129,39 @@
             </div>
 
             <!-- Recent Orders -->
-            <div class="recent-orders-section">
-                <h2>Recent Orders</h2>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Recent Orders</h2>
+                    <select class="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500" id="statusFilter" onchange="filterOrders()">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="return-request">Return Request</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                </div>
                 <% if (recentOrders && recentOrders.length > 0) { %>
-                    <table class="recent-orders-table">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
+                            <tr class="bg-gray-50 text-gray-500 text-sm">
+                                <th class="p-3">Order ID</th>
+                                <th class="p-3">Customer</th>
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="ordersTableBody">
                             <% recentOrders.forEach(order => { %>
-                                <tr>
-                                    <td>#<%= order.orderId %></td>
-                                    <td><%= order.user ? order.user.name : 'Unknown' %></td>
-                                    <td><%= order.createdOn.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
-                                    <td>₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
-                                    <td>
+                                <tr class="border-b border-gray-200 text-gray-700">
+                                    <td class="p-3">#<%= order.orderId %></td>
+                                    <td class="p-3"><%= order.user ? order.user.name : 'Unknown' %></td>
+                                    <td class="p-3"><%= order.createdOn.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                                    <td class="p-3">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
+                                    <td class="p-3">
                                         <span class="status-badge status-<%= order.status.toLowerCase().replace(' ', '-') %>">
                                             <%= order.status %>
                                         </span>
@@ -363,200 +170,139 @@
                             <% }) %>
                         </tbody>
                     </table>
-                    <!-- Pagination --><div class="pagination">
-    <span>
-        Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders
-    </span>
-    <div>
-        <a href="/admin/dashboard?page=<%= currentPage - 1 > 0 ? currentPage - 1 : 1 %>" class="<%= currentPage === 1 ? 'disabled' : '' %>">Previous</a>
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="/admin/dashboard?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-        <% } %>
-        <a href="/admin/dashboard?page=<%= currentPage + 1 <= totalPages ? currentPage + 1 : totalPages %>" class="<%= currentPage === totalPages ? 'disabled' : '' %>">Next</a>
-    </div>
-</div>
+                    <div class="flex justify-between items-center mt-4 text-sm text-gray-600">
+                        <span>Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders</span>
+                        <div class="flex gap-2">
+                            <a href="/admin/dashboard?page=<%= currentPage - 1 > 0 ? currentPage - 1 : 1 %>" class="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 <%= currentPage === 1 ? 'opacity-50 cursor-not-allowed' : '' %>">Previous</a>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="/admin/dashboard?page=<%= i %>" class="px-3 py-1 rounded-md <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>"><%= i %></a>
+                            <% } %>
+                            <a href="/admin/dashboard?page=<%= currentPage + 1 <= totalPages ? currentPage + 1 : totalPages %>" class="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 <%= currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : '' %>">Next</a>
+                        </div>
+                    </div>
                 <% } else { %>
-                    <p>No recent orders available.</p>
+                    <p class="text-gray-500">No recent orders available.</p>
                 <% } %>
             </div>
-
-            <!-- Ledger Book -->
-            <!-- <div class="ledger-section">
-                <h2>Ledger Book</h2>
-                <button onclick="generateLedger()">Generate Ledger Book</button>
-            </div> -->
         </div>
     </div>
 
     <script>
-      // Sales Chart
-    let salesChart;
-    const salesData = <%- JSON.stringify(salesData) %>;
+        // Sales Chart
+        let salesChart;
+        const salesData = <%- JSON.stringify(salesData) %>;
 
-    function updateChart() {
-        const timePeriod = document.getElementById('timePeriod').value;
-        let labels, data;
+        function updateChart() {
+            const timePeriod = document.getElementById('timePeriod').value;
+            let labels, data;
 
-        if (timePeriod === 'weekly') {
-            labels = salesData.weekly.labels;
-            data = salesData.weekly.data;
-        } else if (timePeriod === 'monthly') {
-            labels = salesData.monthly.labels;
-            data = salesData.monthly.data;
-        } else {
-            labels = salesData.yearly.labels;
-            data = salesData.yearly.data;
+            if (timePeriod === 'weekly') {
+                labels = salesData.weekly.labels;
+                data = salesData.weekly.data;
+            } else if (timePeriod === 'monthly') {
+                labels = salesData.monthly.labels;
+                data = salesData.monthly.data;
+            } else {
+                labels = salesData.yearly.labels;
+                data = salesData.yearly.data;
+            }
+
+            if (salesChart) salesChart.destroy();
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: timePeriod === 'weekly' ? 'Date (DD/MM)' : timePeriod === 'monthly' ? 'Month (MMM YY)' : 'Year',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { maxRotation: 45, minRotation: 45, font: { size: 12 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Revenue (₹)', font: { size: 14, weight: 'bold' } },
+                            ticks: { callback: value => '₹' + value.toLocaleString('en-IN'), font: { size: 12 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { font: { size: 14 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        if (salesChart) salesChart.destroy();
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        salesChart = new Chart(ctx, {
-            type: 'line',
+        // Category Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'pie',
             data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Sales Revenue',
-                    data: data,
-                    borderColor: '#4299e1',
-                    backgroundColor: 'rgba(66, 153, 225, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
+                labels: <%- JSON.stringify(topCategories.map(cat => cat.name)) %>,
+                datasets: [{ data: <%- JSON.stringify(topCategories.map(cat => cat.revenue)) %>, backgroundColor: ['#3b82f6', '#8b5cf6', '#ef4444'] }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: timePeriod === 'weekly' ? 'Date (DD/MM)' : timePeriod === 'monthly' ? 'Month (MMM YY)' : 'Year',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 45,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Revenue (₹)',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        ticks: {
-                            callback: value => '₹' + value.toLocaleString('en-IN'),
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += '₹' + context.parsed.y.toLocaleString('en-IN');
-                                return label;
-                            }
-                        }
-                    }
-                }
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } }
             }
         });
-    }
 
-    // Category Chart
-    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-    new Chart(categoryCtx, {
-        type: 'pie',
-        data: {
-            labels: <%- JSON.stringify(topCategories.map(cat => cat.name)) %>,
-            datasets: [{
-                data: <%- JSON.stringify(topCategories.map(cat => cat.revenue)) %>,
-                backgroundColor: ['#4299e1', '#9f7aea', '#f56565']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
+        // Brand Chart
+        const brandCtx = document.getElementById('brandChart').getContext('2d');
+        new Chart(brandCtx, {
+            type: 'pie',
+            data: {
+                labels: <%- JSON.stringify(topBrands.map(brand => brand.name)) %>,
+                datasets: [{ data: <%- JSON.stringify(topBrands.map(brand => brand.revenue)) %>, backgroundColor: ['#3b82f6', '#8b5cf6', '#ef4444'] }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } }
             }
-        }
-    });
+        });
 
-    // Brand Chart
-    const brandCtx = document.getElementById('brandChart').getContext('2d');
-    new Chart(brandCtx, {
-        type: 'pie',
-        data: {
-            labels: <%- JSON.stringify(topBrands.map(brand => brand.name)) %>,
-            datasets: [{
-                data: <%- JSON.stringify(topBrands.map(brand => brand.revenue)) %>,
-                backgroundColor: ['#4299e1', '#9f7aea', '#f56565']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 12
-                        }
-                    }
+        // Order Filter
+        function filterOrders() {
+            const status = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#ordersTableBody tr');
+            rows.forEach(row => {
+                const statusCell = row.querySelector('.status-badge').textContent.trim().toLowerCase();
+                if (status === 'all' || statusCell === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
-            }
+            });
         }
-    });
 
         // Initial Chart Load
         updateChart();
-
-        // Ledger Book Generation
-        function generateLedger() {
-            fetch('/admin/generate-ledger', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Ledger book generated successfully!');
-                        window.location.href = '/admin/download-ledger';
-                    } else {
-                        alert('Failed to generate ledger book.');
-                    }
-                });
-        }
     </script>
 </body>
 </html>

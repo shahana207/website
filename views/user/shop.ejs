@@ -2,11 +2,11 @@
 <link rel="stylesheet" href="/style/css/shop.css">
 
 <style>
+    /* Existing styles */
     .nice-select, .nice-select * {
         all: unset !important;
     }
 
-    /* Add styles for stock status */
     .stock-status {
         font-size: 14px;
         margin-top: 5px;
@@ -47,44 +47,72 @@
         background-color: #ccc;
         cursor: not-allowed;
     }
-.wishlist-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
 
-.wishlist-btn svg {
-    fill: #ccc; /* Default color (grey for outline heart) */
-    stroke: #ccc;
-    transition: fill 0.3s ease, stroke 0.3s ease;
-}
+    .wishlist-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-.wishlist-btn.active svg {
-    fill: #e74c3c; /* Red color for filled heart when active */
-    stroke: #e74c3c;
-}
-/* Highlight active filters */
-.filter-item a.active {
-    color: #e74c3c;
-    font-weight: 600;
-    background-color: #f8f8f8;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
+    .wishlist-btn svg {
+        fill: #ccc;
+        stroke: #ccc;
+        transition: fill 0.3s ease, stroke 0.3s ease;
+    }
 
-.price-button.active {
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-}
+    .wishlist-btn.active svg {
+        fill: #e74c3c;
+        stroke: #e74c3c;
+    }
 
-.list-group-item.active {
-    background-color: #e74c3c;
-    color: #fff;
-    font-weight: 600;
+    .filter-item a.active {
+        color: #e74c3c;
+        font-weight: 600;
+        background-color: #f8f8f8;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+
+    .price-button.active {
+        background-color: #e74c3c;
+        color: #fff;
+        border: none;
+    }
+
+    .list-group-item.active {
+        background-color: #e74c3c;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Offer Badge Styles */
+    .offer-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #e74c3c; /* Red background */
+        color: #fff; /* White text */
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        z-index: 1; /* Ensure it appears above the image */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Ensure product card is positioned relatively to allow absolute positioning of badge */
+    .product-card {
+        position: relative;
+    }
+    .product-offer {
+    background-color: #28a745; /* Green for product offers */
+}
+.category-offer {
+    background-color: #3498db; /* Blue for category offers */
 }
 </style>
 
@@ -203,56 +231,56 @@
                 <!-- Clear Filters -->
                 <a href="/shop" class="price-button" style="margin-top: 10px;">Clear Filters</a>
             </aside>
-
-            <!-- Product Grid -->
-            <main class="product-grid">
-                <% if (products.length > 0) { %>
-                <% products.forEach(product => { %>
-                <div class="product-card">
-<span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">
-    <svg class="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-    </svg>
-</span>
-                    <a href="/productDetails?id=<%= product._id %>">
-                        <img
-                            src="/Uploads/product-images/<%= product.productImage[0] %>"
-                            alt="<%= product.productName %>"
-                        />
-                        <h4><%= product.productName %></h4>
-                        <p>Brand: <%= product.brand.name %></p>
-                        <p>
-                            <% if (product.bestOffer) { %>
-                                <span style="color: #28a745; font-weight: 600;">
-                                    ₹<%= product.bestOffer.offerPrice.toLocaleString('en-IN') %>
-                                </span>
-                                <span class="text-muted" style="margin-left: 8px;">
-                                    <strike>₹<%= product.bestOffer.originalPrice.toLocaleString('en-IN') %></strike>
-                                </span>
-                                <!-- <div style="font-size: 0.8em; color: #28a745; margin-top: 4px;">
-                                    <i class="fa fa-tag"></i> <%= product.bestOffer.name %>
-                                </div> -->
-                            <% } else { %>
-                                Price: ₹<%= product.salePrice.toLocaleString('en-IN') %>
-                                <span class="text-muted">
-                                    <strike>₹<%= product.regularPrice.toLocaleString('en-IN') %></strike>
-                                </span>
-                            <% } %>
-                        </p>
-                       
-                    </a>
-                    <!-- Update Add to Cart Button -->
-                    <% if (product.status === "Available" && product.quantity > 0) { %>
-                        <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
-                    <% } else { %>
-                        <button class="add-to-cart-btn" disabled>Out of Stock</button>
-                    <% } %>
-                </div>
-                <% }) %>
+<main class="product-grid">
+    <% if (products.length > 0) { %>
+    <% products.forEach(product => { %>
+    <div class="product-card">
+        <!-- Offer Badge (Moved inside the loop) -->
+        <% if (product.bestOffer) { %>
+        <div class="offer-badge <%= product.bestOffer.type === 'Product' ? 'product-offer' : product.bestOffer.type === 'Category' ? 'category-offer' : 'brand-offer' %>">
+            <%= product.bestOffer.discount %>% OFF
+        </div>
+        <% } %>
+        <span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">
+            <svg class="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+        </span>
+        <a href="/productDetails?id=<%= product._id %>">
+            <img
+                src="/Uploads/product-images/<%= product.productImage[0] %>"
+                alt="<%= product.productName %>"
+            />
+            <h4><%= product.productName %></h4>
+            <p>Brand: <%= product.brand.name %></p>
+            <p>
+                <% if (product.bestOffer) { %>
+                    <span style="color: #28a745; font-weight: 600;">
+                        ₹<%= product.bestOffer.offerPrice.toLocaleString('en-IN') %>
+                    </span>
+                    <span class="text-muted" style="margin-left: 8px;">
+                        <strike>₹<%= product.bestOffer.originalPrice.toLocaleString('en-IN') %></strike>
+                    </span>
                 <% } else { %>
-                <p>No products found.</p>
+                    Price: ₹<%= product.salePrice.toLocaleString('en-IN') %>
+                    <span class="text-muted">
+                        <strike>₹<%= product.regularPrice.toLocaleString('en-IN') %></strike>
+                    </span>
                 <% } %>
-            </main>
+            </p>
+        </a>
+        <!-- Add to Cart Button -->
+        <% if (product.status === "Available" && product.quantity > 0) { %>
+            <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+        <% } else { %>
+            <button class="add-to-cart-btn" disabled>Out of Stock</button>
+        <% } %>
+    </div>
+    <% }) %>
+    <% } else { %>
+    <p>No products found.</p>
+    <% } %>
+</main>
         </div>
 
         <!-- Pagination -->

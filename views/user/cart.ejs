@@ -454,8 +454,9 @@
                                 <tr>
                                     <th>Product</th>
                                     <th>Image</th>
+                                      <th>Price</th>
                                     <th>Quantity</th>
-                                    <th>Price</th>
+                                  
                                     <th>Total</th>
                                     <th></th> <!-- For Remove button -->
                                 </tr>
@@ -470,27 +471,31 @@
                                                 <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
                                             </div>
                                         </td>
-                                        <td data-title="Product" class="zz-item-info">
-                                            <h4><a href="/productDetails?id=<%= item.productId._id %>"><%= item.productId.productName %></a></h4>
-                                            <div class="zz-item-meta">
-                                                <% if (item.productId.brand && item.productId.brand.name) { %>
-                                                    <span>Brand: <%= item.productId.brand.name %></span>
-                                                <% } %>
-                                                <% if (item.productId.color) { %>
-                                                    <span> | Color: <%= item.productId.color %></span>
-                                                <% } %>
-                                            </div>
-                                        </td>
-                                        <td data-title="Price" class="zz-item-price">
-                                            <% if (item.bestOffer) { %>
-                                                <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= item.bestOffer.originalPrice %></span>
-                                                <br>
-                                                <span style="color: #28a745; font-weight: 600;">₹ <%= (item.bestOffer.originalPrice - item.bestOffer.discountAmount).toFixed(2) %></span>
-                                               
-                                            <% } else { %>
-                                                ₹ <%= item.productId.salePrice %>
-                                            <% } %>
-                                        </td>
+                                    <td data-title="Product" class="zz-item-info">
+    <h4><a href="/productDetails?id=<%= item.productId._id %>"><%= item.productId.productName %></a></h4>
+    <div class="zz-item-meta">
+        <% if (item.productId.brand && item.productId.brand.name) { %>
+            <span>Brand: <%= item.productId.brand.name %></span>
+        <% } %>
+        <% if (item.productId.color) { %>
+            <span> | Color: <%= item.productId.color %></span>
+        <% } %>
+        <% if (item.size) { %>
+            <span> | Size: <%= item.size %></span>
+        <% } %>
+    </div>
+</td>
+<td data-title="Price" class="zz-item-price">
+    <% if (item.bestOffer && item.bestOffer.originalPrice) { %>
+        <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= item.bestOffer.originalPrice.toFixed(2) %></span>
+        <br>
+        <span style="color: #28a745; font-weight: 600;">₹ <%= (item.bestOffer.originalPrice - item.bestOffer.discountAmount).toFixed(2) %></span>
+        <br>
+        <span style="color: #28a745; font-size: 0.9em;">You saved ₹ <%= item.bestOffer.discountAmount.toFixed(2) %></span>
+    <% } else { %>
+        ₹ <%= item.productId.salePrice.toFixed(2) %>
+    <% } %>
+</td>
                                         <td data-title="Quantity">
                                             <div class="zz-quantity-widget">
                                                 <button type="button" class="zz-quantity-btn decrease-qty">
@@ -503,7 +508,7 @@
                                             </div>
                                         </td>
                                         <td data-title="Total" class="zz-item-total">
-                                            <% if (item.bestOffer ) { %>
+                                            <% if (item.bestOffer.originalPrice ) { %>
                                                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= (item.bestOffer.originalPrice * item.quantity).toFixed(2) %></span>
                                                 <br>
                                                 <span style="color: #28a745; font-weight: 600;">₹ <%= item.totalPrice.toFixed(2) %></span>
@@ -538,25 +543,36 @@
             <div class="col-lg-4">
                 <div class="zz-cart-summary">
                     <h3 class="zz-summary-title">Order Summary</h3>
-                    <% if (cart && cart.items && cart.items.length > 0) { %>
-                        <% cart.items.forEach(item => { 
-                            if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
-                        %>
-                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                                <div class="zz-item-image" style="margin-right: 15px;">
-                                    <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
-                                </div>
-                                <div>
-                                    <h4 style="font-size: 16px; margin: 0;"><%= item.productId.productName %></h4>
-                                    <p style="font-size: 14px; color: #777; margin: 5px 0;">Qty <%= item.quantity %></p>
-                                    <p style="font-weight: 600; color: #333; margin: 0;">₹ <%= (item.productId.salePrice * item.quantity).toFixed(2) %></p>
-                                </div>
-                            </div>
-                        <% }); %>
+                   <% if (cart && cart.items && cart.items.length > 0) { %>
+    <% cart.items.forEach(item => { 
+        if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+    %>
+        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <div class="zz-item-image" style="margin-right: 15px;">
+                <img src="/Uploads/product-images/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+            </div>
+            <div>
+                <h4 style="font-size: 16px; margin: 0;"><%= item.productId.productName %></h4>
+                <p style="font-size: 14px; color: #777; margin: 5px 0;">
+                    <% if (item.size) { %>Size: <%= item.size %> | <% } %>Qty <%= item.quantity %>
+                </p>
+                <p style="font-weight: 600; color: #333; margin: 0;">
+                    <% if (item.bestOffer && item.bestOffer.originalPrice) { %>
+                        <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ <%= (item.bestOffer.originalPrice * item.quantity).toFixed(2) %></span>
+                        <br>
+                        <span style="color: #28a745; font-weight: 600;">₹ <%= item.totalPrice.toFixed(2) %></span>
+                        <br>
+                        <span style="color: #28a745; font-size: 0.9em;">You saved ₹ <%= (item.bestOffer.discountAmount * item.quantity).toFixed(2) %></span>
                     <% } else { %>
-                        <p>Your cart is empty.</p>
+                        ₹ <%= (item.productId.salePrice * item.quantity).toFixed(2) %>
                     <% } %>
-                    
+                </p>
+            </div>
+        </div>
+    <% }); %>
+<% } else { %>
+    <p>Your cart is empty.</p>
+<% } %>
                     
                     <div class="zz-summary-item">
                         <span class="zz-summary-label">Subtotal</span>
@@ -568,10 +584,7 @@
                         <span class="zz-summary-value">₹ <%= cart && cart.items.length && cart.shipping != null ? cart.shipping.toFixed(2) : '50.00' %></span>
                     </div>
                     
-                    <div class="zz-summary-item">
-                        <span class="zz-summary-label">Tax</span>
-                        <span class="zz-summary-value">₹ 0.00</span>
-                    </div>
+                 
                     
                     <% if (cart && cart.discount > 0) { %>
                         <div class="zz-summary-item">
