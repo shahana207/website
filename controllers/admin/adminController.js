@@ -52,7 +52,7 @@ const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
     
-      const today = new Date("2025-05-21T17:25:00+05:30");
+      const today = new Date();
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);

@@ -371,9 +371,9 @@
                 </div>
                 <% order.orderedItems.forEach(item => { %>
                     <div class="zz-order-item">
-                        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
-                            <input type="checkbox" class="zz-item-checkbox" data-item-id="<%= item._id %>" style="margin-right: 10px;">
-                        <% } %>
+                        <!-- <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %> -->
+                            <!-- <input type="checkbox" class="zz-item-checkbox" data-item-id="<%= item._id %>" style="margin-right: 10px;"> -->
+                        <!-- <% } %> -->
                         <div class="zz-order-item-image">
                             <img src="/Uploads/product-images/<%= item.product?.productImage[0] || 'placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
                         </div>
@@ -435,64 +435,64 @@
     <script>
         $(document).ready(function() {
             // Handle checkbox selection to show/hide "Cancel Selected Products" button
-            $('.zz-item-checkbox').on('change', function() {
-                const selectedItems = $('.zz-item-checkbox:checked').length;
-                if (selectedItems > 0) {
-                    $('.cancel-items-btn').show();
-                } else {
-                    $('.cancel-items-btn').hide();
-                }
-            });
+            // $('.zz-item-checkbox').on('change', function() {
+            //     const selectedItems = $('.zz-item-checkbox:checked').length;
+            //     if (selectedItems > 0) {
+            //         $('.cancel-items-btn').show();
+            //     } else {
+            //         $('.cancel-items-btn').hide();
+            //     }
+            // });
 
             // Handle bulk cancellation of selected items
-            $('.cancel-items-btn').on('click', function() {
-                const selectedItems = $('.zz-item-checkbox:checked').map(function() {
-                    return $(this).data('item-id');
-                }).get();
+            // $('.cancel-items-btn').on('click', function() {
+            //     const selectedItems = $('.zz-item-checkbox:checked').map(function() {
+            //         return $(this).data('item-id');
+            //     }).get();
 
-                if (selectedItems.length === 0) {
-                    Swal.fire('Error', 'Please select at least one item to cancel.', 'error');
-                    return;
-                }
+            //     if (selectedItems.length === 0) {
+            //         Swal.fire('Error', 'Please select at least one item to cancel.', 'error');
+            //         return;
+            //     }
 
-                Swal.fire({
-                    title: 'Cancel Selected Items',
-                    text: 'Please provide a reason for cancellation:',
-                    input: 'text',
-                    showCancelButton: true,
-                    confirmButtonText: 'Cancel Items',
-                    cancelButtonText: 'Close',
-                    preConfirm: (reason) => {
-                        if (!reason) {
-                            Swal.showValidationMessage('Reason is required');
-                        }
-                        return reason;
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const orderId = '<%= order.orderId %>';
-                        fetch('/cancel-items', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ orderId, itemIds: selectedItems, reason: result.value })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Cancelled!', data.message, 'success')
-                                    .then(() => window.location.reload());
-                            } else {
-                                Swal.fire('Error', data.message, 'error');
-                            }
-                        })
-                        .catch(() => {
-                            Swal.fire('Error', 'Failed to cancel items.', 'error');
-                        });
-                    }
-                });
-            });
+            //     Swal.fire({
+            //         title: 'Cancel Selected Items',
+            //         text: 'Please provide a reason for cancellation:',
+            //         input: 'text',
+            //         showCancelButton: true,
+            //         confirmButtonText: 'Cancel Items',
+            //         cancelButtonText: 'Close',
+            //         preConfirm: (reason) => {
+            //             if (!reason) {
+            //                 Swal.showValidationMessage('Reason is required');
+            //             }
+            //             return reason;
+            //         }
+            //     }).then((result) => {
+            //         if (result.isConfirmed) {
+            //             const orderId = '<%= order.orderId %>';
+            //             fetch('/cancel-items', {
+            //                 method: 'POST',
+            //                 headers: {
+            //                     'Content-Type': 'application/json'
+            //                 },
+            //                 body: JSON.stringify({ orderId, itemIds: selectedItems, reason: result.value })
+            //             })
+            //             .then(response => response.json())
+            //             .then(data => {
+            //                 if (data.success) {
+            //                     Swal.fire('Cancelled!', data.message, 'success')
+            //                         .then(() => window.location.reload());
+            //                 } else {
+            //                     Swal.fire('Error', data.message, 'error');
+            //                 }
+            //             })
+            //             .catch(() => {
+            //                 Swal.fire('Error', 'Failed to cancel items.', 'error');
+            //             });
+            //         }
+            //     });
+            // });
 
             // Handle cancellation of all products
             $('.cancel-all-btn').on('click', function() {

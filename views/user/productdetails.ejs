@@ -610,7 +610,7 @@
                 <p>SKU: <span><%= product.sku || 'N/A' %></span></p>
                 <div class="stock-status" id="stockStatus">
                     <% if (product.status === "Available" && product.sizeVariants[0].quantity > 0) { %>
-                        <span class="in-stock">In Stock (<%= product.sizeVariants[0].quantity %> available)</span>
+                        <!-- <span class="in-stock">In Stock (<%= product.sizeVariants[0].quantity %> available)</span> -->
                     <% } else { %>
                         <span class="out-of-stock">Out of Stock</span>
                     <% } %>

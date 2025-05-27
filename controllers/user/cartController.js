@@ -84,7 +84,6 @@ const loadCart = async (req, res) => {
                     item.totalPrice = item.productId.salePrice * item.quantity;
                 }
             }
-            console.log(cart,'cart,idsaf da')
          
             cart.shippingCharge = 50;
             cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);

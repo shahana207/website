@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Wishlist = require("../../models/wishlistSchema");
+const Offer = require('../../models/offerSchema');
 
 const loadWishlist = async (req, res) => {
     try {
@@ -15,10 +16,26 @@ const loadWishlist = async (req, res) => {
         }
 
         const wishlist = await Wishlist.findOne({ userId }).populate("products.productId");
-        
+
+const updatedWishlist = [];
+
+for (let item of wishlist.products) {
+    const itemObj = item.toObject(); 
+    const bestOffer = await getBestOffer(itemObj.productId);
+
+    if (bestOffer) {
+        const discountAmount = (itemObj.productId.salePrice * bestOffer.discountAmount) / 100;
+        itemObj.offerPrice = itemObj.productId.salePrice - discountAmount;
+    } else {
+        itemObj.salePrice = itemObj.productId.salePrice;
+    }
+
+    updatedWishlist.push(itemObj);
+}
+
         res.render('wishlist', {
             user: user,
-            wishlist
+            wishlist:updatedWishlist
         });
     } catch (error) {
         console.log("Error in loadWishlist:", error);
@@ -82,7 +99,6 @@ const addToWishlist = async (req, res) => {
 const getWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
-        console.log('getWishlist userId:', userId);
 
         if (!userId) {
             return res.status(401).json({ success: false, message: 'Please log in' });
@@ -90,7 +106,6 @@ const getWishlist = async (req, res) => {
 
         const wishlist = await Wishlist.findOne({ userId }).populate('products.productId');
         if (!wishlist) {
-            console.log('No wishlist found for user:', userId);
             return res.status(200).json({ success: true, wishlist: [] });
         }
 
@@ -98,6 +113,7 @@ const getWishlist = async (req, res) => {
             .filter(item => item.productId)
             .map(item => item.productId._id.toString());
         console.log('getWishlist response:', wishlistProductIds);
+
         return res.status(200).json({ success: true, wishlist: wishlistProductIds });
     } catch (error) {
         console.error('Error in getWishlist:', error);
@@ -107,6 +123,7 @@ const getWishlist = async (req, res) => {
 
 const removeFromWishlist = async (req, res) => {
     try {
+        console.log(req.body)
         const { productId } = req.body;
         const userId = req.session.user;
 
@@ -218,6 +235,57 @@ const addToCart = async (req, res) => {
             success: false,
             message: "Server error"
         });
+    }
+};
+
+const getBestOffer = async (product) => {
+    try {
+        const currentDate = new Date();
+      
+        const productOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Products',
+            applicableTo: product._id
+        });
+
+       
+        const brandOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Brands',
+            applicableTo: product.brand
+        });
+
+        const categoryOffers = await Offer.find({
+            isListed: true,
+            isDeleted: false,
+            validFrom: { $lte: currentDate },
+            validUpto: { $gte: currentDate },
+            offerType: 'Category',
+            applicableTo: product.category
+        });
+
+        const allOffers = [...productOffers, ...brandOffers, ...categoryOffers];
+
+        if (allOffers.length === 0) {
+            return null;
+        }
+
+        const bestOffer = allOffers.reduce((best, current) => {
+            const currentDiscount = (product.salePrice * current.discountAmount) / 100;
+            const bestDiscount = best ? (product.salePrice * best.discountAmount) / 100 : 0;
+            return currentDiscount > bestDiscount ? current : best;
+        }, null);
+
+        return bestOffer;
+    } catch (error) {
+        console.error('Error finding best offer:', error);
+        return null;
     }
 };
 
