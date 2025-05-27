@@ -717,7 +717,7 @@ const getWalletPage = async (req, res , next) => {
         
         const { page = 1, limit = 5 } = req.query;
         
-        // Find the wallet
+        
         let wallet = await Wallet.findOne({userId: user._id});
         
         if (!wallet) {

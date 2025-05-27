@@ -22,6 +22,23 @@
         color: #e74c3c;
         font-weight: 600;
     }
+  .wishlist-btn .heart-icon.active {
+    stroke: red;
+}
+.wishlist-btn .heart-icon.active path {
+    fill: red;
+}
+.wishlist-btn.active .heart-icon {
+    stroke: red;
+}
+.wishlist-btn.active .heart-icon path {
+    fill: red;
+}
+.wishlist-btn.active svg {
+    fill: #e74c3c;
+    stroke: #e74c3c;
+}
+
 
     .add-to-cart-btn {
         display: block;
@@ -241,7 +258,7 @@
             <%= product.bestOffer.discount %>% OFF
         </div>
         <% } %>
-        <span class="wishlist-btn" onclick="addToWishlist('<%= product._id %>')">
+       <span class="wishlist-btn" onclick="addToWishlist(this,'<%= product._id %>', '<%= product.color[0] %>', '<%= product.sizes[0] %>')">
             <svg class="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
@@ -323,142 +340,195 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script>
-document.querySelectorAll('#sortSelect .list-group-item').forEach(function (item) {
-    item.addEventListener('click', function () {
-        const sortValue = item.getAttribute('data-value');
-        document.getElementById('sortInput').value = sortValue;
+// Verify jQuery and SweetAlert2 are loaded
+if (typeof jQuery === 'undefined') {
+    console.error('jQuery failed to load');
+}
+if (typeof Swal === 'undefined') {
+    console.error('SweetAlert2 failed to load');
+}
+
+// Sorting handler
+document.querySelectorAll('#sortSelect .list-group-item').forEach(item => {
+    item.addEventListener('click', () => {
+        console.log('Sort item clicked:', item.getAttribute('data-value'));
+        document.getElementById('sortInput').value = item.getAttribute('data-value');
         document.getElementById('sort-form').submit();
     });
 });
 
-// Add to Cart via AJAX (similar to productDetails.ejs)
+// Add to Cart
 async function addToCart(productId) {
+    console.log('Add to Cart called with productId:', productId);
     try {
-        
-        const response = await fetch("/addToCart",{
-            method:"POST",
+        const response = await fetch('/addToCart', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                 id: productId,
-                qty: 1
-            })
-
-        })
-
+            body: JSON.stringify({ id: productId, qty: 1 })
+        });
         const result = await response.json();
+        console.log('addToCart response:', result);
 
         if (result.success) {
             Swal.fire({
                 icon: 'success',
                 title: 'Added to Cart!',
-                text: result.message,
+                text: result.message || 'Success',
                 showConfirmButton: false,
                 timer: 1500
             });
-
-        } else  if (result.redirect) {
+        } else if (result.redirect) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Authentication Required',
-                text: result.message || 'Please sign in to add to cart..',
+                text: result.message || 'Please sign in to add to cart.',
                 timer: 1500,
                 showConfirmButton: false
             }).then(() => {
                 window.location.href = result.redirect;
             });
-        }else {
+        } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: result.message || 'Failed to add to cart',
-                timer: 1500,
-                showConfirmButton: "OK"
-            })
-        }
-    } catch (error) {
-        Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text:"Error:" + err.message  || 'An error occurred while adding to cart',
-                showConfirmButton: true
-            })
-    }
-
-}
-
-// Add to Wishlist
-// Add to Wishlist
-function addToWishlist(productId) {
-    $.ajax({
-        url: '/addToWishlist',
-        method: 'POST',
-        data: { id: productId },
-        success: function(response) {
-            if (response.status) {
-                const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
-                if (response.message.includes('removed')) {
-                    wishlistBtn.classList.remove('active');
-                } else {
-                    wishlistBtn.classList.add('active');
-                }
-
-                Swal.fire({
-                    icon: 'success',
-                    title: response.message.includes('added') ? 'Added to Wishlist!' : 'Removed from Wishlist!',
-                    text: response.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            } else if (response.redirect) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Authentication Required',
-                    text: response.message,
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = response.redirect;
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed to Update Wishlist',
-                    text: response.message,
-                    showConfirmButton: true
-                });
-            }
-        },
-        error: function(err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while updating wishlist',
                 showConfirmButton: true
             });
         }
-    });
+    } catch (error) {
+        console.error('addToCart error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while adding to cart',
+            showConfirmButton: true
+        });
+    }
+}
+
+// Add to Wishlist
+async function addToWishlist(button, productId, color, size) {
+    console.log('addToWishlist called:', { productId, color, size });
+    try {
+        // Check if product is logged in
+        const wishlistResponse = await fetch('/getWishlist', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const wishlistData = await wishlistResponse.json();
+        console.log('getWishlist response:', wishlistData);
+
+        if (!wishlistData.success) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Authentication Required',
+                text: 'Please log in to manage your wishlist',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '/login';
+            });
+            return;
+        }
+
+        const isInWishlist = wishlistData.wishlist && wishlistData.wishlist.includes(productId);
+        console.log('isInWishlist:', isInWishlist);
+
+        if (isInWishlist) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Already in Wishlist',
+                text: 'This product is already in your wishlist!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            button.classList.add('active');
+            return;
+        }
+
+        // Add/remove from wishlist
+        const response = await fetch('/addToWishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId, color: color || '', size: size || '' })
+        });
+        const result = await response.json();
+        console.log('addToWishlist response:', result);
+
+        if (result.success) {
+            if (result.action === 'added') {
+                button.classList.add('active');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Wishlist!',
+                    text: result.message || 'Product added to wishlist',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else if (result.action === 'removed') {
+                button.classList.remove('active');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Removed from Wishlist!',
+                    text: result.message || 'Product removed from wishlist',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        } else if (result.redirect) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Authentication Required',
+                text: result.message || 'Please sign in to manage wishlist',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = result.redirect;
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.message || 'Failed to update wishlist',
+                showConfirmButton: true
+            });
+        }
+    } catch (error) {
+        console.error('addToWishlist error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating wishlist',
+            showConfirmButton: true
+        });
+    }
 }
 
 // Initialize wishlist icons
-document.addEventListener('DOMContentLoaded', function() {
-    $.ajax({
-        url: '/getWishlist',
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing wishlist icons');
+    fetch('/getWishlist', {
         method: 'GET',
-        success: function(response) {
-            if (response.success && response.wishlist) {
-                response.wishlist.forEach(productId => {
-                    const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="addToWishlist('${productId}')"]`);
-                    if (wishlistBtn) {
-                        wishlistBtn.classList.add('active');
-                    }
-                });
-            }
-        },
-        error: function(err) {
-            console.error('Error fetching wishlist:', err);
+        headers: { 'Content-Type': 'application/json' }
+    }).then(response => response.json()).then(data => {
+        console.log('getWishlist data:', data);
+        if (data.success && data.wishlist) {
+            data.wishlist.forEach(productId => {
+                console.log('Setting active for productId:', productId);
+                const wishlistBtn = document.querySelector(`.wishlist-btn[onclick*="'${productId}'"]`);
+                if (wishlistBtn) {
+                    wishlistBtn.classList.add('active');
+                } else {
+                    console.log('No wishlist button found for productId:', productId);
+                }
+            });
+        } else {
+            console.log('getWishlist failed:', data);
         }
+    }).catch(error => {
+        console.error('Error fetching wishlist:', error);
     });
 });
 </script>

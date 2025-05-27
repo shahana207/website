@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
+        /* Existing styles remain unchanged */
         body {
             font-family: 'Nunito Sans', sans-serif;
             background-color: #f5f5f5;
@@ -25,10 +26,12 @@
             flex-wrap: wrap;
             gap: 30px;
         }
-.size-details.low-stock {
-    color: #e74c3c;
-    font-weight: 600;
-}
+
+        .size-details.low-stock {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
         /* Product Gallery */
         .product-gallery {
             flex: 1;
@@ -107,10 +110,7 @@
             color: #999;
             text-decoration: line-through;
         }
-.size-details.low-stock {
-    color: #e74c3c;
-    font-weight: 600;
-}
+
         .product-meta {
             margin-bottom: 15px;
         }
@@ -607,14 +607,14 @@
                 <% } else { %>
                     <p>Brand: <span>Unknown</span></p>
                 <% } %>
-                <p>SKU: <span><%= product._id %></span></p>
-                <!-- <div class="stock-status" id="stockStatus">
-                    <% if (product.status === "Available" && product.quantity > 0) { %>
-                        <span class="in-stock">In Stock (<%= product.quantity %> available)</span>
+                <p>SKU: <span><%= product.sku || 'N/A' %></span></p>
+                <div class="stock-status" id="stockStatus">
+                    <% if (product.status === "Available" && product.sizeVariants[0].quantity > 0) { %>
+                        <span class="in-stock">In Stock (<%= product.sizeVariants[0].quantity %> available)</span>
                     <% } else { %>
                         <span class="out-of-stock">Out of Stock</span>
                     <% } %>
-                </div> -->
+                </div>
             </div>
 
             <% if (product.color && product.color.length > 0) { %>
@@ -627,41 +627,42 @@
                 </div>
             <% } %>
 
-     <% if (product.sizeVariants && product.sizeVariants.length > 0) { %>
-    <div class="size-options">
-        <p>Select Size:</p>
-        <div class="size-buttons">
-            <% product.sizeVariants.forEach((variant, index) => { %>
-                <% 
-                    let stock = variant.quantity || 0;
-                    let isOutOfStock = stock <= 0;
-                    let discountedPrice = offerDetails.bestOffer > 0 ? offerDetails.discountedPrice : product.salePrice;
-                %>
-                <button 
-                    class="size-button <%= index === 0 ? 'active' : '' %> <%= isOutOfStock ? 'disabled' : '' %>" 
-                    data-size="<%= variant.size %>" 
-                    data-stock="<%= stock %>" 
-                    data-price="<%= product.salePrice %>" 
-                    data-discounted-price="<%= discountedPrice %>" 
-                    onclick="selectSize(this, '<%= variant.size %>')"
-                    <%= isOutOfStock ? 'disabled' : '' %>
-                >
-                    <%= variant.size %>
-                    <span class="size-details <%= stock <= 5 && !isOutOfStock ? 'low-stock' : '' %>">
-                        <% if (isOutOfStock) { %>
-                            Out of Stock
-                        <% } else if (stock <= 5) { %>
-                            Only <%= stock %> left!
-                        <% } %>
-                    </span>
-                </button>
-            <% }) %>
-        </div>
-        <input type="hidden" name="selectedSize" id="selectedSize" value="<%= product.sizeVariants[0].size %>">
-    </div>
-<% } %>
+            <% if (product.sizeVariants && product.sizeVariants.length > 0) { %>
+                <div class="size-options">
+                    <p>Select Size:</p>
+                    <div class="size-buttons">
+                        <% product.sizeVariants.forEach((variant, index) => { %>
+                            <% 
+                                let stock = variant.quantity || 0;
+                                let isOutOfStock = stock <= 0;
+                                let discountedPrice = offerDetails.bestOffer > 0 ? offerDetails.discountedPrice : product.salePrice;
+                            %>
+                            <button 
+                                class="size-button <%= index === 0 ? 'active' : '' %> <%= isOutOfStock ? 'disabled' : '' %>" 
+                                data-size="<%= variant.size %>" 
+                                data-stock="<%= stock %>" 
+                                data-price="<%= product.salePrice %>" 
+                                data-discounted-price="<%= discountedPrice %>" 
+                                onclick="selectSize(this, '<%= variant.size %>')"
+                                <%= isOutOfStock ? 'disabled' : '' %>
+                            >
+                                <%= variant.size %>
+                                <span class="size-details <%= stock <= 5 && !isOutOfStock ? 'low-stock' : '' %>">
+                                    <% if (isOutOfStock) { %>
+                                        Out of Stock
+                                    <% } else if (stock <= 5) { %>
+                                        Only <%= stock %> left!
+                                    <% } %>
+                                </span>
+                            </button>
+                        <% }) %>
+                    </div>
+                    <input type="hidden" name="selectedSize" id="selectedSize" value="<%= product.sizeVariants[0].size %>">
+                </div>
+            <% } %>
+
             <!-- Quantity Selector -->
-            <% if (product.status === "Available" && product.quantity > 0) { %>
+            <% if (product.status === "Available" && product.sizeVariants[0].quantity > 0) { %>
                 <div class="quantity-selector">
                     <p style="margin-right: 10px;">Quantity:</p>
                     <button onclick="updateQuantity(-1)">-</button>
@@ -672,7 +673,7 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <% if (product.status === "Available" && product.quantity > 0) { %>
+                <% if (product.status === "Available" && product.sizeVariants[0].quantity > 0) { %>
                     <button class="add-to-cart" id="addToCartBtn" onclick="addToCart('<%= product._id %>')">ADD TO CART</button>
                     <button class="add-to-whishlist <%= isInWishlist ? 'in-wishlist' : '' %>" onclick="toggleWishlist('<%= product._id %>')">
                         <i class="fas fa-heart"></i>
@@ -753,313 +754,354 @@
             <% } %>
         </div>
     </div>
-</div>
 
-<%- include("../partials/user/footer") %>
+    <%- include("../partials/user/footer") %>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    // Store initial product data for reference
-    const productData = {
-        basePrice: <%= product.salePrice %>,
-        baseDiscountedPrice: <%= offerDetails.bestOffer > 0 ? offerDetails.discountedPrice : product.salePrice %>,
-        baseStock: <%= product.quantity %>
-    };
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Store initial product data for reference
+        const productData = {
+            basePrice: <%= product.salePrice %>,
+            baseDiscountedPrice: <%= offerDetails.bestOffer > 0 ? offerDetails.discountedPrice : product.salePrice %>,
+            baseStock: <%= product.quantity %>
+        };
 
-    function selectSize(button, size) {
-        // Update active state
-        document.querySelectorAll('.size-button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        button.classList.add('active');
-        document.getElementById('selectedSize').value = size;
+       function selectSize(button, size) {
+    console.log(`Selecting size: ${size}`); // Debug log
+    document.querySelectorAll('.size-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    button.classList.add('active');
+    document.getElementById('selectedSize').value = size;
 
-        // Update product details based on selected size variant
-        const stock = parseInt(button.getAttribute('data-stock'));
-        const price = parseFloat(button.getAttribute('data-price'));
-        const discountedPrice = parseFloat(button.getAttribute('data-discounted-price'));
+    const stock = parseInt(button.getAttribute('data-stock'));
+    const price = parseFloat(button.getAttribute('data-price'));
+    const discountedPrice = parseFloat(button.getAttribute('data-discounted-price'));
 
-        // Update price
-        const priceElement = document.getElementById('productPrice');
-        priceElement.innerHTML = '';
-        if (<%= offerDetails.bestOffer > 0 %>) {
-            priceElement.innerHTML = `
-                <span class="original-price">₹ ${price.toLocaleString('en-IN')}</span>
-                <span>₹ ${discountedPrice.toLocaleString('en-IN')}</span>
-            `;
-        } else {
-            priceElement.innerHTML = `₹ ${price.toLocaleString('en-IN')}`;
-        }
-
-        // Update stock status
-        const stockStatusElement = document.getElementById('stockStatus');
-        stockStatusElement.innerHTML = '';
-        if (stock > 0) {
-            stockStatusElement.innerHTML = `<span class="in-stock">In Stock (${stock} available)</span>`;
-            document.getElementById('addToCartBtn').disabled = false;
-        } else {
-            stockStatusElement.innerHTML = `<span class="out-of-stock">Out of Stock</span>`;
-            document.getElementById('addToCartBtn').disabled = true;
-        }
-
-        updateAddToCartParams();
+    const priceElement = document.getElementById('productPrice');
+    priceElement.innerHTML = '';
+    if (<%= offerDetails.bestOffer > 0 %>) {
+        priceElement.innerHTML = `
+            <span class="original-price">₹ ${price.toLocaleString('en-IN')}</span>
+            <span>₹ ${discountedPrice.toLocaleString('en-IN')}</span>
+        `;
+    } else {
+        priceElement.innerHTML = `₹ ${price.toLocaleString('en-IN')}`;
     }
 
-    function selectColor(element, color) {
-        document.querySelectorAll('.color-options span').forEach(span => {
-            span.classList.remove('active');
-        });
-        element.classList.add('active');
-        document.getElementById('selectedColor').value = color;
-        updateAddToCartParams();
+    const stockStatusElement = document.getElementById('stockStatus');
+    stockStatusElement.innerHTML = '';
+    if (stock > 0) {
+        stockStatusElement.innerHTML = `<span class="in-stock">In Stock (${stock} available)</span>`;
+        document.getElementById('addToCartBtn').disabled = false;
+    } else {
+        stockStatusElement.innerHTML = `<span class="out-of-stock">Out of Stock</span>`;
+        document.getElementById('addToCartBtn').disabled = true;
     }
 
-    function updateAddToCartParams() {
-        const size = document.getElementById('selectedSize') ? document.getElementById('selectedSize').value : '';
-        const color = document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : '';
-        return { size, color };
-    }
+    const qtyInput = document.getElementById('quantity');
+    qtyInput.value = 1;
+    updateQuantity(0);
+}
 
-    function updateQuantity(change) {
-        const qtyInput = document.getElementById('quantity');
-        let qty = parseInt(qtyInput.value);
-        const selectedSizeButton = document.querySelector('.size-button.active');
-        const maxStock = selectedSizeButton ? parseInt(selectedSizeButton.getAttribute('data-stock')) : productData.baseStock;
 
-        qty = Math.max(1, Math.min(maxStock, qty + change));
-        qtyInput.value = qty;
-        updateAddToCartParams();
-    }
 
-    async function addToCart(productId) {
-        const { size, color } = updateAddToCartParams();
-        const qty = parseInt(document.getElementById('quantity').value);
 
-        try {
-            const response = await fetch("/addToCart", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    id: productId,
-                    qty: qty,
-                    size: size,
-                    color: color
-                })
+        function selectColor(element, color) {
+            document.querySelectorAll('.color-options span').forEach(span => {
+                span.classList.remove('active');
             });
+            element.classList.add('active');
+            document.getElementById('selectedColor').value = color;
+            updateAddToCartParams();
+        }
 
-            const result = await response.json();
+        function updateAddToCartParams() {
+            const size = document.getElementById('selectedSize') ? document.getElementById('selectedSize').value : '';
+            const color = document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : '';
+            const qty = parseInt(document.getElementById('quantity').value);
+            return { size, color, qty };
+        }
 
-            if (result.success) {
+        function updateQuantity(change) {
+            const qtyInput = document.getElementById('quantity');
+            let qty = parseInt(qtyInput.value);
+            const selectedSizeButton = document.querySelector('.size-button.active');
+            const maxStock = selectedSizeButton ? parseInt(selectedSizeButton.getAttribute('data-stock')) : productData.baseStock;
+
+            // Validate the quantity
+            const validationError = validateQuantity(qty + change, maxStock);
+            if (validationError) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Added to Cart!',
-                    text: result.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            } else if (result.redirect) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Authentication Required',
-                    text: result.message || 'Please sign in to add to cart.',
+                    icon: 'error',
+                    title: 'Invalid Quantity',
+                    text: validationError,
+                    confirmButtonColor: '#000000',
                     timer: 1500,
                     showConfirmButton: false
-                }).then(() => {
-                    window.location.href = result.redirect;
                 });
-            } else {
+                return;
+            }
+
+            qty = Math.max(1, Math.min(maxStock, qty + change));
+            qtyInput.value = qty;
+            updateAddToCartParams();
+        }
+
+        function validateQuantity(qty, maxStock) {
+            if (qty < 1) {
+                return 'Quantity cannot be less than 1';
+            }
+            if (qty > maxStock) {
+                return `Only ${maxStock} units available in stock`;
+            }
+            return null;
+        }
+
+        async function addToCart(productId) {
+            const { size, color, qty } = updateAddToCartParams();
+            const selectedSizeButton = document.querySelector('.size-button.active');
+            const maxStock = selectedSizeButton ? parseInt(selectedSizeButton.getAttribute('data-stock')) : productData.baseStock;
+
+            // Validate quantity before adding to cart
+            const validationError = validateQuantity(qty, maxStock);
+            if (validationError) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Quantity',
+                    text: validationError,
+                    confirmButtonColor: '#000000',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch("/addToCart", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        id: productId,
+                        qty: qty,
+                        size: size,
+                        color: color
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart!',
+                        text: result.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else if (result.redirect) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Authentication Required',
+                        text: result.message || 'Please sign in to add to cart.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = result.redirect;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result.message || 'Failed to add to cart',
+                        timer: 1500,
+                        showConfirmButton: "OK"
+                    });
+                }
+            } catch (error) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: result.message || 'Failed to add to cart',
-                    timer: 1500,
-                    showConfirmButton: "OK"
+                    text: "Error: " + error.message || 'An error occurred while adding to cart',
+                    showConfirmButton: true
                 });
             }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: "Error: " + error.message || 'An error occurred while adding to cart',
-                showConfirmButton: true
-            });
         }
-    }
 
-    async function toggleWishlist(productId) {
-        const wishlistBtn = document.querySelector('.add-to-whishlist');
-        const isInWishlist = wishlistBtn.classList.contains('in-wishlist');
-        const url = isInWishlist ? '/removeFromWishlist' : '/addToWishlist';
-        const method = 'POST';
+        async function toggleWishlist(productId) {
+            const wishlistBtn = document.querySelector('.add-to-whishlist');
+            const isInWishlist = wishlistBtn.classList.contains('in-wishlist');
+            const url = isInWishlist ? '/addToWishlist' : '/addToWishlist';
+            const method = 'POST';
 
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    id: productId,
-                    size: document.getElementById('selectedSize') ? document.getElementById('selectedSize').value : '',
-                    color: document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : ''
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                wishlistBtn.classList.toggle('in-wishlist');
-                Swal.fire({
-                    icon: 'success',
-                    title: isInWishlist ? 'Removed from Wishlist!' : 'Added to Wishlist!',
-                    text: result.message,
-                    showConfirmButton: false,
-                    timer: 1500
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        id: productId,
+                        size: document.getElementById('selectedSize') ? document.getElementById('selectedSize').value : '',
+                        color: document.getElementById('selectedColor') ? document.getElementById('selectedColor').value : ''
+                    })
                 });
-            } else if (result.redirect) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Authentication Required',
-                    text: result.message || 'Please sign in to manage your wishlist.',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = result.redirect;
-                });
-            } else {
+
+                const result = await response.json();
+
+                if (result.success) {
+                    wishlistBtn.classList.toggle('in-wishlist');
+                    Swal.fire({
+                        icon: 'success',
+                        title: isInWishlist ? 'Removed from Wishlist!' : 'Added to Wishlist!',
+                        text: result.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else if (result.redirect) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Authentication Required',
+                        text: result.message || 'Please sign in to manage your wishlist.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = result.redirect;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result.message || 'Failed to update wishlist',
+                        timer: 1500,
+                        showConfirmButton: "OK"
+                    });
+                }
+            } catch (error) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: result.message || 'Failed to update wishlist',
-                    timer: 1500,
-                    showConfirmButton: "OK"
+                    text: "Error: " + error.message || 'An error occurred while updating wishlist',
+                    showConfirmButton: true
                 });
             }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: "Error: " + error.message || 'An error occurred while updating wishlist',
-                showConfirmButton: true
+        }
+
+        function changeMainImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = thumbnail.src;
+            
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
             });
-        }
-    }
+            thumbnail.classList.add('active');
 
-    function changeMainImage(thumbnail) {
-        const mainImage = document.getElementById('mainImage');
-        mainImage.src = thumbnail.src;
-        
-        document.querySelectorAll('.thumbnail').forEach(thumb => {
-            thumb.classList.remove('active');
-        });
-        thumbnail.classList.add('active');
-
-        // Reset zoom state
-        mainImage.style.transform = 'scale(1)';
-        mainImage.style.transformOrigin = 'center center';
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        if (thumbnails.length > 0) {
-            thumbnails[0].classList.add('active');
-        }
-
-        // In-Place Zoom Functionality
-        const zoomContainer = document.querySelector('.zoom-container');
-        const mainImage = document.getElementById('mainImage');
-
-        let isZooming = false;
-        let zoomLevel = 2; // Default zoom level
-
-        zoomContainer.addEventListener('mouseenter', function() {
-            isZooming = true;
-        });
-
-        zoomContainer.addEventListener('mouseleave', function() {
-            isZooming = false;
+            // Reset zoom state
             mainImage.style.transform = 'scale(1)';
             mainImage.style.transformOrigin = 'center center';
-        });
+        }
 
-        zoomContainer.addEventListener('mousemove', function(e) {
-            if (!isZooming) return;
-
-            const rect = zoomContainer.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            const imageWidth = rect.width;
-            const imageHeight = rect.height;
-
-            // Calculate the transform origin based on mouse position
-            const originX = (mouseX / imageWidth) * 100;
-            const originY = (mouseY / imageHeight) * 100;
-
-            mainImage.style.transformOrigin = `${originX}% ${originY}%`;
-            mainImage.style.transform = `scale(${zoomLevel})`;
-        });
-
-        // Optional: Adjust zoom level with mouse wheel
-        zoomContainer.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            if (!isZooming) return;
-
-            zoomLevel += e.deltaY > 0 ? -0.2 : 0.2;
-            zoomLevel = Math.max(1.5, Math.min(4, zoomLevel)); // Limit zoom level between 1.5x and 4x
-
-            const rect = zoomContainer.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            const imageWidth = rect.width;
-            const imageHeight = rect.height;
-
-            const originX = (mouseX / imageWidth) * 100;
-            const originY = (mouseY / imageHeight) * 100;
-
-            mainImage.style.transformOrigin = `${originX}% ${originY}%`;
-            mainImage.style.transform = `scale(${zoomLevel})`;
-        });
-
-        // Touch Support (Pinch to Zoom for Mobile)
-        let initialDistance = 0;
-        let initialZoomLevel = zoomLevel;
-
-        zoomContainer.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const touch1 = e.touches[0];
-                const touch2 = e.touches[1];
-                initialDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-                initialZoomLevel = zoomLevel;
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            if (thumbnails.length > 0) {
+                thumbnails[0].classList.add('active');
             }
-        });
 
-        zoomContainer.addEventListener('touchmove', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const touch1 = e.touches[0];
-                const touch2 = e.touches[1];
-                const currentDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-                zoomLevel = initialZoomLevel * (currentDistance / initialDistance);
-                zoomLevel = Math.max(1.5, Math.min(4, zoomLevel));
+            // In-Place Zoom Functionality
+            const zoomContainer = document.querySelector('.zoom-container');
+            const mainImage = document.getElementById('mainImage');
+
+            let isZooming = false;
+            let zoomLevel = 2; // Default zoom level
+
+            zoomContainer.addEventListener('mouseenter', function() {
+                isZooming = true;
+            });
+
+            zoomContainer.addEventListener('mouseleave', function() {
+                isZooming = false;
+                mainImage.style.transform = 'scale(1)';
+                mainImage.style.transformOrigin = 'center center';
+            });
+
+            zoomContainer.addEventListener('mousemove', function(e) {
+                if (!isZooming) return;
 
                 const rect = zoomContainer.getBoundingClientRect();
-                const touchX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
-                const touchY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
 
                 const imageWidth = rect.width;
                 const imageHeight = rect.height;
 
-                const originX = (touchX / imageWidth) * 100;
-                const originY = (touchY / imageHeight) * 100;
+                // Calculate the transform origin based on mouse position
+                const originX = (mouseX / imageWidth) * 100;
+                const originY = (mouseY / imageHeight) * 100;
 
                 mainImage.style.transformOrigin = `${originX}% ${originY}%`;
                 mainImage.style.transform = `scale(${zoomLevel})`;
-            }
+            });
+
+            // Optional: Adjust zoom level with mouse wheel
+            zoomContainer.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                if (!isZooming) return;
+
+                zoomLevel += e.deltaY > 0 ? -0.2 : 0.2;
+                zoomLevel = Math.max(1.5, Math.min(4, zoomLevel)); // Limit zoom level between 1.5x and 4x
+
+                const rect = zoomContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const imageWidth = rect.width;
+                const imageHeight = rect.height;
+
+                const originX = (mouseX / imageWidth) * 100;
+                const originY = (mouseY / imageHeight) * 100;
+
+                mainImage.style.transformOrigin = `${originX}% ${originY}%`;
+                mainImage.style.transform = `scale(${zoomLevel})`;
+            });
+
+            // Touch Support (Pinch to Zoom for Mobile)
+            let initialDistance = 0;
+            let initialZoomLevel = zoomLevel;
+
+            zoomContainer.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    initialDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+                    initialZoomLevel = zoomLevel;
+                }
+            });
+
+            zoomContainer.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const currentDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+                    zoomLevel = initialZoomLevel * (currentDistance / initialDistance);
+                    zoomLevel = Math.max(1.5, Math.min(4, zoomLevel));
+
+                    const rect = zoomContainer.getBoundingClientRect();
+                    const touchX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+                    const touchY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+
+                    const imageWidth = rect.width;
+                    const imageHeight = rect.height;
+
+                    const originX = (touchX / imageWidth) * 100;
+                    const originY = (touchY / imageHeight) * 100;
+
+                    mainImage.style.transformOrigin = `${originX}% ${originY}%`;
+                    mainImage.style.transform = `scale(${zoomLevel})`;
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
 <%- include("../partials/user/footer") %>

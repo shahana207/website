@@ -12,6 +12,7 @@ const loadCoupon = async (req, res) => {
 
         const totalCoupons = await Coupon.countDocuments(query);
         const coupons = await Coupon.find(query)
+        .sort({startDate:-1})
             .skip((page - 1) * limit)
             .limit(limit);
 

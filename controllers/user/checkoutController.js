@@ -30,7 +30,7 @@ const loadCheckout = async (req, res) => {
         const user = await User.findById(userId).select('name firstName lastName email phone addresses profilePicture');
         let cart = await Cart.findOne({ userId }).populate('items.productId');
 
-        // Fetch the wallet balance
+        
         const wallet = await Wallet.findOne({ userId });
         const walletBalance = wallet ? wallet.balance : 0;
 
@@ -51,7 +51,7 @@ const loadCheckout = async (req, res) => {
             cart,
             userId,
             addresses,
-            walletBalance, // Pass wallet balance to the frontend
+            walletBalance, 
             profilePicture: user.profilePicture || null,
         });
     } catch (error) {
@@ -62,12 +62,35 @@ const loadCheckout = async (req, res) => {
 
 const saveAddress = async (req, res) => {
     try {
-        console.log('hidsafdsalfkdsaljf')
-        console.log(req.body,'body')
-        const userId = req.session.user;
-        console.log(userId,'id')
+      
+        console.log('Received saveAddress request:', {
+            body: req.body,
+            sessionUser: req.session.user,
+        });
+
+       
+        let userId = req.session.user;
         if (!userId) {
-            return res.redirect('/login'); 
+            console.log('User not authenticated in saveAddress');
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login',
+            });
+        }
+
+        
+        if (typeof userId === 'object' && userId._id) {
+            userId = userId._id;
+            console.log('Extracted userId from object:', userId);
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            console.log('Invalid userId format:', userId);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid user ID format',
+            });
         }
 
         const address = {
@@ -80,22 +103,56 @@ const saveAddress = async (req, res) => {
             phone: req.body.phone,
             altPhone: req.body.altPhone || '',
         };
+        console.log('Constructed address object:', address);
 
-       
+      
+        const errors = validateAddress(address);
+        if (errors && Object.keys(errors).length > 0) {
+            console.log('Address validation failed:', errors);
+            return res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                errors,
+            });
+        }
 
+        
         let addressDoc = await Address.findOne({ userId });
+        console.log('Found address document:', addressDoc);
+
         if (!addressDoc) {
+            console.log('No address document found, creating new one for userId:', userId);
             addressDoc = new Address({ userId, address: [] });
         }
 
         addressDoc.address.push(address);
         await addressDoc.save();
-        console.log(addressDoc,'doc ')
-        return res.status(200).json({success:true,message:"address Created Successfully"})
+        console.log('Saved address document:', addressDoc);
+
         
+        const newAddress = addressDoc.address[addressDoc.address.length - 1];
+
+        return res.status(200).json({
+            success: true,
+            message: 'Address created successfully',
+            address: {
+                _id: newAddress._id || Date.now(),
+                addressType: newAddress.addressType,
+                name: newAddress.name,
+                city: newAddress.city,
+                landMark: newAddress.landMark,
+                state: newAddress.state,
+                pincode: newAddress.pincode,
+                phone: newAddress.phone,
+                altPhone: newAddress.altPhone,
+            },
+        });
     } catch (error) {
-        console.error('Cannot save address:', error);
-        return res.redirect('/checkout?error=Failed+to+save+address');
+        console.error('Error in saveAddress:', error.message, error.stack);
+        return res.status(500).json({
+            success: false,
+            message: `Failed to save address: ${error.message}`,
+        });
     }
 };
 
@@ -467,112 +524,155 @@ const downloadInvoice = async (req, res) => {
 
 const getAvailableCoupons = async (req, res) => {
     try {
-        const userId = req.session.user;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "User not authenticated" });
-        }
-
-        const cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.status(404).json({ success: false, message: "Cart not found" });
-        }
-
-        const subtotal = cart.subtotal || 0;
-        const currentDate = new Date();
         const coupons = await Coupon.find({
             status: 'Active',
-            startDate: { $lte: currentDate },
-            endDate: { $gte: currentDate },
-            minPurchase: { $lte: subtotal },
+            endDate: { $gte: new Date() },
         });
-
-        return res.json({ success: true, coupons });
+        console.log('Fetched coupons:', coupons);
+        if (!coupons || coupons.length === 0) {
+            return res.json({
+                success: true,
+                coupons: [],
+                message: 'No active coupons available',
+            });
+        }
+        res.json({
+            success: true,
+            coupons,
+        });
     } catch (error) {
         console.error('Error fetching available coupons:', error);
-        return res.status(500).json({ success: false, message: "Error fetching coupons" });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch coupons',
+        });
     }
 };
 
 const applyCoupon = async (req, res) => {
     try {
         const { couponCode } = req.body;
+        console.log('Applying coupon:', couponCode);
+        console.log('Logged-in user ID:', req.session.user); 
+        console.log('Request user ID:', req.user ? req.user._id.toString() : 'undefined'); 
+
+      
+        if (!req.session.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login'
+            });
+        }
+
         const userId = req.session.user;
-
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "Please log in to apply coupon", redirect: "/login" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(401).json({ success: false, message: "User not found" });
-        }
-
-        const coupon = await Coupon.findOne({ couponCode, status: "Active" });
+        const coupon = await Coupon.findOne({
+            couponCode,
+            status: 'Active',
+            endDate: { $gte: new Date() },
+        });
         if (!coupon) {
-            return res.status(404).json({ success: false, message: "Invalid or inactive coupon" });
+            console.log('Coupon not found or invalid:', couponCode);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired coupon',
+            });
         }
 
-        if (new Date() < coupon.startDate || new Date() > coupon.endDate) {
-            return res.status(400).json({ success: false, message: "Coupon is expired or not yet active" });
+        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+        console.log('Cart found:', cart);
+        if (!cart) {
+            return res.status(404).json({
+                success: false,
+                message: 'Cart not found',
+            });
         }
 
-        let cart = await Cart.findOne({ userId }).populate("items.productId");
-        if (!cart || !cart.items.length) {
-            return res.status(404).json({ success: false, message: "Cart is empty" });
-        }
-
-        const subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        const subtotal = cart.subtotal || 0;
         if (subtotal < coupon.minPurchase) {
-            return res.status(400).json({ success: false, message: `Minimum purchase of ₹${coupon.minPurchase} required` });
+            console.log('Subtotal:', subtotal, 'Min Purchase:', coupon.minPurchase);
+            return res.status(400).json({
+                success: false,
+                message: `Minimum purchase of ₹${coupon.minPurchase} required`,
+            });
         }
 
         cart.coupon = { code: coupon.couponCode, discount: coupon.discountValue };
-        cart.couponApplied = true;
         cart.discount = coupon.discountValue;
-        cart.subtotal = subtotal;
-        cart.shippingCharge = cart.items.length > 0 ? 50 : 0;
-        cart.total = cart.subtotal - cart.discount + cart.shippingCharge;
+        cart.couponApplied = true;
+        cart.total = subtotal + (cart.shippingCharge || 0) + (cart.tax || 0) - (cart.discount || 0);
         await cart.save();
+        console.log('Cart updated with coupon:', cart);
 
-        return res.json({
+        res.json({
             success: true,
-            message: "Coupon applied successfully",
-            cart
+            message: 'Coupon applied successfully',
+            cart: {
+                subtotal: cart.subtotal || 0,
+                shippingCharge: cart.shippingCharge || 0,
+                tax: cart.tax || 0,
+                discount: cart.discount || 0,
+                total: cart.total || 0,
+                coupon: cart.coupon,
+                couponApplied: cart.couponApplied
+            },
         });
     } catch (error) {
-        console.error("Error in applyCoupon:", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error('Error applying coupon:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to apply coupon',
+        });
     }
 };
-
 const removeCoupon = async (req, res) => {
     try {
         const userId = req.session.user;
+        console.log('Logged-in user ID for remove coupon:', userId);
+
         if (!userId) {
-            return res.status(401).json({ success: false, message: "Please log in", redirect: "/login" });
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login'
+            });
         }
 
-        let cart = await Cart.findOne({ userId }).populate("items.productId");
+        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+        console.log('Cart found for coupon removal:', cart);
         if (!cart) {
-            return res.status(404).json({ success: false, message: "Cart not found" });
+            return res.status(404).json({
+                success: false,
+                message: 'Cart not found',
+            });
         }
 
         cart.coupon = { code: null, discount: 0 };
-        cart.couponApplied = false;
         cart.discount = 0;
-        cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        cart.shippingCharge = cart.items.length > 0 ? 50 : 0;
-        cart.total = cart.subtotal + cart.shippingCharge;
+        cart.couponApplied = false;
+        cart.total = (cart.subtotal || 0) + (cart.shippingCharge || 0) + (cart.tax || 0);
         await cart.save();
+        console.log('Cart updated after coupon removal:', cart);
 
-        return res.json({
+        res.json({
             success: true,
-            message: "Coupon removed successfully",
-            cart
+            message: 'Coupon removed successfully',
+            cart: {
+                subtotal: cart.subtotal || 0,
+                shippingCharge: cart.shippingCharge || 0,
+                tax: cart.tax || 0,
+                discount: cart.discount || 0,
+                total: cart.total || 0,
+                coupon: cart.coupon,
+                couponApplied: cart.couponApplied
+            },
         });
     } catch (error) {
-        console.error("Error in removeCoupon:", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error('Error removing coupon:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to remove coupon',
+        });
     }
 };
 

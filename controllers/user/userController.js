@@ -55,7 +55,7 @@ const loadHomepage = async (req, res) => {
 
 const loadSignup = async (req, res) => {
     try {
-        const referralCode = req.query.referralCode || ''; // Capture referral code from query parameter
+        const referralCode = req.query.referralCode || ''; 
         return res.render("signup", { referralCode });
     } catch (error) {
         console.log("Signup page not loading:", error);
@@ -105,9 +105,9 @@ const signup = async (req, res) => {
 
         const validReferral = await User.findOne({referralCode})
 
-        if(!validReferral){
-          return res.render("signup", { message: "Referral code is not valid", referralCode })
-        }
+        // if(!validReferral){
+        //   return res.render("signup", { message: "Referral code is not valid", referralCode })
+        // }
 
         const findUser = await User.findOne({ email: email });
         if (findUser) {
@@ -165,7 +165,6 @@ const verifyOtp = async (req, res) => {
 
             await newUser.save();
 
-            // Initialize Wallet for the new user
             let newUserWallet = await Wallet.findOne({ userId: newUser._id });
             if (!newUserWallet) {
                 newUserWallet = new Wallet({
@@ -175,11 +174,10 @@ const verifyOtp = async (req, res) => {
                 });
             }
 
-            // Handle referral rewards if a valid referral code was provided
             if (userData.referralCode) {
                 const referrer = await User.findOne({ referralCode: userData.referralCode });
                 if (referrer) {
-                    // Update referrer's referral history
+                  
                     referrer.referralHistory.push({
                         referredUser: newUser._id,
                         name: newUser.name,
@@ -187,7 +185,7 @@ const verifyOtp = async (req, res) => {
                         reward: 1000
                     });
 
-                    // Find or create referrer's wallet
+                   
                     let referrerWallet = await Wallet.findOne({ userId: referrer._id });
                     if (!referrerWallet) {
                         referrerWallet = new Wallet({
@@ -197,7 +195,6 @@ const verifyOtp = async (req, res) => {
                         });
                     }
 
-                    // Credit ₹1000 to referrer's wallet
                     referrerWallet.balance += 1000;
                     referrerWallet.transactions.push({
                         transactionId: generateCustomId("TNX"),
@@ -209,7 +206,7 @@ const verifyOtp = async (req, res) => {
                         date: new Date()
                     });
 
-                    // Credit ₹500 to new user's wallet
+                  
                     newUserWallet.balance += 500;
                     newUserWallet.transactions.push({
                         transactionId: generateCustomId("TNX"),
@@ -221,17 +218,16 @@ const verifyOtp = async (req, res) => {
                         date: new Date()
                     });
 
-                    // Mark new user as redeemed
+                    
                     newUser.redeemed = true;
 
-                    // Save both wallets and referrer
                     await referrerWallet.save();
                     await newUserWallet.save();
                     await referrer.save();
                     await newUser.save();
                 }
             } else {
-                // Save new user's wallet even if no referral
+                
                 await newUserWallet.save();
             }
 
@@ -524,7 +520,7 @@ const referralPage = async (req, res) => {
 
         res.render("referral", {
             user,
-            wallet, // Pass wallet data to the view
+            wallet, 
             active: 'referral'
         });
     } catch (error) {

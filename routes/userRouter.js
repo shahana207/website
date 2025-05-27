@@ -13,6 +13,7 @@ const cartController = require("../controllers/user/cartController");
 const checkoutController = require('../controllers/user/checkoutController');
 const ordersController = require('../controllers/user/ordersController');
 const wishlistController=require("../controllers/user/wishlistController");
+const couponController=require("../controllers/user/couponController");
 const { route } = require("./adminRouter");
 
 

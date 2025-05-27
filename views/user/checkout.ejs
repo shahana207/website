@@ -1029,196 +1029,268 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
-    const addAdressForm = document.getElementById('addAdress');
+   $(document).ready(function() {
+    // Toggle New Address Form
+    $('#add-new-address').on('click', function(e) {
+        e.preventDefault();
+        $('#new-address-form').slideToggle();
+        $(this).hide(); // Hide the "Add New Address" button
+    });
 
-addAdressForm.addEventListener('submit', function (e) {
-    e.preventDefault(); // prevent default form submit
-    const form = this;
+    $('#cancel-new-address').on('click', function() {
+        $('#new-address-form').slideUp();
+        $('#add-new-address').show(); // Show the "Add New Address" button again
+        $('#addAdress')[0].reset(); // Reset the form
+        clearErrors(document.getElementById('addAdress')); // Clear any validation errors
+    });
 
-    const address = {
-        addressType: $(form).find('input[name="addressType"]:checked').val(),
-        name: $(form).find('#name-new').val().trim(),
-        landMark: $(form).find('#landmark-new').val().trim(),
-        city: $(form).find('#city-new').val().trim(),
-        state: $(form).find('#state-new').val().trim(),
-        pincode: $(form).find('#pincode-new').val().trim(),
-        phone: $(form).find('#phone-new').val().trim(),
-        altPhone: $(form).find('#alt-phone-new').val().trim()
-    };
+    // Load coupons when the coupon modal is opened
+    $('#couponModal').on('show.bs.modal', function () {
+        fetch('/available-coupons', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+            console.log('Response status for available coupons:', response.status);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    return response.json().then(data => {
+                        if (data.redirect) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Authentication Required',
+                                text: 'Please sign in to view coupons.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = data.redirect;
+                            });
+                        }
+                        throw new Error('Authentication failed');
+                    });
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Coupon data:', data);
+            const couponList = $('#coupon-list');
+            couponList.empty(); // Clear existing content
 
-    const errors = validateAddress(address);
-    if (errors) {
-        displayFormErrors(form, errors);
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Please correct the errors in the form.',
-            confirmButtonColor: '#000000'
+            if (data.success && data.coupons && data.coupons.length > 0) {
+                data.coupons.forEach(coupon => {
+                    const couponItem = `
+                        <div class="zz-coupon-item">
+                            <div class="zz-coupon-details">
+                                <div class="zz-coupon-code">${coupon.couponCode}</div>
+                                <div class="zz-coupon-desc">${coupon.description || 'No description available'}</div>
+                                <div class="zz-coupon-validity">Valid until: ${new Date(coupon.endDate).toLocaleDateString()}</div>
+                                <div class="zz-coupon-validity">Min Purchase: ₹${coupon.minPurchase.toFixed(2)}</div>
+                                <div class="zz-coupon-validity">Discount: ₹${coupon.discountValue.toFixed(2)}</div>
+                            </div>
+                            <button class="zz-coupon-apply-btn" data-coupon-code="${coupon.couponCode}">Apply</button>
+                        </div>
+                    `;
+                    couponList.append(couponItem);
+                });
+            } else {
+                couponList.html('<p>No coupons available at the moment.</p>');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching coupons:', error);
+            $('#coupon-list').html('<p>Failed to load coupons. Please try again later.</p>');
         });
-        return;
-    }
+    });
 
-    // Use fetch to send data to backend
-    fetch('/save-address', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(address)
-    })
-    .then(res => res.json()) // Expect JSON response from backend
-    .then(data => {
-        console.log(data,'data')
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Address saved!',
-                text: data.message,
-                confirmButtonColor: '#000000'
-            });
-            form.reset(); // Clear form
-            // Optionally close modal here
-        } else {
+    // Handle coupon apply button click from modal
+    $(document).on('click', '.zz-coupon-apply-btn', function () {
+        const couponCode = $(this).data('coupon-code');
+        console.log('Selected coupon code:', couponCode);
+        $('#couponCode').val(couponCode);
+        $('#couponModal').modal('hide');
+        $('#apply-coupon-btn').click(); // Trigger the apply coupon button
+    });
+
+    // Apply coupon
+    $('#apply-coupon-btn').on('click', function () {
+        const couponCode = $('#couponCode').val().trim();
+        console.log('Applying coupon:', couponCode);
+        if (!couponCode) {
             Swal.fire({
                 icon: 'error',
-                title: 'Failed to save',
-                text: data.message || 'Something went wrong.',
+                title: 'Error',
+                text: 'Please enter a coupon code',
                 confirmButtonColor: '#000000'
             });
+            return;
         }
-    })
-    
-});
 
-
-        function validateAddress(address) {
-            console.log('dskajfdksahfjksahfjk')
-            let errors = {};
-            if (!address.addressType) {
-                errors.addressType = "Select address type";
-            } else if (!["home", "work", "other"].includes(address.addressType)) {
-                errors.addressType = "Invalid address type";
+        fetch('/apply-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ couponCode })
+        })
+        .then(response => {
+            console.log('Apply coupon response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
-            if (!address.name) {
-                errors.name = "Name required";
-            } else if (address.name.length < 2 || address.name.length > 50) {
-                errors.name = "Name must be 2-50 characters";
-            } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s.]*[a-zA-Z]$/.test(address.name)) {
-                errors.name = "Name can only have letters, spaces, periods";
-            }
-
-            if (!address.landMark) {
-                errors.landMark = "Landmark required";
-            } else if (address.landMark.length < 3 || address.landMark.length > 50) {
-                errors.landMark = "Landmark must be 3-50 characters";
-            } else if (!/^(?=.*[a-zA-Z0-9])(?!.*\s{3,})[a-zA-Z0-9][-.,&()a-zA-Z0-9\s]*[a-zA-Z0-9]$/.test(address.landMark)) {
-                errors.landMark = "Landmark can only have letters, numbers, -.,&()";
-            }
-
-            if (!address.city) {
-                errors.city = "City required";
-            } else if (address.city.length < 3 || address.city.length > 50) {
-                errors.city = "City must be 3-50 characters";
-            } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s-]*[a-zA-Z]$/.test(address.city)) {
-                errors.city = "City can only have letters, spaces, hyphens";
-            }
-
-            if (!address.state) {
-                errors.state = "State required";
-            } else if (address.state.length < 2 || address.state.length > 50) {
-                errors.state = "State must be 2-50 characters";
-            }
-
-            if (!address.pincode) {
-                errors.pincode = "PIN code required";
-            } else if (address.pincode.length !== 6) {
-                errors.pincode = "PIN code must be 6 digits";
-            } else if (!/^\d+$/.test(address.pincode)) {
-                errors.pincode = "PIN code must be digits only";
-            }
-
-            if (!address.phone) {
-                errors.phone = "Phone number required";
-            } else if (address.phone.length !== 10) {
-                errors.phone = "Phone must be 10 digits";
-            } else if (!/^[6-9][0-9]{9}$/.test(address.phone)) {
-                errors.phone = "Phone must start with 6, 7, 8, or 9";
-            }
-
-            if (address.altPhone) {
-                if (address.altPhone.length !== 10) {
-                    errors.altPhone = "Alt phone must be 10 digits";
-                } else if (!/^[6-9][0-9]{9}$/.test(address.altPhone)) {
-                    errors.altPhone = "Alt phone must start with 6, 7, 8, or 9";
+            return response.json();
+        })
+        .then(data => {
+            console.log('Apply coupon response data:', data);
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied',
+                    text: data.message,
+                    confirmButtonColor: '#000000',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                // Update order summary with new discount
+                updateOrderSummary(data.cart);
+                // Disable coupon input and button
+                $('#couponCode').prop('disabled', true);
+                $('#apply-coupon-btn').prop('disabled', true);
+                // Show applied coupon
+                $('.zz-coupon-applied').remove();
+                $('.zz-order-items').after(`
+                    <div class="zz-coupon-applied">
+                        <div class="zz-coupon-info">
+                            <i class="fas fa-check-circle zz-coupon-icon"></i>
+                            <span class="zz-coupon-text">Coupon "${couponCode}" applied</span>
+                        </div>
+                        <span class="zz-coupon-remove" id="remove-coupon">
+                            <i class="fas fa-times"></i> Remove
+                        </span>
+                    </div>
+                `);
+                // Update the place order button state if total changes
+                const newTotal = data.cart.total;
+                if (newTotal >= 0) {
+                    $('#place-order').prop('disabled', false);
+                } else {
+                    $('#place-order').prop('disabled', true);
                 }
-            }
-            return Object.keys(errors).length > 0 ? errors : null;
-        }
-
-        function displayFormErrors(form, errors) {
-            clearErrors(form);
-            if (errors && typeof errors === 'object') {
-                Object.entries(errors).forEach(([field, message]) => {
-                    const input = form.querySelector(`[name="${field}"]`);
-                    if (input) {
-                        input.classList.add('is-invalid');
-                        const feedback = input.nextElementSibling;
-                        if (feedback?.classList.contains('invalid-feedback')) {
-                            feedback.textContent = message;
-                        }
-                    }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Invalid coupon code',
+                    confirmButtonColor: '#000000'
                 });
             }
-        }
-
-        function clearErrors(form) {
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-        }
-
-        // Update Order Summary
-        function updateOrderSummary(cart) {
-            const summaryDetails = document.querySelector('.zz-summary-details');
-            summaryDetails.innerHTML = `
-                <div class="zz-summary-item">
-                    <span class="zz-summary-label">Subtotal</span>
-                    <span class="zz-summary-value">₹${cart.subtotal.toFixed(2)}</span>
-                </div>
-                <div class="zz-summary-item">
-                    <span class="zz-summary-label">Shipping</span>
-                    <span class="zz-summary-value">${cart.shippingCharge ? '₹' + cart.shippingCharge.toFixed(2) : 'Free'}</span>
-                </div>
-                ${cart.discount ? `
-                    <div class="zz-summary-item">
-                        <span class="zz-summary-label">Coupon Discount</span>
-                        <span class="zz-summary-value">-₹${cart.discount.toFixed(2)}</span>
-                    </div>
-                ` : ''}
-                <div class="zz-summary-item">
-                    <span class="zz-summary-label">Tax</span>
-                    <span class="zz-summary-value">₹${cart.tax ? cart.tax.toFixed(2) : '0.00'}</span>
-                </div>
-                <div class="zz-summary-total">
-                    <span class="zz-total-label">Total</span>
-                    <span class="zz-total-value">₹${cart.total.toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        // Load Razorpay Script
-        function loadRazorpayScript() {
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-                script.onload = () => resolve(true);
-                script.onerror = () => resolve(false);
-                document.body.appendChild(script);
+        })
+        .catch(error => {
+            console.error('Error applying coupon:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to apply coupon',
+                confirmButtonColor: '#000000'
             });
-        }
+        });
+    });
 
-     $(document).ready(function() {
-    // Existing code...
+    // Remove coupon
+    $(document).on('click', '#remove-coupon', function () {
+        fetch('/remove-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+            console.log('Remove coupon response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Remove coupon response data:', data);
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed',
+                    text: data.message,
+                    confirmButtonColor: '#000000',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                // Re-enable coupon input and button
+                $('#couponCode').prop('disabled', false).val('');
+                $('#apply-coupon-btn').prop('disabled', false);
+                $('.zz-coupon-applied').remove();
+                updateOrderSummary(data.cart);
+                // Update place order button state
+                const newTotal = data.cart.total;
+                if (newTotal >= 0) {
+                    $('#place-order').prop('disabled', false);
+                } else {
+                    $('#place-order').prop('disabled', true);
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to remove coupon',
+                    confirmButtonColor: '#000000'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error removing coupon:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to remove coupon',
+                confirmButtonColor: '#000000'
+            });
+        });
+    });
+
+    // Update Order Summary
+    function updateOrderSummary(cart) {
+        console.log('Updating order summary with cart:', cart);
+        const summaryDetails = document.querySelector('.zz-summary-details');
+        summaryDetails.innerHTML = `
+            <div class="zz-summary-item">
+                <span class="zz-summary-label">Subtotal</span>
+                <span class="zz-summary-value">₹${(cart.subtotal || 0).toFixed(2)}</span>
+            </div>
+            <div class="zz-summary-item">
+                <span class="zz-summary-label">Shipping</span>
+                <span class="zz-summary-value">${cart.shippingCharge ? '₹' + cart.shippingCharge.toFixed(2) : 'Free'}</span>
+            </div>
+            ${cart.discount ? `
+                <div class="zz-summary-item">
+                    <span class="zz-summary-label">Coupon Discount</span>
+                    <span class="zz-summary-value">-₹${cart.discount.toFixed(2)}</span>
+                </div>
+            ` : ''}
+            <div class="zz-summary-item">
+                <span class="zz-summary-label">Tax</span>
+                <span class="zz-summary-value">₹${(cart.tax || 0).toFixed(2)}</span>
+            </div>
+            <div class="zz-summary-total">
+                <span class="zz-total-label">Total</span>
+                <span class="zz-total-value">₹${(cart.total || 0).toFixed(2)}</span>
+            </div>
+        `;
+    }
+
+    // Load Razorpay Script
+    function loadRazorpayScript() {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    }
 
     // Handle Payment Method Selection with COD restriction
     $('.zz-payment-method').on('click', function() {
@@ -1242,7 +1314,6 @@ addAdressForm.addEventListener('submit', function (e) {
                 // Revert to a default payment method (e.g., Wallet or Razorpay) or uncheck COD
                 $('.zz-payment-method input[value="COD"]').prop('checked', false);
                 $('.zz-payment-method').removeClass('active');
-                // Optionally, select another payment method by default
                 const walletMethod = $('.zz-payment-method input[value="Wallet"]').closest('.zz-payment-method');
                 const onlineMethod = $('.zz-payment-method input[value="Online"]').closest('.zz-payment-method');
                 if (walletMethod.length && <%= walletBalance %> >= totalAmount) {
@@ -1254,8 +1325,6 @@ addAdressForm.addEventListener('submit', function (e) {
         }
     });
 
-    // Existing code for other functionalities...
-
     // Place Order with COD restriction
     $('#place-order').on('click', async function(e) {
         e.preventDefault();
@@ -1263,7 +1332,6 @@ addAdressForm.addEventListener('submit', function (e) {
         const selectedAddress = $('input[name="selectedAddress"]:checked').val();
         const totalAmount = Number($('.zz-total-value').text().replace('₹', '')) || 0;
 
-        // Check if COD is selected and total is above ₹1000
         if (paymentMethod === 'COD' && totalAmount > 1000) {
             Swal.fire({
                 icon: 'warning',
@@ -1410,7 +1478,6 @@ addAdressForm.addEventListener('submit', function (e) {
                     window.location.href = `/payment-failure?error=${encodeURIComponent(response.error.description)}`;
                 });
                 paymentObject.open();
-
             } else if (result.success) {
                 Swal.fire({
                     icon: 'success',
@@ -1450,6 +1517,206 @@ addAdressForm.addEventListener('submit', function (e) {
             });
         }
     });
+
+   // Add New Address Form Submission
+const addAdressForm = document.getElementById('addAdress');
+addAdressForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = this;
+
+    const address = {
+        addressType: $(form).find('input[name="addressType"]:checked').val(),
+        name: $(form).find('#name-new').val().trim(),
+        landMark: $(form).find('#landmark-new').val().trim(),
+        city: $(form).find('#city-new').val().trim(),
+        state: $(form).find('#state-new').val().trim(),
+        pincode: $(form).find('#pincode-new').val().trim(),
+        phone: $(form).find('#phone-new').val().trim(),
+        altPhone: $(form).find('#alt-phone-new').val().trim(),
+    };
+    console.log('Submitting address:', address);
+
+    const errors = validateAddress(address);
+    if (errors) {
+        displayFormErrors(form, errors);
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please correct the errors in the form.',
+            confirmButtonColor: '#000000',
+        });
+        return;
+    }
+
+    fetch('/save-address', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(address),
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Save address response:', data);
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Address Saved!',
+                    text: data.message,
+                    confirmButtonColor: '#000000',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+                // Add the new address to the UI
+                const addressContainer = $('.address-container');
+                const noAddressContainer = $('.no-address-container');
+                const newAddress = data.address;
+
+                if (noAddressContainer.length) {
+                    noAddressContainer.remove(); // Remove "No address" message if it exists
+                }
+
+                const isFirstAddress = addressContainer.find('.address-item').length === 0;
+                const addressHtml = `
+                    <div class="address-item ${isFirstAddress ? 'active' : ''}" data-address-id="${newAddress._id}">
+                        <div class="address-details">
+                            <div class="form-check">
+                                <input class="form-check-input address-checkbox" type="radio" name="selectedAddress" id="address-${newAddress._id}" value="${newAddress._id}" ${isFirstAddress ? 'checked' : ''}>
+                                <label class="form-check-label address-name" for="address-${newAddress._id}">
+                                    ${newAddress.name}
+                                </label>
+                            </div>
+                            <div class="address-text">
+                                ${newAddress.landMark}, ${newAddress.city}, ${newAddress.state} - ${newAddress.pincode}
+                            </div>
+                            <div class="address-phone">
+                                Phone: ${newAddress.phone}
+                                ${newAddress.altPhone ? `<br>Alternate: ${newAddress.altPhone}` : ''}
+                            </div>
+                            <div class="address-type">${newAddress.addressType}</div>
+                        </div>
+                        <div class="button-container">
+                            <a href="/edit-address?id=${newAddress._id}" class="edit-btn">Edit</a>
+                        </div>
+                    </div>
+                `;
+                addressContainer.append(addressHtml);
+
+                // Hide the form and reset it
+                $('#new-address-form').slideUp();
+                $('#add-new-address').show();
+                form.reset();
+                clearErrors(form);
+            } else {
+                // Display specific error message from backend
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Save',
+                    text: data.message || 'Something went wrong.',
+                    confirmButtonColor: '#000000',
+                });
+                // If validation errors are returned, display them
+                if (data.errors) {
+                    displayFormErrors(form, data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error saving address:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to save address. Please try again.',
+                confirmButtonColor: '#000000',
+            });
+        });
+});
+
+    function validateAddress(address) {
+        let errors = {};
+        if (!address.addressType) {
+            errors.addressType = "Select address type";
+        } else if (!["home", "work", "other"].includes(address.addressType)) {
+            errors.addressType = "Invalid address type";
+        }
+
+        if (!address.name) {
+            errors.name = "Name required";
+        } else if (address.name.length < 2 || address.name.length > 50) {
+            errors.name = "Name must be 2-50 characters";
+        } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s.]*[a-zA-Z]$/.test(address.name)) {
+            errors.name = "Name can only have letters, spaces, periods";
+        }
+
+        if (!address.landMark) {
+            errors.landMark = "Landmark required";
+        } else if (address.landMark.length < 3 || address.landMark.length > 50) {
+            errors.landMark = "Landmark must be 3-50 characters";
+        } else if (!/^(?=.*[a-zA-Z0-9])(?!.*\s{3,})[a-zA-Z0-9][-.,&()a-zA-Z0-9\s]*[a-zA-Z0-9]$/.test(address.landMark)) {
+            errors.landMark = "Landmark can only have letters, numbers, -.,&()";
+        }
+
+        if (!address.city) {
+            errors.city = "City required";
+        } else if (address.city.length < 3 || address.city.length > 50) {
+            errors.city = "City must be 3-50 characters";
+        } else if (!/^(?!.*\s{3,})[a-zA-Z][a-zA-Z\s-]*[a-zA-Z]$/.test(address.city)) {
+            errors.city = "City can only have letters, spaces, hyphens";
+        }
+
+        if (!address.state) {
+            errors.state = "State required";
+        } else if (address.state.length < 2 || address.state.length > 50) {
+            errors.state = "State must be 2-50 characters";
+        }
+
+        if (!address.pincode) {
+            errors.pincode = "PIN code required";
+        } else if (address.pincode.length !== 6) {
+            errors.pincode = "PIN code must be 6 digits";
+        } else if (!/^\d+$/.test(address.pincode)) {
+            errors.pincode = "PIN code must be digits only";
+        }
+
+        if (!address.phone) {
+            errors.phone = "Phone number required";
+        } else if (address.phone.length !== 10) {
+            errors.phone = "Phone must be 10 digits";
+        } else if (!/^[6-9][0-9]{9}$/.test(address.phone)) {
+            errors.phone = "Phone must start with 6, 7, 8, or 9";
+        }
+
+        if (address.altPhone) {
+            if (address.altPhone.length !== 10) {
+                errors.altPhone = "Alt phone must be 10 digits";
+            } else if (!/^[6-9][0-9]{9}$/.test(address.altPhone)) {
+                errors.altPhone = "Alt phone must start with 6, 7, 8, or 9";
+            }
+        }
+        return Object.keys(errors).length > 0 ? errors : null;
+    }
+
+    function displayFormErrors(form, errors) {
+        clearErrors(form);
+        if (errors && typeof errors === 'object') {
+            Object.entries(errors).forEach(([field, message]) => {
+                const input = form.querySelector(`[name="${field}"]`);
+                if (input) {
+                    input.classList.add('is-invalid');
+                    const feedback = input.nextElementSibling;
+                    if (feedback?.classList.contains('invalid-feedback')) {
+                        feedback.textContent = message;
+                    }
+                }
+            });
+        }
+    }
+
+    function clearErrors(form) {
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    }
 });
     </script>
 </body>

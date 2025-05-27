@@ -51,21 +51,21 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
-      // Get current date for sales calculations (May 21, 2025, 05:25 PM IST)
+    
       const today = new Date("2025-05-21T17:25:00+05:30");
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
       const yearStart = new Date(today.getFullYear(), 0, 1);
 
-      // Fetch all orders for sales calculations
+      
       const orders = await Order.find()
         .populate("orderedItems.product")
         .populate("user");
 
       if (!orders) orders = [];
 
-      // Sales Calculations (using finalAmount)
+      
       const todaySales = orders
         .filter((order) => order.createdOn.toDateString() === today.toDateString())
         .reduce((sum, order) => sum + (order.finalAmount || 0), 0);
@@ -82,7 +82,7 @@ const loadDashboard = async (req, res) => {
         .filter((order) => order.createdOn >= yearStart)
         .reduce((sum, order) => sum + (order.finalAmount || 0), 0);
 
-      // Sales Data for Chart
+     
       const weeklyStart = new Date(today);
       weeklyStart.setDate(today.getDate() - 29);
       const weeklyOrders = orders.filter((order) => order.createdOn >= weeklyStart);
@@ -120,7 +120,7 @@ const loadDashboard = async (req, res) => {
         yearly: { labels: yearlyLabels, data: yearlyData },
       };
 
-      // Best Selling Products (Top 10 by quantity sold)
+     
       const topProducts = await Order.aggregate([
         { $unwind: "$orderedItems" },
         {
@@ -148,7 +148,6 @@ const loadDashboard = async (req, res) => {
         },
       ]);
 
-      // Best Selling Categories (Top 10 by revenue)
       const topCategories = await Order.aggregate([
         { $unwind: "$orderedItems" },
         {
@@ -186,7 +185,7 @@ const loadDashboard = async (req, res) => {
         },
       ]);
 
-      // Best Selling Brands (Top 10 by revenue)
+    
       const topBrands = await Order.aggregate([
         { $unwind: "$orderedItems" },
         {
@@ -224,9 +223,9 @@ const loadDashboard = async (req, res) => {
         },
       ]);
 
-      // Pagination for Recent Orders
+    
       const page = parseInt(req.query.page) || 1;
-      const limit = 10; // Orders per page
+      const limit = 10; 
       const skip = (page - 1) * limit;
 
       const totalOrders = await Order.countDocuments();
@@ -238,7 +237,7 @@ const loadDashboard = async (req, res) => {
         .skip(skip)
         .limit(limit);
 
-      // Render the dashboard with the required data
+      
       res.render("dashboard", {
         todaySales,
         yesterdaySales,
@@ -285,19 +284,18 @@ const getSalesReport = async (req, res) => {
 
         const { startDate, endDate, status } = req.query;
 
-        // Build query for filtering orders
+       
         let query = {};
         if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
-            // Validate dates
+         
             if (isNaN(start) || isNaN(end)) {
                 throw new Error('Invalid date format');
             }
             if (start > end) {
                 throw new Error('Start date cannot be later than end date');
             }
-            // Set end date to end of day
             end.setHours(23, 59, 59, 999);
             query.createdOn = {
                 $gte: start,
@@ -367,7 +365,7 @@ const exportSalesReport = async (req, res) => {
 
         const orders = await Order.find(query).sort({ createdOn: -1 });
 
-        // Calculate summary
+      
         const summary = {
             grossSales: orders.reduce((sum, order) => sum + order.totalPrice, 0),
             couponsRedeemed: orders.reduce((sum, order) => sum + (order.couponApplied ? order.discount : 0), 0),
@@ -383,17 +381,17 @@ const exportSalesReport = async (req, res) => {
             res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
             doc.pipe(res);
 
-            // Title
+          
             doc.fontSize(20).font('Helvetica-Bold').text('Sales Report', { align: 'center' });
             doc.moveDown();
 
-            // Date Range and Status
+          
             doc.fontSize(12).font('Helvetica');
             doc.text(`Date Range: ${startDate || 'N/A'} to ${endDate || 'N/A'}`);
             doc.text(`Status: ${status || 'All'}`);
             doc.moveDown();
 
-            // Summary Section
+          
             doc.fontSize(14).font('Helvetica-Bold').text('Summary', { align: 'left' });
             doc.moveDown(0.5);
             doc.fontSize(12).font('Helvetica');
@@ -404,13 +402,13 @@ const exportSalesReport = async (req, res) => {
             doc.text(`Total Orders: ${summary.totalOrders}`);
             doc.moveDown(1.5);
 
-            // Table Headers
+           
             const tableTop = doc.y + 10;
             const rowHeight = 20;
             const pageHeight = doc.page.height - doc.page.margins.bottom;
             let y = tableTop;
 
-            // Define column positions and widths
+           
             const colPositions = {
                 orderId: 50,
                 amount: 150,
@@ -430,7 +428,7 @@ const exportSalesReport = async (req, res) => {
                 status: 60
             };
 
-            // Draw Headers
+            
             doc.font('Helvetica-Bold');
             doc.text('Order ID', colPositions.orderId, y, { width: colWidths.orderId });
             doc.text('Amount', colPositions.amount, y, { width: colWidths.amount });
@@ -443,15 +441,15 @@ const exportSalesReport = async (req, res) => {
             doc.moveTo(colPositions.orderId, y).lineTo(colPositions.status + colWidths.status, y).stroke();
             y += 5;
 
-            // Draw Rows
+          
             doc.font('Helvetica');
             orders.forEach((order, index) => {
-                // Check if we're near the bottom of the page
+               
                 if (y + rowHeight > pageHeight) {
                     doc.addPage();
                     y = doc.page.margins.top;
 
-                    // Redraw Headers on new page
+                   
                     doc.font('Helvetica-Bold');
                     doc.text('Order ID', colPositions.orderId, y, { width: colWidths.orderId });
                     doc.text('Amount', colPositions.amount, y, { width: colWidths.amount });
@@ -481,7 +479,7 @@ const exportSalesReport = async (req, res) => {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Sales Report');
 
-            // Add Summary to Excel
+          
             worksheet.addRow(['Sales Report']);
             worksheet.addRow(['Date Range', `${startDate || 'N/A'} to ${endDate || 'N/A'}`]);
             worksheet.addRow(['Status', status || 'All']);
@@ -494,7 +492,6 @@ const exportSalesReport = async (req, res) => {
             worksheet.addRow(['Total Orders', summary.totalOrders]);
             worksheet.addRow([]);
 
-            // Add Orders Table
             worksheet.columns = [
                 { header: 'Order ID', key: 'orderId', width: 20 },
                 { header: 'Amount', key: 'totalPrice', width: 15 },

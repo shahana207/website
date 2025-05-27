@@ -78,7 +78,7 @@ const addProducts = async (req, res) => {
     try {
         const { productName, description, category, brand, regularPrice, salePrice, quantity, color, sizeVariants } = req.body;
 
-        // Server-side validation
+       
         if (!productName?.trim() || !/^[a-zA-Z0-9\s,()\-.]+$/.test(productName.trim())) {
             return res.redirect('/admin/load-add-product?error=Invalid%20product%20name');
         }
@@ -98,7 +98,7 @@ const addProducts = async (req, res) => {
             return res.redirect('/admin/load-add-product?error=Quantity%20must%20be%20non-negative');
         }
 
-        // Process sizeVariants
+       
         let sizeVariantsArray = [];
         if (sizeVariants && Array.isArray(sizeVariants)) {
             sizeVariantsArray = sizeVariants
@@ -127,7 +127,7 @@ const addProducts = async (req, res) => {
             }
         }
 
-        // Process colors
+       
         let colors = [];
         if (color && color.trim()) {
             colors = color.split(',').map(c => c.trim()).filter(c => c);
@@ -160,7 +160,7 @@ const addProducts = async (req, res) => {
             salePrice: parseFloat(salePrice),
             quantity: parseInt(quantity),
             color: colors,
-            sizeVariants: sizeVariantsArray, // Use sizeVariants instead of sizes
+            sizeVariants: sizeVariantsArray, 
             productImage: images,
             status: 'Available'
         });
@@ -267,13 +267,13 @@ const editProduct = async (req, res) => {
             }
         }
 
-        // Process colors
+       
         let colors = [];
         if (color && color.trim()) {
             colors = color.split(',').map(c => c.trim()).filter(c => c);
         }
 
-        // Process sizeVariants
+       
         let sizeVariantsArray = [];
         if (sizeVariants && Array.isArray(sizeVariants)) {
             sizeVariantsArray = sizeVariants
@@ -349,7 +349,7 @@ const editProduct = async (req, res) => {
             offerPrice: offerPriceNum,
             hasOffer: hasOffer === 'on',
             color: colors,
-            sizeVariants: sizeVariantsArray, // Use sizeVariants instead of sizes
+            sizeVariants: sizeVariantsArray, 
             productImage: productImages
         };
 
@@ -411,7 +411,7 @@ async function migrateSizes() {
             if (product.sizes && product.sizes.length > 0) {
                 const sizeVariants = product.sizes.map(size => ({
                     size: size,
-                    quantity: product.quantity // Use the product's total quantity or adjust as needed
+                    quantity: product.quantity 
                 }));
                 await Product.updateOne(
                     { _id: product._id },

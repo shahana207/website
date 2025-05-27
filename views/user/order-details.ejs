@@ -256,7 +256,29 @@
             padding-top: 10px;
             border-top: 1px solid #ddd;
         }
+.zz-download-invoice-btn {
+    background-color: #3498db; /* A professional blue shade */
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    text-decoration: none; /* For the <a> tag */
+    display: inline-block; /* Ensure proper alignment */
+}
 
+.zz-download-invoice-btn:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+    transform: scale(1.03); /* Slight scale effect on hover */
+}
+
+.zz-download-invoice-btn:active {
+    transform: scale(0.98); 
+}
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .zz-container {
@@ -320,11 +342,13 @@
                 </div>
                 <div>
                     <a href="/order" class="zz-back-btn">Back to Orders</a>
-                    <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
-                        <button class="zz-cancel-order-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
-                    <% } %>
-                </div>
-            </div>
+        <!-- Add Download Invoice Button -->
+        <a href="/download-invoice/<%= order.orderId %>" class="btn btn-outline-primary btn-sm" style="margin-left: 10px;" target="_blank">Download Invoice</a>
+        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
+            <button class="zz-cancel-order-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
+        <% } %>
+    </div>
+</div>
 
             <!-- Shipping Address -->
             <div class="zz-shipping-address">

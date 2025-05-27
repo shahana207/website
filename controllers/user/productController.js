@@ -2,7 +2,7 @@ const Product=require("../../models/productSchema");
 const Category=require("../../models/categorySchema");
 const User= require("../../models/userSchema");
 const Offer = require("../../models/offerSchema");
-const Whishlist = require('../../models/wishlistSchema')
+const Wishlist = require("../../models/wishlistSchema");
 
 
 const calculateBestOffer = async (product) => {
@@ -68,7 +68,7 @@ const productDetails = async (req, res) => {
         const userId = req.session.user;
         let userData = null;
 
-        // Fetch user data if logged in
+       
         if (userId) {
             userData = await User.findById(userId);
         }
@@ -84,7 +84,7 @@ const productDetails = async (req, res) => {
 
         const offerDetails = await calculateBestOffer(product);
 
-        // Fetch related products
+       
         const relatedProducts = await Product.find({
             category: product.category._id,
             _id: { $ne: productId }
@@ -94,29 +94,37 @@ const productDetails = async (req, res) => {
             .limit(4)
             .lean();
 
-        // Initialize isInWishlist for main product
+       
         let isInWishlist = false;
         let relatedProductsWithOffers = relatedProducts;
 
-        // Check wishlist status if user is logged in
+       
         if (userId) {
-            const wishlist = await Whishlist.findOne({ userId }).lean();
-            const wishlistProductIds = wishlist ? wishlist.products.map(item => item.productId.toString()) : [];
+            const wishlist = await Wishlist.findOne({ userId }).lean();
+            const wishlistItems = wishlist ? wishlist.products : [];
 
-            // Check if main product is in wishlist
-            isInWishlist = wishlistProductIds.includes(productId);
+           
+            isInWishlist = wishlistItems.some(item => 
+                item.productId.toString() === productId &&
+                item.size === (product.sizeVariants?.[0]?.size || '') &&
+                item.color === (product.color?.[0] || '')
+            );
 
-            // Add isInWishlist and offerDetails to related products
             relatedProductsWithOffers = await Promise.all(relatedProducts.map(async (relatedProduct) => {
                 const offerDetails = await calculateBestOffer(relatedProduct);
+                const isInWishlist = wishlistItems.some(item => 
+                    item.productId.toString() === relatedProduct._id.toString() &&
+                    item.size === (relatedProduct.sizeVariants?.[0]?.size || '') &&
+                    item.color === (relatedProduct.color?.[0] || '')
+                );
                 return {
                     ...relatedProduct,
                     offerDetails,
-                    isInWishlist: wishlistProductIds.includes(relatedProduct._id.toString())
+                    isInWishlist
                 };
             }));
         } else {
-            // For unauthenticated users, set isInWishlist to false for related products
+          
             relatedProductsWithOffers = await Promise.all(relatedProducts.map(async (relatedProduct) => {
                 const offerDetails = await calculateBestOffer(relatedProduct);
                 return {
@@ -139,7 +147,6 @@ const productDetails = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
-
 module.exports = {
     productDetails,
 }

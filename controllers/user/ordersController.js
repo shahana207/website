@@ -77,37 +77,49 @@ const cancelOrder = async (req, res) => {
 
         let refundAmount = 0;
         if (['Wallet', 'Online'].includes(order.paymentMethod)) {
-            refundAmount = order.finalAmount;
+            refundAmount = order.finalAmount; 
+            console.log(`Refunding ₹${refundAmount} for order #${order.orderId} (finalAmount: ${order.finalAmount}, totalPrice: ${order.totalPrice}, discount: ${order.discount})`);
 
-            const wallet = await Wallet.findOneAndUpdate(
-                { userId },
-                {
-                    $setOnInsert: { userId },
-                    $inc: { balance: refundAmount },
-                    $push: {
-                        transactions: {
-                            transactionId: generateCustomId("RFD"),
-                            amount: refundAmount,
-                            type: "Credit",
-                            status: "Completed",
-                            method: "Refund",
-                            description: `Refund for cancelled order #${order.orderId}`,
-                            orderId: order._id,
-                            date: new Date()
-                        }
+            
+            const walletCheck = await Wallet.findOne({ userId, 'transactions.orderId': order._id });
+            if (walletCheck && walletCheck.transactions.some(tx => tx.orderId.toString() === order._id.toString() && tx.method === 'Refund')) {
+                console.log('Refund already processed for this order. Skipping wallet update.');
+                order.refundAmount = (order.refundAmount || 0) + refundAmount;
+            } else {
+             
+                const wallet = await Wallet.findOneAndUpdate(
+                    { userId },
+                    {
+                        $setOnInsert: { userId },
+                        $inc: { balance: refundAmount },
+                        $push: {
+                            transactions: {
+                                transactionId: generateCustomId("RFD"),
+                                amount: refundAmount,
+                                type: "Credit",
+                                status: "Completed",
+                                method: "Refund",
+                                description: `Refund for cancelled order #${order.orderId}`,
+                                orderId: order._id,
+                                date: new Date(),
+                            },
+                        },
+                        $set: { lastUpdated: new Date() },
                     },
-                    $set: { lastUpdated: new Date() }
-                },
-                { upsert: true, new: true }
-            );
+                    { upsert: true, new: true }
+                );
 
-            order.refundAmount = (order.refundAmount || 0) + refundAmount;
+                console.log('Wallet updated with refund:', wallet.transactions.slice(-1)); 
+                order.refundAmount = (order.refundAmount || 0) + refundAmount;
+            }
         }
 
+        
         order.status = 'Cancelled';
-        order.cancellationReason = reason; // Optionally store the reason in the order
+        order.cancellationReason = reason;
         await order.save();
 
+       
         for (const item of order.orderedItems) {
             const product = await Product.findById(item.product);
             if (product) {
@@ -118,7 +130,7 @@ const cancelOrder = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: `Order cancelled successfully${['Wallet', 'Online'].includes(order.paymentMethod) ? `. ₹${refundAmount} refunded to wallet.` : ''}`
+            message: `Order cancelled successfully${['Wallet', 'Online'].includes(order.paymentMethod) ? `. ₹${refundAmount} refunded to wallet.` : ''}`,
         });
     } catch (error) {
         console.error('Cannot cancel order:', error);
@@ -327,12 +339,12 @@ const cancelItems = async (req, res) => {
             item.returnStatus = 'Cancelled';
             item.returnReason = reason;
 
-            // Refund calculation for Wallet or Online payments
+          
             if (['Wallet', 'Online'].includes(order.paymentMethod)) {
                 const refundAmount = item.price * item.quantity;
                 totalRefundAmount += refundAmount;
 
-                // Update product stock
+                
                 const product = await Product.findById(item.product);
                 if (product) {
                     product.quantity += item.quantity;
@@ -341,7 +353,7 @@ const cancelItems = async (req, res) => {
             }
         }
 
-        // Update wallet if applicable
+       
         if (totalRefundAmount > 0) {
             const wallet = await Wallet.findOneAndUpdate(
                 { userId },
@@ -368,7 +380,7 @@ const cancelItems = async (req, res) => {
             order.refundAmount = (order.refundAmount || 0) + totalRefundAmount;
         }
 
-        // Check if all items are cancelled
+        
         const allCancelled = order.orderedItems.every(i => i.returnStatus === 'Cancelled');
         if (allCancelled) {
             order.status = 'Cancelled';

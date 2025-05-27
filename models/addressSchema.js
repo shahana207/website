@@ -32,7 +32,7 @@ const addressSchema= new Schema({
             required:true
         },
         pincode:{
-            type:Number,
+            type:String,
             required:true
 
         },

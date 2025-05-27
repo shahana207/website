@@ -250,7 +250,8 @@
                             <div class="header__top__links">
                                 <% if (locals.user) { %>
                                     <div class="dropdown">
-                                        <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/img/default-profile.png' %>">
+                                       <img class="header__profile-img" src="<%= user && user.profilePicture ? user.profilePicture : '/Uploads/profile-pictures/profile icon.jpeg' %>">
+
                                         <a href="#" class="sign-in-link"><%= locals.user.name %></a>
                                         <div class="dropdown-content">
                                             <a href="/userProfile">Profile</a>
