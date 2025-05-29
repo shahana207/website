@@ -69,6 +69,8 @@ router.get("/referral", userAuth, userController.referralPage);
 
 router.get('/aboutUs', userAuth,userController. getAboutUs);
 
+router.get('/contactUs',userAuth,userController. getContactUs);
+
 
 
 

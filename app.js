@@ -55,11 +55,16 @@ app.use((err, req, res, next) => {
         method: req.method,
         body: req.body
     });
+
+    // If the request is expecting JSON (like an API/AJAX call)
     if (req.xhr || req.headers.accept?.includes('application/json')) {
         return res.status(500).json({ error: 'Something went wrong!' });
     }
-    res.status(500).send('Something went wrong!');
+
+    // Otherwise, redirect to a custom error page
+    res.redirect('/pageNotFound');
 });
+
 
 
 

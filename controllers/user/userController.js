@@ -581,6 +581,16 @@ const getAboutUs = async (req, res) => {
     }
 };
 
+
+const getContactUs = async (req, res) => {
+  try {
+    res.render('contactUs');
+  } catch (error) {
+    console.error("Error loading Contact Us page:", error);
+    res.redirect("/pageerror");
+  }
+};
+
 module.exports = {
     loadHomepage,
     pageNotFound,
@@ -594,4 +604,5 @@ module.exports = {
     loadShoppingPage,
     referralPage,
     getAboutUs,
+    getContactUs,
 };
