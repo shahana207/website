@@ -96,44 +96,87 @@ async function sendVerificationEmail(email, otp) {
 }
 
 const signup = async (req, res) => {
-    try {
-        const { name, phone, email, password, confirmPassword, referralCode } = req.body;
+  try {
+    const { name, phone, email, password, confirmPassword, referralCode } = req.body;
 
-        if (password !== confirmPassword) {
-            return res.render("signup", { message: "Passwords do not match", referralCode });
-        }
-
-        const validReferral = await User.findOne({referralCode})
-
-        // if(!validReferral){
-        //   return res.render("signup", { message: "Referral code is not valid", referralCode })
-        // }
-
-        const findUser = await User.findOne({ email: email });
-        if (findUser) {
-            return res.render("signup", {
-                message: "User with this email already exists",
-                referralCode
-            }); 
-        }
-
-        const otp = generateOtp(); 
-
-        const emailSent = await sendVerificationEmail(email, otp);
-        if (!emailSent) {
-            return res.json("email-error");
-        }
-
-        req.session.userOtp = otp;
-        req.session.otpExpires = Date.now() + 30 * 1000;
-        req.session.userData = { name, phone, email, password, referralCode }; // Store referralCode in session
-
-        res.render("verify-otp"); 
-        console.log("OTP Sent:", otp);
-    } catch (error) {
-        console.error("Signup error:", error);
-        res.redirect("/pageNotFound");
+    // Validate password match
+    if (password !== confirmPassword) {
+      return res.render("signup", { message: "Passwords do not match", referralCode });
     }
+
+    // Validate phone number
+    const phonePattern = /^[6-9]\d{9}$/;
+    const sequentialNumbers = /^(?:1234567890|0123456789|9876543210|0987654321)$/;
+    const repetitiveNumbers = /^(\d)\1{9}$/;
+
+    if (!phonePattern.test(phone)) {
+      return res.render("signup", {
+        message: "Enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9",
+        referralCode,
+      });
+    }
+
+    if (sequentialNumbers.test(phone)) {
+      return res.render("signup", {
+        message: "Sequential numbers like 1234567890 are not allowed",
+        referralCode,
+      });
+    }
+
+    if (repetitiveNumbers.test(phone)) {
+      return res.render("signup", {
+        message: "Repetitive numbers like 1111111111 are not allowed",
+        referralCode,
+      });
+    }
+
+    // Check for duplicate phone number
+    const findPhone = await User.findOne({ phone });
+    if (findPhone) {
+      return res.render("signup", {
+        message: "Phone number already exists",
+        referralCode,
+      });
+    }
+
+    // Check for duplicate email
+    const findUser = await User.findOne({ email });
+    if (findUser) {
+      return res.render("signup", {
+        message: "User with this email already exists",
+        referralCode,
+      });
+    }
+
+    // Validate referral code if provided
+    if (referralCode) {
+      const validReferral = await User.findOne({ referralCode });
+      if (!validReferral) {
+        return res.render("signup", {
+          message: "Invalid referral code",
+          referralCode,
+        });
+      }
+    }
+
+    // Generate and send OTP
+    const otp = generateOtp();
+    const emailSent = await sendVerificationEmail(email, otp);
+    if (!emailSent) {
+      return res.json("email-error");
+    }
+
+    // Store user data and OTP in session
+    req.session.userOtp = otp;
+    req.session.otpExpires = Date.now() + 30 * 1000;
+    req.session.userData = { name, phone, email, password, referralCode };
+
+    res.render("verify-otp");
+    console.log("OTP Sent:", otp);
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.redirect("/pageNotFound");
+  }
 };
 
 const verifyOtp = async (req, res) => {
@@ -529,6 +572,15 @@ const referralPage = async (req, res) => {
     }
 };
 
+const getAboutUs = async (req, res) => {
+    try {
+        res.render('aboutUs');
+    } catch (error) {
+        console.error("Error loading About Us page:", error);
+        res.redirect("/pageerror");
+    }
+};
+
 module.exports = {
     loadHomepage,
     pageNotFound,
@@ -540,5 +592,6 @@ module.exports = {
     loadLogin,
     logout,
     loadShoppingPage,
-    referralPage
+    referralPage,
+    getAboutUs,
 };

@@ -67,6 +67,8 @@ router.get("/shop",userAuth,userController.loadShoppingPage);
 
 router.get("/referral", userAuth, userController.referralPage);
 
+router.get('/aboutUs', userAuth,userController. getAboutUs);
+
 
 
 
@@ -148,6 +150,7 @@ router.put('/update-cart',userAuth,cartController.updateCart);
 router.patch('/removeFromCart/:productId', userAuth,cartController.removeFromCart);
 
 
+
 //checkout management
 
 router.get('/checkout', userAuth, checkoutController.loadCheckout);
@@ -172,6 +175,10 @@ router.post('/remove-coupon', checkoutController.removeCoupon);
 
 router.post('/update-order-status', checkoutController.updateOrderStatus);
 
+router.post('/retry-payment', checkoutController.retryPayment);
+
+router.get('/submit-payment', checkoutController.submitPayment);
+
 // //order management
 
 router.get("/order",userAuth,ordersController.loadOrders);
@@ -183,6 +190,9 @@ router.get('/order-details/:orderId', userAuth, ordersController.viewOrderDetail
 router.post('/cancel-item', userAuth, ordersController.cancelItem);
 
 router.post('/return-item', userAuth, ordersController.returnItem);
+
+router.get('/retry-payment/:orderId', ordersController.retryPayment);
+// router.get('/retry-payment/:orderId', ordersController.retryPayment);
 
 
 //wishlist management

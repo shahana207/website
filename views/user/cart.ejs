@@ -620,7 +620,7 @@
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script>
+   <script>
 document.addEventListener('DOMContentLoaded', function() {
     const decreaseBtns = document.querySelectorAll('.decrease-qty');
     const increaseBtns = document.querySelectorAll('.increase-qty');
@@ -646,30 +646,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon: 'success',
                     title: 'Cart Updated',
                     text: 'Your cart has been updated successfully!',
-                    timer: 2000,
+                    timer: 1500,
                     showConfirmButton: false
                 });
+                // Update DOM without reloading
                 updateCartSummary(data.cart);
-                updateItemPrice(document.querySelector(`.zz-cart-item[data-product-id="${productId}"]`));
-                window.location.reload()
+                updateItemRow(productId, quantity, data.cart);
             } else {
                 // Handle errors (e.g., stock limit exceeded)
-                let errorMessage = 'There was an issue updating your cart.';
-                if (data.errors && data.errors.length > 0) {
-                    errorMessage = data.errors.map(e => e.message).join('\n');
-                }
+                let errorMessage = data.errors?.map(e => e.message).join('\n') || 'There was an issue updating your cart.';
                 Swal.fire({
                     icon: 'error',
                     title: 'Update Failed',
                     text: errorMessage,
                     confirmButtonText: 'OK'
                 });
-                // Revert input to previous valid value (optional)
+                // Revert input to previous valid value
                 const input = document.querySelector(`.zz-cart-item[data-product-id="${productId}"] .quantity-input`);
-                input.value = data.cart.items.find(item => item.productId._id.toString() === productId)?.quantity || 1;
+                input.value = data.cart?.items.find(item => item.productId._id.toString() === productId)?.quantity || 1;
             }
-        }).then(()=>{
-
         })
         .catch(error => {
             console.error('Error updating cart:', error);
@@ -681,26 +676,56 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Function to update the cart item row in the DOM
+    function updateItemRow(productId, quantity, cart) {
+        const cartItem = document.querySelector(`.zz-cart-item[data-product-id="${productId}"]`);
+        const priceElement = cartItem.querySelector('.zz-item-price');
+        const totalElement = cartItem.querySelector('.zz-item-total');
+        const input = cartItem.querySelector('.quantity-input');
+
+        // Find the item in the cart response
+        const item = cart.items.find(i => i.productId._id.toString() === productId);
+        if (!item) return;
+
+        // Update quantity input
+        input.value = quantity;
+
+        // Update price and total
+        const price = item.bestOffer?.originalPrice
+            ? item.bestOffer.originalPrice - item.bestOffer.discountAmount
+            : item.productId.salePrice;
+        const total = price * quantity;
+
+        // Update price display
+        if (item.bestOffer?.originalPrice) {
+            priceElement.innerHTML = `
+                <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ ${item.bestOffer.originalPrice.toFixed(2)}</span><br>
+                <span style="color: #28a745; font-weight: 600;">₹ ${price.toFixed(2)}</span><br>
+                <span style="color: #28a745; font-size: 0.9em;">You saved ₹ ${item.bestOffer.discountAmount.toFixed(2)}</span>
+            `;
+            totalElement.innerHTML = `
+                <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ ${(item.bestOffer.originalPrice * quantity).toFixed(2)}</span><br>
+                <span style="color: #28a745; font-weight: 600;">₹ ${total.toFixed(2)}</span>
+            `;
+        } else {
+            priceElement.innerHTML = `₹ ${price.toFixed(2)}`;
+            totalElement.innerHTML = `₹ ${total.toFixed(2)}`;
+        }
+    }
+
     // Function to update cart summary totals
     function updateCartSummary(cart) {
         const subtotalElement = document.querySelector('.zz-summary-item .zz-summary-value');
         const shippingElement = document.querySelectorAll('.zz-summary-item .zz-summary-value')[1];
+        const discountElement = document.querySelector('.zz-summary-item .zz-summary-value[data-discount]');
         const totalElement = document.querySelector('.zz-total-value');
 
         subtotalElement.innerText = `₹ ${cart.subtotal.toFixed(2)}`;
         shippingElement.innerText = `₹ ${cart.shippingCharge.toFixed(2)}`;
+        if (discountElement) {
+            discountElement.innerText = `- ₹ ${cart.discount.toFixed(2)}`;
+        }
         totalElement.innerText = `₹ ${cart.total.toFixed(2)}`;
-    }
-
-    // Function to update item price calculation based on quantity
-    function updateItemPrice(cartItem) {
-        const priceElement = cartItem.querySelector('.zz-item-price');
-        const price = parseFloat(priceElement.innerText.replace('₹ ', ''));
-        const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
-        const totalElement = cartItem.querySelector('.zz-item-total');
-
-        const total = price * quantity;
-        totalElement.innerText = `₹ ${total.toFixed(2)}`;
     }
 
     // Decrease quantity
@@ -710,7 +735,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentValue = parseInt(input.value);
             const productId = this.closest('.zz-cart-item').getAttribute('data-product-id');
             if (currentValue > 1) {
-                input.value = currentValue - 1;
                 updateCartItem(productId, currentValue - 1);
             }
         });
@@ -725,14 +749,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const productId = this.closest('.zz-cart-item').getAttribute('data-product-id');
 
             if (currentValue < maxValue) {
-                input.value = currentValue + 1;
                 updateCartItem(productId, currentValue + 1);
             } else {
                 Swal.fire({
                     icon: 'info',
                     title: 'Stock Limit Reached',
                     text: `Only ${maxValue} items available in stock.`,
-                    timer: 2000,
+                    timer: 1500,
                     showConfirmButton: false
                 });
             }
@@ -803,7 +826,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                 timer: 1500,
                                 showConfirmButton: false
                             }).then(() => {
-                                window.location.reload();
+                                // Remove the item row from DOM
+                                const cartItem = document.querySelector(`.zz-cart-item[data-product-id="${productId}"]`);
+                                cartItem.remove();
+                                // Update summary
+                                updateCartSummary(data.cart);
+                                // Update summary section items
+                                updateSummaryItems(data.cart);
+                                // If cart is empty, show empty message
+                                if (!data.cart.items.length) {
+                                    const cartContainer = document.querySelector('.zz-cart-container');
+                                    cartContainer.innerHTML = `
+                                        <h2 class="zz-cart-title">Your Cart</h2>
+                                        <div class="zz-cart-empty">
+                                            <i class="fa fa-shopping-cart"></i>
+                                            <h3>Your cart is empty</h3>
+                                            <p>Looks like you haven't added any products to your cart yet.</p>
+                                            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+                                        </div>
+                                    `;
+                                    document.querySelector('.zz-checkout-btn').classList.add('disabled');
+                                    document.querySelector('.zz-checkout-btn').href = '#';
+                                }
                             });
                         } else {
                             Swal.fire({
@@ -825,6 +869,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Function to update summary section items
+    function updateSummaryItems(cart) {
+        const summaryContainer = document.querySelector('.zz-cart-summary');
+        let itemsHtml = '';
+        if (cart.items.length > 0) {
+            cart.items.forEach(item => {
+                if (!item.productId || !item.productId.productImage || !item.productId.productImage.length) return;
+                const price = item.bestOffer?.originalPrice
+                    ? item.bestOffer.originalPrice - item.bestOffer.discountAmount
+                    : item.productId.salePrice;
+                const total = price * item.quantity;
+                itemsHtml += `
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div class="zz-item-image" style="margin-right: 15px;">
+                            <img src="/Uploads/product-images/${item.productId.productImage[0]}" alt="${item.productId.productName}">
+                        </div>
+                        <div>
+                            <h4 style="font-size: 16px; margin: 0;">${item.productId.productName}</h4>
+                            <p style="font-size: 14px; color: #777; margin: 5px 0;">
+                                ${item.size ? `Size: ${item.size} | ` : ''}Qty ${item.quantity}
+                            </p>
+                            <p style="font-weight: 600; color: #333; margin: 0;">
+                                ${item.bestOffer?.originalPrice ? `
+                                    <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">₹ ${(item.bestOffer.originalPrice * item.quantity).toFixed(2)}</span><br>
+                                    <span style="color: #28a745; font-weight: 600;">₹ ${total.toFixed(2)}</span><br>
+                                    <span style="color: #28a745; font-size: 0.9em;">You saved ₹ ${(item.bestOffer.discountAmount * item.quantity).toFixed(2)}</span>
+                                ` : `₹ ${total.toFixed(2)}`}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            itemsHtml = '<p>Your cart is empty.</p>';
+        }
+        // Replace the items in the summary section
+        const summaryItems = summaryContainer.querySelectorAll('.zz-cart-summary > div:not(.zz-summary-item):not(.zz-summary-total):not(.zz-checkout-btn):not(.zz-payment-options)');
+        summaryItems.forEach(item => item.remove());
+        summaryContainer.insertAdjacentHTML('afterbegin', itemsHtml);
+    }
 });
 </script>
 </body>

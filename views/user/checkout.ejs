@@ -619,6 +619,7 @@
     </style>
 </head>
 <body>
+    <input type="hidden" id="retryOrderId" value="<%= typeof orderId !== 'undefined' ? orderId : '' %>">
     <input type="hidden" id="currentUserId" value="<%= user._id %>">
 
     <!-- Breadcrumb Navigation -->
@@ -1029,7 +1030,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
-   $(document).ready(function() {
+$(document).ready(function() {
     // Toggle New Address Form
     $('#add-new-address').on('click', function(e) {
         e.preventDefault();
@@ -1325,12 +1326,13 @@
         }
     });
 
-    // Place Order with COD restriction
+    // Place Order with retryOrderId
     $('#place-order').on('click', async function(e) {
         e.preventDefault();
         const paymentMethod = $('input[name="paymentMethod"]:checked').val();
         const selectedAddress = $('input[name="selectedAddress"]:checked').val();
         const totalAmount = Number($('.zz-total-value').text().replace('₹', '')) || 0;
+        const retryOrderId = $('#retryOrderId').val() || null;
 
         if (paymentMethod === 'COD' && totalAmount > 1000) {
             Swal.fire({
@@ -1368,7 +1370,8 @@
         const orderData = {
             paymentMethod,
             addressId: selectedAddress,
-            totalAmount
+            totalAmount,
+            retryOrderId // Include retryOrderId if present
         };
 
         try {
@@ -1461,7 +1464,7 @@
                                 await fetch('/update-order-status', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ orderId: result.orderId, status: 'failed' })
+                                    body: JSON.stringify({ orderId: result.orderId, status: 'Payment Failed' })
                                 });
                                 window.location.href = '/payment-failure';
                             } catch (error) {
@@ -1508,6 +1511,7 @@
                 });
             }
         } catch (error) {
+            console.error('Error placing order:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -1518,43 +1522,43 @@
         }
     });
 
-   // Add New Address Form Submission
-const addAdressForm = document.getElementById('addAdress');
-addAdressForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const form = this;
+    // Add New Address Form Submission
+    const addAdressForm = document.getElementById('addAdress');
+    addAdressForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = this;
 
-    const address = {
-        addressType: $(form).find('input[name="addressType"]:checked').val(),
-        name: $(form).find('#name-new').val().trim(),
-        landMark: $(form).find('#landmark-new').val().trim(),
-        city: $(form).find('#city-new').val().trim(),
-        state: $(form).find('#state-new').val().trim(),
-        pincode: $(form).find('#pincode-new').val().trim(),
-        phone: $(form).find('#phone-new').val().trim(),
-        altPhone: $(form).find('#alt-phone-new').val().trim(),
-    };
-    console.log('Submitting address:', address);
+        const address = {
+            addressType: $(form).find('input[name="addressType"]:checked').val(),
+            name: $(form).find('#name-new').val().trim(),
+            landMark: $(form).find('#landmark-new').val().trim(),
+            city: $(form).find('#city-new').val().trim(),
+            state: $(form).find('#state-new').val().trim(),
+            pincode: $(form).find('#pincode-new').val().trim(),
+            phone: $(form).find('#phone-new').val().trim(),
+            altPhone: $(form).find('#alt-phone-new').val().trim(),
+        };
+        console.log('Submitting address:', address);
 
-    const errors = validateAddress(address);
-    if (errors) {
-        displayFormErrors(form, errors);
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Please correct the errors in the form.',
-            confirmButtonColor: '#000000',
-        });
-        return;
-    }
+        const errors = validateAddress(address);
+        if (errors) {
+            displayFormErrors(form, errors);
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please correct the errors in the form.',
+                confirmButtonColor: '#000000',
+            });
+            return;
+        }
 
-    fetch('/save-address', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(address),
-    })
+        fetch('/save-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(address),
+        })
         .then(res => res.json())
         .then(data => {
             console.log('Save address response:', data);
@@ -1631,7 +1635,7 @@ addAdressForm.addEventListener('submit', function (e) {
                 confirmButtonColor: '#000000',
             });
         });
-});
+    });
 
     function validateAddress(address) {
         let errors = {};
@@ -1717,7 +1721,21 @@ addAdressForm.addEventListener('submit', function (e) {
         form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
     }
+
+    // Handle submit-payment redirect (temporary fallback until submitPayment is implemented)
+    if (window.location.pathname === '/submit-payment') {
+        console.warn('submit-payment route accessed, redirecting to orders page');
+        Swal.fire({
+            icon: 'info',
+            title: 'Redirecting',
+            text: 'Payment submission is being processed. Redirecting to orders page.',
+            timer: 1500,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.href = '/orders';
+        });
+    }
 });
-    </script>
+</script>
 </body>
 </html>

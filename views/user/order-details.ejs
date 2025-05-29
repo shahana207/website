@@ -6,128 +6,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fazion - Order Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
-     -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body {
-            background-color: #f5f5f5;
+            background-color: #f9fafb;
             font-family: 'Nunito Sans', sans-serif;
             margin: 0;
+            color: #333;
         }
 
         .zz-container {
             display: flex;
-            padding: 30px 15px;
-            min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+            padding: 40px 20px;
+            min-height: calc(100vh - 140px);
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Sidebar alignment */
         .sidebar {
-            width: 250px;
-            background-color: white;
-            padding: 30px 20px;
-            border-right: 1px solid #eee;
+            width: 280px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             flex-shrink: 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-right: 30px;
         }
 
-        /* Order Details Container */
         .zz-order-details-container {
             flex: 1;
             background: #fff;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-left: 20px;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .zz-order-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
+            gap: 15px;
         }
 
         .zz-order-header h3 {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
             margin: 0;
-            color: #333;
+            color: #1a1a1a;
         }
 
         .zz-order-header p {
-            font-size: 14px;
-            color: #777;
-            margin: 5px 0 0;
+            font-size: 15px;
+            color: #6b7280;
+            margin: 8px 0 0;
         }
 
         .zz-order-status {
             color: #e67e22;
             font-weight: 600;
+            text-transform: capitalize;
         }
 
         .zz-back-btn {
-            color: #007bff;
+            color: #5b86e5;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
             transition: color 0.3s;
         }
 
         .zz-back-btn:hover {
-            color: #0056b3;
+            color: #4a73c8;
             text-decoration: underline;
         }
 
-        .zz-cancel-order-btn {
-            background-color: #e74c3c;
-            color: white;
+        .zz-action-btn {
+            background: linear-gradient(135deg, #5b86e5 0%, #36d1dc 100%);
+            color: #fff;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .zz-cancel-order-btn:hover {
-            background-color: #c0392b;
+        .zz-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91,134,229,0.3);
         }
 
-        .zz-cancel-order-btn:disabled {
-            background-color: #ccc;
+        .zz-action-btn:disabled {
+            background: #d1d5db;
             cursor: not-allowed;
         }
 
-        /* Shipping Address Section */
+        .zz-action-btn.cancel {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .zz-action-btn.cancel:hover {
+            box-shadow: 0 4px 12px rgba(231,76,60,0.3);
+        }
+
+        .zz-action-btn.return {
+            background: linear-gradient(135deg, #f39c12 0%, #e08e0b 100%);
+        }
+
+        .zz-action-btn.return:hover {
+            box-shadow: 0 4px 12px rgba(243,156,18,0.3);
+        }
+
+        .zz-action-btn.retry-payment {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .zz-action-btn.retry-payment:hover {
+            box-shadow: 0 4px 12px rgba(52,152,219,0.3);
+        }
+
+        .zz-download-invoice-btn {
+            background: linear-gradient(135deg, #5b86e5 0%, #36d1dc 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .zz-download-invoice-btn:hover {
+            background: linear-gradient(135deg, #5b86e5 0%, #36d1dc 100%);
+        }
+
         .zz-shipping-address {
             background: #f0f7ff;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
 
         .zz-shipping-address h4 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 12px;
-            color: #333;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .zz-shipping-address p {
-            font-size: 14px;
-            color: #555;
-            margin: 5px 0;
-            line-height: 1.5;
+            font-size: 15px;
+            color: #4b5563;
+            margin: 8px 0;
+            line-height: 1.6;
         }
 
-        /* Order Items Section */
         .zz-order-items-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .zz-order-items-section .header {
@@ -136,34 +180,36 @@
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
 
         .zz-order-items-section h4 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin: 0;
-            color: #333;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .zz-order-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 5px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
             margin-bottom: 15px;
-            background-color: #fafafa;
+            background-color: #fff;
             transition: box-shadow 0.3s;
         }
 
         .zz-order-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .zz-order-item-image {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin-right: 20px;
             flex-shrink: 0;
         }
@@ -172,24 +218,25 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         .zz-order-item-info {
             flex: 1;
+            margin-right: 20px;
         }
 
         .zz-order-item-name {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 6px;
-            color: #333;
+            margin-bottom: 8px;
+            color: #1a1a1a;
         }
 
         .zz-order-item-meta {
-            font-size: 13px;
-            color: #777;
-            line-height: 1.5;
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
         }
 
         .zz-order-item-meta .status-cancelled {
@@ -198,159 +245,146 @@
         }
 
         .zz-order-item-price {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
-            color: #333;
-            margin-top: 6px;
+            color: #1a1a1a;
+            margin-top: 8px;
         }
 
-        .zz-action-btn {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .zz-action-btn:hover {
-            background-color: #c0392b;
-        }
-
-        .zz-action-btn.return {
-            background-color: #f39c12;
-        }
-
-        .zz-action-btn.return:hover {
-            background-color: #e08e0b;
-        }
-
-        /* Order Summary Section */
         .zz-order-summary {
             background: #f0f7ff;
-            padding: 20px;
-            border-radius: 5px;
+            padding: 25px;
+            border-radius: 8px;
         }
 
         .zz-order-summary h4 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #333;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .zz-summary-item {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 12px;
-            color: #555;
+            font-size: 15px;
+            margin-bottom: 15px;
+            color: #4b5563;
         }
 
         .zz-summary-item.total {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            color: #333;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
+            color: #1a1a1a;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
         }
-.zz-download-invoice-btn {
-    background-color: #3498db; /* A professional blue shade */
-    color: rgb(0, 0, 0);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-family: 'Nunito Sans', sans-serif;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    text-decoration: none; /* For the <a> tag */
-    display: inline-block; /* Ensure proper alignment */
-}
 
-.zz-download-invoice-btn:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    transform: scale(1.03); /* Slight scale effect on hover */
-}
-
-.zz-download-invoice-btn:active {
-    transform: scale(0.98); 
-}
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .zz-container {
                 flex-direction: column;
-                padding: 20px 10px;
+                padding: 30px 15px;
             }
 
             .sidebar {
                 width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #eee;
-                padding: 20px;
-                margin-bottom: 20px;
+                margin-right: 0;
+                margin-bottom: 30px;
             }
 
             .zz-order-details-container {
-                margin-left: 0;
-                padding: 15px;
+                padding: 20px;
             }
+        }
 
+        @media (max-width: 768px) {
             .zz-order-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 15px;
             }
 
             .zz-order-items-section .header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
             }
 
             .zz-order-item {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
+                padding: 15px;
             }
 
             .zz-order-item-image {
+                width: 120px;
+                height: 120px;
                 margin-right: 0;
-                width: 100px;
-                height: 100px;
+            }
+
+            .zz-order-item-info {
+                margin-right: 0;
+            }
+
+            .zz-action-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .zz-download-invoice-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .zz-order-header h3 {
+                font-size: 20px;
+            }
+
+            .zz-shipping-address h4,
+            .zz-order-items-section h4,
+            .zz-order-summary h4 {
+                font-size: 16px;
+            }
+
+            .zz-summary-item {
+                font-size: 14px;
+            }
+
+            .zz-summary-item.total {
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container zz-container">
-        <!-- Include Sidebar Partial -->
         <%- include("../partials/user/sidebar", { active: 'orders' }) %>
 
-        <!-- Order Details -->
         <div class="zz-order-details-container">
             <div class="zz-order-header">
-                <div>
-                    <h3>Order Details <%= order.orderId %></h3>
-                    <p>
-                        <span class="zz-order-status"><%= order.status %></span> | 
-                        Order Date: <%= order.createdOn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
-                    </p>
-                </div>
-                <div>
-                    <a href="/order" class="zz-back-btn">Back to Orders</a>
-        <!-- Add Download Invoice Button -->
-        <a href="/download-invoice/<%= order.orderId %>" class="btn btn-outline-primary btn-sm" style="margin-left: 10px;" target="_blank">Download Invoice</a>
-        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
-            <button class="zz-cancel-order-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
+    <div>
+        <h3>Order Details <%= order.orderId %></h3>
+        <p>
+            <span class="zz-order-status" style="color: <%= order.status === 'Payment Failed' ? '#e74c3c' : '#e67e22' %>;"><%= order.status %></span> |
+            Order Date: <%= order.createdOn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/order" class="zz-back-btn" aria-label="Back to orders">Back to Orders</a>
+        <a href="/download-invoice/<%= order.orderId %>" class="zz-download-invoice-btn" target="_blank" aria-label="Download invoice">Download Invoice</a>
+        <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && order.status !== 'Payment Failed') { %>
+            <button class="zz-action-btn cancel zz-cancel-order-btn" data-order-id="<%= order.orderId %>" aria-label="Cancel order">Cancel Order</button>
+        <% } %>
+        <% if (order.status === 'Payment Failed') { %>
+            <a href="/retry-payment/<%= order.orderId %>" class="zz-action-btn retry-payment" aria-label="Retry payment">Retry Payment</a>
         <% } %>
     </div>
 </div>
-
-            <!-- Shipping Address -->
             <div class="zz-shipping-address">
                 <h4><i class="fas fa-map-marker-alt"></i> Shipping Address</h4>
                 <p><%= order.address.name %></p>
@@ -358,22 +392,17 @@
                 <p>Phone: <%= order.address.phone %><%= order.address.altPhone ? ', Alt: ' + order.address.altPhone : '' %></p>
             </div>
 
-            <!-- Order Items -->
             <div class="zz-order-items-section">
                 <div class="header">
                     <h4><i class="fas fa-shopping-bag"></i> Order Items</h4>
                     <div>
                         <% if (order.orderedItems.length >= 2 && order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
-                            <button class="zz-action-btn cancel-items-btn" style="display: none;">Cancel Selected Products</button>
-                            <!-- <button class="zz-action-btn cancel-all-btn" style="margin-left: 10px;">Cancel All Products</button> -->
+                            <button class="zz-action-btn cancel cancel-items-btn" style="display: none;">Cancel Selected Products</button>
                         <% } %>
                     </div>
                 </div>
                 <% order.orderedItems.forEach(item => { %>
                     <div class="zz-order-item">
-                        <!-- <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %> -->
-                            <!-- <input type="checkbox" class="zz-item-checkbox" data-item-id="<%= item._id %>" style="margin-right: 10px;"> -->
-                        <!-- <% } %> -->
                         <div class="zz-order-item-image">
                             <img src="/Uploads/product-images/<%= item.product?.productImage[0] || 'placeholder.jpg' %>" alt="<%= item.product?.productName || 'Product' %>">
                         </div>
@@ -391,155 +420,47 @@
                                     <span class="status-cancelled"> | Status: <%= item.returnStatus %></span>
                                 <% } %>
                             </div>
-                            <div class="zz-order-item-price">₹ <%= (item.price * item.quantity).toFixed(2) %></div>
+                            <div class="zz-order-item-price">₹<%= (item.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></div>
                         </div>
                         <% if (order.status !== 'Delivered' && order.status !== 'Cancelled' && item.returnStatus === 'Not Returned') { %>
-                            <button class="zz-action-btn cancel-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Cancel Product</button>
+                            <button class="zz-action-btn cancel cancel-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>" aria-label="Cancel product">Cancel Product</button>
                         <% } %>
                         <% if (order.status === 'Delivered' && item.returnStatus === 'Not Returned') { %>
-                            <button class="zz-action-btn return return-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>">Return Product</button>
+                            <button class="zz-action-btn return return-item-btn" data-item-id="<%= item._id %>" data-order-id="<%= order.orderId %>" aria-label="Return product">Return Product</button>
                         <% } %>
                     </div>
                 <% }) %>
             </div>
 
-            <!-- Order Summary -->
             <div class="zz-order-summary">
                 <h4><i class="fas fa-file-invoice"></i> Order Summary</h4>
                 <div class="zz-summary-item">
                     <span>Subtotal</span>
-                    <span>₹ <%= order.totalPrice.toFixed(2) %></span>
+                    <span>₹<%= order.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
                 </div>
                 <% if (order.discount > 0) { %>
                     <div class="zz-summary-item">
                         <span>Discount</span>
-                        <span>-₹ <%= order.discount.toFixed(2) %></span>
+                        <span>-₹<%= order.discount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
                     </div>
                 <% } %>
                 <div class="zz-summary-item">
                     <span>Shipping</span>
-                    <span><%= order.shippingCharge ? '₹' + order.shippingCharge.toFixed(2) : 'Free' %></span>
+                    <span><%= order.shippingCharge ? '₹' + order.shippingCharge.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'Free' %></span>
                 </div>
                 <div class="zz-summary-item total">
                     <span>Grand Total</span>
-                    <span>₹ <%= order.finalAmount.toFixed(2) %></span>
+                    <span>₹<%= order.finalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
                 </div>
             </div>
         </div>
     </div>
 
     <%- include("../partials/user/footer") %>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            // Handle checkbox selection to show/hide "Cancel Selected Products" button
-            // $('.zz-item-checkbox').on('change', function() {
-            //     const selectedItems = $('.zz-item-checkbox:checked').length;
-            //     if (selectedItems > 0) {
-            //         $('.cancel-items-btn').show();
-            //     } else {
-            //         $('.cancel-items-btn').hide();
-            //     }
-            // });
-
-            // Handle bulk cancellation of selected items
-            // $('.cancel-items-btn').on('click', function() {
-            //     const selectedItems = $('.zz-item-checkbox:checked').map(function() {
-            //         return $(this).data('item-id');
-            //     }).get();
-
-            //     if (selectedItems.length === 0) {
-            //         Swal.fire('Error', 'Please select at least one item to cancel.', 'error');
-            //         return;
-            //     }
-
-            //     Swal.fire({
-            //         title: 'Cancel Selected Items',
-            //         text: 'Please provide a reason for cancellation:',
-            //         input: 'text',
-            //         showCancelButton: true,
-            //         confirmButtonText: 'Cancel Items',
-            //         cancelButtonText: 'Close',
-            //         preConfirm: (reason) => {
-            //             if (!reason) {
-            //                 Swal.showValidationMessage('Reason is required');
-            //             }
-            //             return reason;
-            //         }
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             const orderId = '<%= order.orderId %>';
-            //             fetch('/cancel-items', {
-            //                 method: 'POST',
-            //                 headers: {
-            //                     'Content-Type': 'application/json'
-            //                 },
-            //                 body: JSON.stringify({ orderId, itemIds: selectedItems, reason: result.value })
-            //             })
-            //             .then(response => response.json())
-            //             .then(data => {
-            //                 if (data.success) {
-            //                     Swal.fire('Cancelled!', data.message, 'success')
-            //                         .then(() => window.location.reload());
-            //                 } else {
-            //                     Swal.fire('Error', data.message, 'error');
-            //                 }
-            //             })
-            //             .catch(() => {
-            //                 Swal.fire('Error', 'Failed to cancel items.', 'error');
-            //             });
-            //         }
-            //     });
-            // });
-
-            // Handle cancellation of all products
-            $('.cancel-all-btn').on('click', function() {
-                const allItems = $('.zz-item-checkbox').map(function() {
-                    return $(this).data('item-id');
-                }).get();
-
-                Swal.fire({
-                    title: 'Cancel All Items',
-                    text: 'Are you sure you want to cancel all items in this order? Please provide a reason:',
-                    input: 'text',
-                    showCancelButton: true,
-                    confirmButtonText: 'Cancel All Items',
-                    cancelButtonText: 'Close',
-                    preConfirm: (reason) => {
-                        if (!reason) {
-                            Swal.showValidationMessage('Reason is required');
-                        }
-                        return reason;
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const orderId = '<%= order.orderId %>';
-                        fetch('/cancel-items', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ orderId, itemIds: allItems, reason: result.value })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Cancelled!', data.message, 'success')
-                                    .then(() => window.location.reload());
-                            } else {
-                                Swal.fire('Error', data.message, 'error');
-                            }
-                        })
-                        .catch(() => {
-                            Swal.fire('Error', 'Failed to cancel all items.', 'error');
-                        });
-                    }
-                });
-            });
-
-            // Handle entire order cancellation
             $('.zz-cancel-order-btn').on('click', function() {
                 const orderId = $(this).data('order-id');
                 Swal.fire({
@@ -559,9 +480,7 @@
                     if (result.isConfirmed) {
                         fetch('/cancel-order', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ orderId, reason: result.value })
                         })
                         .then(response => response.json())
@@ -574,14 +493,12 @@
                             }
                         })
                         .catch(error => {
-                            const message = error.message || 'Failed to cancel order';
-                            Swal.fire('Error', message, 'error');
+                            Swal.fire('Error', error.message || 'Failed to cancel order', 'error');
                         });
                     }
                 });
             });
 
-            // Handle single item cancellation
             $('.cancel-item-btn').on('click', function() {
                 const orderId = $(this).data('order-id');
                 const itemId = $(this).data('item-id');
@@ -602,9 +519,7 @@
                     if (result.isConfirmed) {
                         fetch('/cancel-item', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ orderId, itemId, reason: result.value })
                         })
                         .then(response => response.json())
@@ -623,7 +538,6 @@
                 });
             });
 
-            // Handle item return
             $('.return-item-btn').on('click', function() {
                 const orderId = $(this).data('order-id');
                 const itemId = $(this).data('item-id');
@@ -644,9 +558,7 @@
                     if (result.isConfirmed) {
                         fetch('/return-item', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ orderId, itemId, reason: result.value })
                         })
                         .then(response => response.json())

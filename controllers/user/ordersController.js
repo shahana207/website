@@ -398,6 +398,34 @@ const cancelItems = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Failed to cancel items' });
     }
 };
+
+const retryPayment = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.redirect('/login?error=User not authenticated');
+        }
+
+        const { orderId } = req.params;
+
+        const response = await fetch('/retry-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            return res.redirect(result.redirectUrl);
+        } else {
+            return res.redirect(`/orders?error=${encodeURIComponent(result.message)}`);
+        }
+    } catch (error) {
+        console.error('Error retrying payment:', error);
+        res.redirect('/orders?error=Failed to retry payment');
+    }
+};
 module.exports = {
     loadOrders,
     cancelOrder,
@@ -405,4 +433,5 @@ module.exports = {
     cancelItem,
     returnItem,
     cancelItems,
+    retryPayment,
 };
