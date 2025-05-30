@@ -2,7 +2,7 @@ const Offer = require('../../models/offerSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const Brand = require('../../models/brandSchema');
-
+const mongoose = require("mongoose")
 const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const getAllOffers = async (req, res) => {
@@ -364,7 +364,7 @@ const toggleOffer = async (req, res) => {
     }
 
     console.log('Offer updated:', offer); 
-    res.json({ success: true, message: `Offer ${action}ed successfully` });
+    return res.redirect("/admin/offers")
   } catch (error) {
     console.error('Error toggling offer:', error);
     res.status(500).json({ success: false, message: 'Failed to toggle offer' });

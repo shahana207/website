@@ -84,7 +84,7 @@ const loadCart = async (req, res) => {
                     item.totalPrice = item.productId.salePrice * item.quantity;
                 }
             }
-
+         
             cart.shippingCharge = 50;
             cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
             cart.total = cart.subtotal + cart.shippingCharge;
@@ -97,6 +97,7 @@ const loadCart = async (req, res) => {
             userId,
             profilePicture: userData.profilePicture || null,
         });
+        console.log(cart)
     } catch (error) {
         console.error('Cannot render the cart page:', error);
         res.redirect('/pageNotFound');
@@ -122,7 +123,6 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found or price missing' });
     }
 
-    
     if (quantity > product.quantity) {
       return res.status(400).json({
         success: false,
@@ -137,7 +137,6 @@ const addToCart = async (req, res) => {
 
     const existingItem = cart.items.find(item => item.productId.toString() === id);
     if (existingItem) {
-      
       const newQuantity = existingItem.quantity + quantity;
       if (newQuantity > product.quantity) {
         return res.status(400).json({
@@ -281,7 +280,17 @@ const removeFromCart = async (req, res) => {
     }
   };
   
-  
+  const updateCartsWithSize = async () => {
+    const carts = await Cart.find();
+    for (let cart of carts) {
+        for (let item of cart.items) {
+            if (!item.size) {
+                item.size = null; 
+            }
+        }
+        await cart.save();
+    }
+};
   
 
   module.exports ={
@@ -289,6 +298,7 @@ const removeFromCart = async (req, res) => {
     addToCart,
     updateCart,
     removeFromCart,
+    updateCartsWithSize
 
   }
   

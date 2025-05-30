@@ -151,6 +151,21 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
         
+        .form-control.error {
+            border-color: #ef4444;
+        }
+        
+        .error-text {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .error-text.active {
+            display: block;
+        }
+        
         textarea.form-control {
             min-height: 120px;
             resize: vertical;
@@ -174,6 +189,10 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        .form-select.error {
+            border-color: #ef4444;
         }
         
         .form-row {
@@ -294,53 +313,61 @@
             <form id="offerForm">
                 <div class="form-group">
                     <label for="offerName" class="form-label">Offer Name</label>
-                    <input type="text" id="offerName" class="form-control" placeholder="Enter offer name" required>
+                    <input type="text" id="offerName" class="form-control" placeholder="Enter offer name" >
+                    <span class="error-text" id="offerNameError">Offer name is required</span>
                 </div>
                 
                 <div class="form-group">
                     <label for="description" class="form-label">Description</label>
-                    <textarea id="description" class="form-control" placeholder="Enter offer description" required></textarea>
+                    <textarea id="description" class="form-control" placeholder="Enter offer description"></textarea>
+                    <span class="error-text" id="descriptionError">Description cannot be longer than 500 characters</span>
                 </div>
                 
                 <div class="form-group">
                     <label for="discountType" class="form-label">Discount Type</label>
-                    <select id="discountType" class="form-select" required>
+                    <select id="discountType" class="form-select" >
                         <option value="percentage">Percentage</option>
                     </select>
+                    <span class="error-text" id="discountTypeError">Discount type is required</span>
                 </div>
                 
                 <div class="form-group">
                     <label for="discountAmount" class="form-label">Discount Amount (%)</label>
-                    <input type="number" id="discountAmount" class="form-control" placeholder="Enter discount percentage" min="0" max="100" required>
+                    <input type="number" id="discountAmount" class="form-control" placeholder="Enter discount percentage" min="0" max="100" >
+                    <span class="error-text" id="discountAmountError">Discount amount must be between 0 and 100</span>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="validFrom" class="form-label">Valid From</label>
-                        <input type="date" id="validFrom" class="form-control" required>
+                        <input type="date" id="validFrom" class="form-control" >
+                        <span class="error-text" id="validFromError">Valid from date is required</span>
                     </div>
                     
                     <div class="form-group">
                         <label for="validUntil" class="form-label">Valid Until</label>
-                        <input type="date" id="validUntil" class="form-control" required>
+                        <input type="date" id="validUntil" class="form-control" >
+                        <span class="error-text" id="validUntilError">Valid until date must be after valid from date</span>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="offerType" class="form-label">Offer Type</label>
-                    <select id="offerType" class="form-select" required>
+                    <select id="offerType" class="form-select" >
                         <option value="" disabled selected>-- Select Offer Type --</option>
                         <option value="Products">Products</option>
                         <option value="Category">Category</option>
                         <option value="Brands">Brands</option>
                     </select>
+                    <span class="error-text" id="offerTypeError">Offer type is required</span>
                 </div>
                 
                 <div class="form-group">
                     <label for="applyTo" class="form-label">Apply To</label>
-                    <select id="applyTo" class="form-select" required>
+                    <select id="applyTo" class="form-select" >
                         <option value="" disabled selected>-- Select Item --</option>
                     </select>
+                    <span class="error-text" id="applyToError">Please select an item to apply the offer to</span>
                 </div>
                 
                 <div class="btn-group">
@@ -411,10 +438,94 @@
                 confirmButtonText: 'Yes, go back'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/admin/offerss';
+                    window.location.href = '/admin/offers';
                 }
             });
         });
+        
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            const offerName = document.getElementById('offerName');
+            const description = document.getElementById('description');
+            const discountType = document.getElementById('discountType');
+            const discountAmount = document.getElementById('discountAmount');
+            const validFrom = document.getElementById('validFrom');
+            const validUntil = document.getElementById('validUntil');
+            const offerType = document.getElementById('offerType');
+            const applyTo = document.getElementById('applyTo');
+            
+            // Reset error states
+            document.querySelectorAll('.form-control, .form-select').forEach(input => {
+                input.classList.remove('error');
+            });
+            document.querySelectorAll('.error-text').forEach(error => {
+                error.classList.remove('active');
+            });
+            
+            // Validate Offer Name
+            if (!offerName.value.trim()) {
+                offerName.classList.add('error');
+                document.getElementById('offerNameError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Description (optional, max 500 characters)
+            if (description.value.length > 500) {
+                description.classList.add('error');
+                document.getElementById('descriptionError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Discount Type
+            if (!discountType.value) {
+                discountType.classList.add('error');
+                document.getElementById('discountTypeError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Discount Amount
+            const discountValue = parseFloat(discountAmount.value);
+            if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
+                discountAmount.classList.add('error');
+                document.getElementById('discountAmountError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Valid From
+            if (!validFrom.value) {
+                validFrom.classList.add('error');
+                document.getElementById('validFromError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Valid Until and ensure it's after Valid From
+            if (!validUntil.value) {
+                validUntil.classList.add('error');
+                document.getElementById('validUntilError').classList.add('active');
+                isValid = false;
+            } else if (validFrom.value && validUntil.value && new Date(validUntil.value) < new Date(validFrom.value)) {
+                validUntil.classList.add('error');
+                document.getElementById('validUntilError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Offer Type
+            if (!offerType.value) {
+                offerType.classList.add('error');
+                document.getElementById('offerTypeError').classList.add('active');
+                isValid = false;
+            }
+            
+            // Validate Apply To
+            if (!applyTo.value) {
+                applyTo.classList.add('error');
+                document.getElementById('applyToError').classList.add('active');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
         
         // Dynamic population of Apply To dropdown
         document.getElementById('offerType').addEventListener('change', async (e) => {
@@ -458,6 +569,17 @@
         // Form submission with AJAX
         document.getElementById('offerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Validate form
+            if (!validateForm()) {
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: 'Please correct the errors in the form',
+                    icon: 'error',
+                    confirmButtonColor: '#6366f1'
+                });
+                return;
+            }
             
             const formData = {
                 offerName: document.getElementById('offerName').value,

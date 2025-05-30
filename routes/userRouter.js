@@ -13,6 +13,7 @@ const cartController = require("../controllers/user/cartController");
 const checkoutController = require('../controllers/user/checkoutController');
 const ordersController = require('../controllers/user/ordersController');
 const wishlistController=require("../controllers/user/wishlistController");
+const couponController=require("../controllers/user/couponController");
 const { route } = require("./adminRouter");
 
 
@@ -66,6 +67,10 @@ router.get("/shop",userAuth,userController.loadShoppingPage);
 
 router.get("/referral", userAuth, userController.referralPage);
 
+router.get('/aboutUs', userAuth,userController. getAboutUs);
+
+router.get('/contactUs',userAuth,userController. getContactUs);
+
 
 
 
@@ -99,6 +104,8 @@ router.get("/userProfile",userAuth,profileController.userProfile);
 router.get("/getEditProfile",userAuth,profileController.getEditProfile);
 
 router.post('/updateProfile', uploadProfilePicture.single('profilePicture'), profileController.updateProfile);
+
+router.patch('/deleteProfilePicture', userAuth, profileController.deleteProfilePicture);
 
 router.get("/change-email",userAuth,profileController.changeEmail);
 
@@ -145,6 +152,7 @@ router.put('/update-cart',userAuth,cartController.updateCart);
 router.patch('/removeFromCart/:productId', userAuth,cartController.removeFromCart);
 
 
+
 //checkout management
 
 router.get('/checkout', userAuth, checkoutController.loadCheckout);
@@ -169,6 +177,10 @@ router.post('/remove-coupon', checkoutController.removeCoupon);
 
 router.post('/update-order-status', checkoutController.updateOrderStatus);
 
+router.post('/retry-payment', checkoutController.retryPayment);
+
+router.get('/submit-payment', checkoutController.submitPayment);
+
 // //order management
 
 router.get("/order",userAuth,ordersController.loadOrders);
@@ -181,12 +193,15 @@ router.post('/cancel-item', userAuth, ordersController.cancelItem);
 
 router.post('/return-item', userAuth, ordersController.returnItem);
 
+router.get('/retry-payment/:orderId', ordersController.retryPayment);
+// router.get('/retry-payment/:orderId', ordersController.retryPayment);
+
 
 //wishlist management
 
 router.get("/wishlist",userAuth,wishlistController.loadWishlist);
 
-router.post("/addToWishlist",userAuth,wishlistController.addToWishList);
+router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
 
 router.get("/getWishlist", userAuth, wishlistController.getWishlist);
 
@@ -194,7 +209,7 @@ router.post("/wishlist/remove", userAuth, wishlistController.removeFromWishlist)
 
 //
 
-
+  
 
 
 

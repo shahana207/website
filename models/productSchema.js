@@ -52,10 +52,18 @@ const productSchema = new mongoose.Schema({
         required: true,
         validate: [arr => arr.length > 0, 'At least one image is required']
     },
-    sizes: { 
-        type: [String],
-        default: []
-      },
+  sizeVariants: [{
+        size: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 0
+        }
+    }],
     isBlocked: {
         type: Boolean,
         default: false

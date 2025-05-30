@@ -531,6 +531,7 @@ const postAddAddress = async (req, res) => {
 
 const checkoutAddAddress = async (req, res) => {
     try {
+        console.log('hsdakfjdsafidosaufdisafuo')
       const userId = req.session.user;
   
       if (!userId) {
@@ -716,7 +717,7 @@ const getWalletPage = async (req, res , next) => {
         
         const { page = 1, limit = 5 } = req.query;
         
-        // Find the wallet
+        
         let wallet = await Wallet.findOne({userId: user._id});
         
         if (!wallet) {
@@ -752,6 +753,35 @@ const getWalletPage = async (req, res , next) => {
         next(error);
     }
 };
+const deleteProfilePicture = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'User not authenticated' });
+        }
+
+        const user = await User.findById(userId).select('profilePicture');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        if (user.profilePicture) {
+            const oldPicturePath = path.join(__dirname, '..', '..', 'public', user.profilePicture);
+            try {
+                await fs.unlink(oldPicturePath);
+            } catch (err) {
+                console.warn(`Failed to delete profile picture file: ${oldPicturePath}`, err);
+            }
+
+            await User.findByIdAndUpdate(userId, { $unset: { profilePicture: '' } }, { new: true });
+        }
+
+        return res.status(200).json({ success: true, message: 'Profile picture deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting profile picture:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
 
 
 
@@ -766,7 +796,7 @@ module.exports = {
     userProfile,
     getEditProfile,
     updateProfile,
-    // deleteProfilePicture,
+    deleteProfilePicture,
     changeEmail,
     changeEmailValid,
     verifyEmailOtp,

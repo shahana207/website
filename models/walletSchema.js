@@ -32,7 +32,7 @@ const walletSchema = new Schema({
         },
         method: {
             type: String,
-            enum: ["Razorpay", "Cashback", "Refund","OrderPayment","Referral"],
+            enum: ["Razorpay", "Cashback", "Refund","OrderPayment","Referral","Signup"],
             required: true
         },
         status: {

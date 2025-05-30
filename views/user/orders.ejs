@@ -1,473 +1,512 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Fazion Order History" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fazion Order History">
     <title>Fazion - Order History</title>
-
-    <!-- External CSS dependencies -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css" />
-    <link rel="stylesheet" href="/css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="/css/style.css" type="text/css" />
-    <!-- SweetAlert2 CDN -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-      /* Scoped styles */
-      .fazion-orders-content {
-        color: #333;
-        line-height: 1.6;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
+        * {
+            box-sizing: border-box;
+        }
 
-      body {
-        background-color: #f5f5f5;
-      }
+        body {
+            background-color: #f9fafb;
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
 
-      .fazion-profile-container {
-        display: flex;
-        max-width: 1200px;
-        margin: 30px auto;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-      }
-
-      .fazion-content {
-        flex: 1;
-        padding: 30px;
-        background-color: white;
-      }
-
-      .fazion-header {
-        padding: 20px 0;
-        border-bottom: 1px solid #e0e0e0;
-        text-align: center;
-      }
-
-      .fazion-header h1 {
-        color: #444;
-        font-size: 30px;
-        font-weight: 600;
-        margin: 0;
-      }
-
-      .fazion-order-history {
-        margin-top: 30px;
-      }
-
-      .fazion-order-card {
-        background: #fff;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.2s;
-      }
-
-      .fazion-order-card:hover {
-        transform: translateY(-5px);
-      }
-
-      .fazion-order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .fazion-order-id {
-        font-size: 18px;
-        font-weight: 600;
-        color: #444;
-      }
-
-      .fazion-order-date {
-        color: #777;
-        font-size: 16px;
-      }
-
-      .fazion-status-badgeeeee {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 8px 20px;
-        border-radius: 0; /* Square shape */
-        width: 115px;
-        font-size: 13px;
-        font-weight: 600;
-        text-align: center;
-        text-transform: uppercase;
-        cursor: pointer;
-        z-index: 5;
-
-      }
-
-      .fazion-status-processing {
-        background-color: #38f27f; /* Orange */
-        color: #333;
-      }
-
-      .fazion-status-delivered {
-        background-color: #e36724; /* Green */
-        color: white;
-      }
-
-      .fazion-status-cancelled {
-        background-color: #dc3545; /* Red */
-        color: white;
-      }
-
-      .fazion-status-returned {
-        background-color: #20c997; /* Teal */
-        color: white;
-      }
-
-      .fazion-order-item {
-        display: flex;
-        align-items: center;
-        padding-bottom: 15px;
-      }
-
-      .fazion-product-image {
-        width: 80px;
-        height: 100px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-right: 20px;
-      }
-
-      .fazion-product-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .fazion-product-details {
-        flex: 1;
-      }
-
-      .fazion-product-name {
-        font-size: 18px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 5px;
-      }
-
-      .fazion-product-qty {
-        font-size: 14px;
-        color: #777;
-        margin-bottom: 5px;
-      }
-
-      .fazion-product-price {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .fazion-order-total {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 15px;
-        border-top: 1px solid #e0e0e0;
-      }
-
-      .fazion-total-label {
-        font-size: 16px;
-        font-weight: 600;
-        color: #444;
-      }
-
-      .fazion-total-amount {
-        font-size: 20px;
-        font-weight: 700;
-        color: #333;
-      }
-
-      .fazion-view-details {
-        background-color: #007bff; /* Blue */
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 0; /* Square shape */
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      .fazion-view-details:hover {
-        background-color: #0056b3; /* Darker blue */
-      }
-
-      .fazion-no-orders {
-        text-align: center;
-        color: #777;
-        font-size: 18px;
-        margin-top: 40px;
-      }
-
-      /* Pagination Styles */
-      .fazion-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 30px;
-        gap: 10px;
-      }
-
-      .fazion-pagination a {
-        padding: 8px 16px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        text-decoration: none;
-        color: #000000;
-        font-size: 14px;
-        font-weight: 600;
-        transition: background-color 0.3s;
-      }
-
-      .fazion-pagination a:hover {
-        background-color: #f0f0f0;
-      }
-
-      .fazion-pagination a.fazion-active {
-        background-color: #010101;
-        color: white;
-        border-color: #007bff;
-      }
-
-      .fazion-pagination a.fazion-disabled {
-        color: #ccc;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      .fazion-order-item-price .fazion-original-price {
-        text-decoration: line-through;
-        color: #777;
-        font-weight: 400;
-        margin-right: 8px;
-      }
-
-      .fazion-order-item-price .fazion-offer-price {
-        color: #e74c3c;
-        font-weight: 700;
-      }
-
-      .fazion-order-item-meta .fazion-offer-info {
-        color: #27ae60;
-        font-size: 12px;
-      }
-
-      @media (max-width: 768px) {
         .fazion-profile-container {
-          flex-direction: column;
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 15px;
+            overflow-x: auto;
+            gap: 20px;
         }
 
         .fazion-content {
-          padding: 20px;
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .fazion-header {
+            text-align: left;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .fazion-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .fazion-order-history {
+            margin-top: 20px;
+        }
+
+        .fazion-order-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .fazion-order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
         .fazion-order-header {
-          flex-direction: column;
-          align-items: flex-start;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .fazion-order-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
         }
 
         .fazion-order-date {
-          margin-top: 5px;
+            font-size: 14px;
+            color: #6b7280;
         }
 
         .fazion-status-badge {
-          position: static;
-          margin-top: 10px;
-          display: inline-block;
+            display: inline-block !important;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            color: #fff !important;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        .fazion-status-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .fazion-order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .fazion-product-image {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .fazion-product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .fazion-product-details {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .fazion-product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .fazion-product-qty {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .fazion-product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
         }
 
         .fazion-order-total {
-          flex-direction: column;
-          align-items: flex-start;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 0;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+        }
+
+        .fazion-total-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            flex: 1;
+        }
+
+        .fazion-total-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
         }
 
         .fazion-view-details {
-          margin-top: 10px;
-          width: 100%;
-          text-align: center;
+            display: inline-block !important;
+            background: linear-gradient(135deg, #000000 0%, #5f6060 100%) !important;
+            color: #fff !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            min-width: 120px !important;
+            text-align: center !important;
+            z-index: 10 !important;
+        }
+
+        .fazion-view-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91,134,229,0.3);
+        }
+
+        .fazion-no-orders {
+            text-align: center;
+            color: #6b7280;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 40px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .fazion-pagination {
-          flex-wrap: wrap;
-          gap: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .fazion-pagination a {
-          padding: 6px 12px;
-          font-size: 12px;
+            padding: 10px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #1a1a1a;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
         }
-      }
+
+        .fazion-pagination a:hover {
+            background-color: #f0f7ff;
+            transform: translateY(-2px);
+        }
+
+        .fazion-pagination a.fazion-active {
+            background: linear-gradient(135deg, #000000 0%, #5f6060 100%);
+            color: #fff;
+            border: none;
+        }
+
+        .fazion-pagination a.fazion-disabled {
+            color: #d1d5db;
+            border-color: #d1d5db;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 1200px) {
+            .fazion-profile-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .fazion-content {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .fazion-header h1 {
+                font-size: 22px;
+            }
+
+            .fazion-order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .fazion-order-id {
+                font-size: 16px;
+            }
+
+            .fazion-order-date {
+                font-size: 13px;
+            }
+
+            .fazion-status-badge {
+                margin: 10px 0;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .fazion-order-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .fazion-product-image {
+                width: 80px;
+                height: 80px;
+                margin-right: 0;
+            }
+
+            .fazion-product-details {
+                min-width: 100%;
+            }
+
+            .fazion-order-total {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .fazion-total-label {
+                text-align: left;
+            }
+
+            .fazion-view-details {
+                width: 100% !important;
+                min-width: unset !important;
+                padding: 8px 16px !important;
+            }
+
+            .fazion-pagination a {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .fazion-order-card {
+                padding: 15px;
+            }
+
+            .fazion-product-name,
+            .fazion-product-price {
+                font-size: 15px;
+            }
+
+            .fazion-product-qty {
+                font-size: 13px;
+            }
+
+            .fazion-total-label,
+            .fazion-total-amount {
+                font-size: 15px;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <%- include("../partials/user/header") %>
 
     <div class="fazion-profile-container">
-      <%- include("../partials/user/sidebar", { active: 'orders' }) %>
+        <%- include("../partials/user/sidebar", { active: 'orders' }) %>
 
-      <div class="fazion-content">
-        <div class="fazion-header">
-          <h1>Your Order History</h1>
-        </div>
-
-        <div class="fazion-order-history fazion-orders-content">
-          <% if (orders && orders.length > 0) { %>
-            <% orders.forEach(order => { %>
-              <div class="fazion-order-card">
-                <div 
-                  class="fazion-status-badge"
-                  data-status="<%= String(order.status || 'Unknown') %>"
-                >
-                  ORDER STATUS : <%= order.status.toUpperCase() || 'Unknown' %>
-                </div>
-
-                <div class="fazion-order-header">
-                  <div class="fazion-order-id">Order #<%= String(order.orderId || 'Unknown') %></div>
-                  <div class="fazion-order-date">
-                    <% 
-                      let orderDate = 'Date not available'; 
-                      if (order.createdOn) {
-                        try {
-                          const date = new Date(order.createdOn);
-                          if (!isNaN(date.getTime())) {
-                            orderDate = date.toLocaleDateString('en-GB');
-                          }
-                        } catch (e) {
-                          console.error('Invalid date format for order.createdOn:', order.createdOn);
-                        }
-                      }
-                    %>
-                    <%= orderDate %>
-                  </div>
-                </div>
-
-                <% order.orderedItems.forEach(item => { %>
-                  <div class="fazion-order-item">
-                    <div class="fazion-product-image">
-                      <img 
-                        src="/Uploads/product-images/<%= String(item.product?.productImage?.[0] || '/images/placeholder.jpg') %>" 
-                        alt="<%= String(item.product?.productName || 'Product') %>" 
-                      />
-                    </div>
-                    <div class="fazion-product-details">
-                      <div class="fazion-product-name">
-                        <%= String(item.product?.productName || 'Product Name Unavailable') %>
-                      </div>
-                      <div class="fazion-product-qty">Qty: <%= item.quantity || 1 %></div>
-                      <div class="fazion-product-price">₹<%= item.price ? item.price.toFixed(2) : '0.00' %></div>
-                    </div>
-                  </div>
-                <% }) %>
-
-                <div class="fazion-order-total">
-                  <div class="fazion-total-label">
-                    Total: <span class="fazion-total-amount">₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></span>
-                  </div>
-                  <button class="fazion-view-details" data-order-id="<%= String(order.orderId || 'Unknown') %>">
-                    View Details
-                  </button>
-                  <a href=""></a>
-                </div>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <div class="fazion-no-orders">No orders found.</div>
-          <% } %>
-          <div class="fazion-order-item-meta"></div>
-
-          <!-- Pagination Controls -->
-          <% if (totalPages > 1) { %>
-            <div class="fazion-pagination">
-              <% if (currentPage > 1) { %>
-                <a href="?page=<%= currentPage - 1 %>">Previous</a>
-              <% } else { %>
-                <a class="fazion-disabled">Previous</a>
-              <% } %>
-              <% for (let i = 1; i <= totalPages; i++) { %>
-                <a href="?page=<%= i %>" class="<%= currentPage === i ? 'fazion-active' : '' %>"><%= i %></a>
-              <% } %>
-              <% if (currentPage < totalPages) { %>
-                <a href="?page=<%= currentPage + 1 %>">Next</a>
-              <% } else { %>
-                <a class="fazion-disabled">Next</a>
-              <% } %>
+        <div class="fazion-content">
+            <div class="fazion-header">
+                <h1>Your Order History</h1>
             </div>
-          <% } %>
+
+            <div class="fazion-order-history">
+                <% if (!orders || !Array.isArray(orders) || orders.length === 0) { %>
+                    <div class="fazion-no-orders">
+                        No orders found. Start shopping to see your orders here!
+                        <script>
+                            console.log('No orders available:', <%- JSON.stringify(orders || 'null') %>);
+                        </script>
+                    </div>
+                <% } else { %>
+                    <% orders.forEach(order => { %>
+                       <div class="fazion-order-card">
+    <div 
+        class="fazion-status-badge"
+        style="background-color: <%= order.status === 'Processing' ? '#f39c12' : order.status === 'Delivered' ? '#27ae60' : order.status === 'Cancelled' ? '#e74c3c' : order.status === 'Returned' ? '#3498db' : order.status === 'Payment Failed' ? '#e74c3c' : '#6b7280' %>;"
+        data-status="<%= order.status || 'Unknown' %>"
+        aria-label="Order status: <%= order.status || 'Unknown' %>"
+    >
+        <%= (order.status || 'Unknown').toUpperCase() %>
+    </div>
+
+    <div class="fazion-order-header">
+        <div class="fazion-order-id">Order #<%= order.orderId || 'N/A' %></div>
+        <div class="fazion-order-date">
+            <% 
+                let orderDate = 'Date not available'; 
+                if (order.createdOn) {
+                    try {
+                        const date = new Date(order.createdOn);
+                        if (!isNaN(date.getTime())) {
+                            orderDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        }
+                    } catch (e) {
+                        console.error('Invalid date format for order.createdOn:', order.createdOn);
+                    }
+                }
+            %>
+            <%= orderDate %>
         </div>
-      </div>
+    </div>
+
+    <% if (order.orderedItems && Array.isArray(order.orderedItems)) { %>
+        <% order.orderedItems.forEach(item => { %>
+            <div class="fazion-order-item">
+                <div class="fazion-product-image">
+                    <img 
+                        src="/Uploads/product-images/<%= item.product?.productImage?.[0] || 'placeholder.jpg' %>" 
+                        alt="<%= item.product?.productName || 'Product' %>"
+                    >
+                </div>
+                <div class="fazion-product-details">
+                    <div class="fazion-product-name"><%= item.product?.productName || 'Product Name Unavailable' %></div>
+                    <div class="fazion-product-qty">Qty: <%= item.quantity || 1 %></div>
+                    <div class="fazion-product-price">₹<%= item.price ? item.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00' %></div>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <div class="fazion-no-orders">No items found in this order.</div>
+    <% } %>
+
+    <div class="fazion-order-total">
+        <div class="fazion-total-label">
+            Total: <span class="fazion-total-amount">₹<%= order.finalAmount ? order.finalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00' %></span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="fazion-view-details" data-order-id="<%= order.orderId || 'N/A' %>" aria-label="View details for order <%= order.orderId || 'N/A' %>">
+                View Details
+            </button>
+            <% if (order.status === 'Payment Failed') { %>
+                <a href="/retry-payment/<%= order.orderId %>" class="fazion-view-details" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" aria-label="Retry payment for order <%= order.orderId %>">
+                    Retry Payment
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+                    <% }) %>
+                <% } %>
+
+                <% if (totalPages > 1) { %>
+                    <div class="fazion-pagination">
+                        <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage - 1 %>" aria-label="Previous page">Previous</a>
+                        <% } else { %>
+                            <a class="fazion-disabled" aria-disabled="true">Previous</a>
+                        <% } %>
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?page=<%= i %>" class="<%= currentPage === i ? 'fazion-active' : '' %>" aria-label="Page <%= i %>"><%= i %></a>
+                        <% } %>
+                        <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %>" aria-label="Next page">Next</a>
+                        <% } else { %>
+                            <a class="fazion-disabled" aria-disabled="true">Next</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
     </div>
 
     <%- include("../partials/user/footer") %>
 
-    <!-- External JS dependencies -->
-    <script src="/js/jquery-3.3.1.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/jquery.nice-select.min.js"></script>
-    <script src="/js/jquery.nicescroll.min.js"></script>
-    <script src="/js/jquery.magnific-popup.min.js"></script>
-    <script src="/js/jquery.countdown.min.js"></script>
-    <script src="/js/jquery.slicknav.js"></script>
-    <script src="/js/mixitup.min.js"></script>
-    <script src="/js/owl.carousel.min.js"></script>
-    <script src="/js/main.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      // View Details Functionality
-      document.querySelectorAll(".fazion-view-details").forEach((button) => {
-        button.addEventListener("click", function () {
-          const orderId = this.getAttribute("data-order-id");
-          console.log("Viewing details for order:", orderId);
-          window.location.href = `/order-details/${orderId}`;
-        });
-      });
+        $(document).ready(function() {
+            console.log('Page loaded at 02:05 PM IST, May 28, 2025');
+            console.log('Orders:', <%- JSON.stringify(orders || 'null') %>);
+            const viewDetailsButtons = $('.fazion-view-details');
+            console.log('View Details buttons found:', viewDetailsButtons.length);
+            const statusBadges = $('.fazion-status-badge');
+            console.log('Status badges found:', statusBadges.length);
 
-      // Show Status Functionality
-      async function showStatus(status) {
-        await Swal.fire({
-          icon: "info",
-          title: "Order Status",
-          text: `The status of this order is: ${status}`,
-          confirmButtonText: "OK",
-          confirmButtonColor: "#007bff",
-        });
-      }
+            if (viewDetailsButtons.length === 0) {
+                console.warn('No View Details buttons found. Check orders data.');
+            }
 
-      // Add event listeners for status badges
-      document.querySelectorAll(".fazion-status-badge").forEach((badge) => {
-        badge.addEventListener("click", function () {
-          const status = this.getAttribute("data-status");
-          showStatus(status);
+            viewDetailsButtons.on('click', function() {
+                const orderId = $(this).data('order-id');
+                console.log('Clicked View Details for orderId:', orderId);
+                if (!orderId || orderId === 'N/A') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Invalid order ID. Please try again.',
+                        confirmButtonColor: '#5b86e5'
+                    });
+                    return;
+                }
+                window.location.href = `/order-details/${orderId}`;
+            });
+
+            statusBadges.on('click', function() {
+                const status = $(this).data('status') || 'Unknown';
+                console.log('Showing status:', status);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Order Status',
+                    text: `The status of this order is: ${status}`,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#5b86e5'
+                });
+            });
         });
-      });
     </script>
-  </body>
+</body>
 </html>

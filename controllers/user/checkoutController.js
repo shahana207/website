@@ -30,6 +30,10 @@ const loadCheckout = async (req, res) => {
         const user = await User.findById(userId).select('name firstName lastName email phone addresses profilePicture');
         let cart = await Cart.findOne({ userId }).populate('items.productId');
 
+        
+        const wallet = await Wallet.findOne({ userId });
+        const walletBalance = wallet ? wallet.balance : 0;
+
         const addressDoc = await Address.findOne({ userId });
         const addresses = addressDoc && addressDoc.address ? addressDoc.address : [];
 
@@ -47,6 +51,7 @@ const loadCheckout = async (req, res) => {
             cart,
             userId,
             addresses,
+            walletBalance, 
             profilePicture: user.profilePicture || null,
         });
     } catch (error) {
@@ -57,14 +62,35 @@ const loadCheckout = async (req, res) => {
 
 const saveAddress = async (req, res) => {
     try {
-        const userId = req.session.user;
+      
+        console.log('Received saveAddress request:', {
+            body: req.body,
+            sessionUser: req.session.user,
+        });
+
+       
+        let userId = req.session.user;
         if (!userId) {
-            return res.redirect('/login'); 
+            console.log('User not authenticated in saveAddress');
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login',
+            });
+        }
+
+        
+        if (typeof userId === 'object' && userId._id) {
+            userId = userId._id;
+            console.log('Extracted userId from object:', userId);
         }
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
-            req.flash('error', 'Invalid user ID');
-            return res.redirect('/checkout');
+            console.log('Invalid userId format:', userId);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid user ID format',
+            });
         }
 
         const address = {
@@ -77,29 +103,59 @@ const saveAddress = async (req, res) => {
             phone: req.body.phone,
             altPhone: req.body.altPhone || '',
         };
+        console.log('Constructed address object:', address);
 
+      
         const errors = validateAddress(address);
-        if (Object.keys(errors).length > 0) {
-            req.flash('error', Object.values(errors)[0]);
-            return res.redirect('/checkout');
+        if (errors && Object.keys(errors).length > 0) {
+            console.log('Address validation failed:', errors);
+            return res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                errors,
+            });
         }
 
+        
         let addressDoc = await Address.findOne({ userId });
+        console.log('Found address document:', addressDoc);
+
         if (!addressDoc) {
+            console.log('No address document found, creating new one for userId:', userId);
             addressDoc = new Address({ userId, address: [] });
         }
 
         addressDoc.address.push(address);
         await addressDoc.save();
-        req.flash('success', 'Address saved successfully');
+        console.log('Saved address document:', addressDoc);
 
-        return res.redirect('/checkout');
+        
+        const newAddress = addressDoc.address[addressDoc.address.length - 1];
+
+        return res.status(200).json({
+            success: true,
+            message: 'Address created successfully',
+            address: {
+                _id: newAddress._id || Date.now(),
+                addressType: newAddress.addressType,
+                name: newAddress.name,
+                city: newAddress.city,
+                landMark: newAddress.landMark,
+                state: newAddress.state,
+                pincode: newAddress.pincode,
+                phone: newAddress.phone,
+                altPhone: newAddress.altPhone,
+            },
+        });
     } catch (error) {
-        console.error('Cannot save address:', error);
-        req.flash('error', 'Failed to save address');
-        return res.redirect('/checkout');
+        console.error('Error in saveAddress:', error.message, error.stack);
+        return res.status(500).json({
+            success: false,
+            message: `Failed to save address: ${error.message}`,
+        });
     }
 };
+
 
 const placeOrder = async (req, res) => {
     try {
@@ -145,7 +201,7 @@ const placeOrder = async (req, res) => {
         const orderedItems = cart.items.map(item => ({
             product: item.productId._id,
             quantity: item.quantity,
-            price: item.totalPrice/item.quantity,
+            price: item.totalPrice / item.quantity,
         }));
 
         if (isNaN(totalPrice) || totalPrice <= 0) {
@@ -163,25 +219,24 @@ const placeOrder = async (req, res) => {
             orderedItems,
             totalPrice,
             discount,
-            shippingCharge: shippingFee,
+            shippingFee,
             finalAmount,
             address: deliveryAddress,
             paymentMethod,
             invoiceDate: new Date(),
-            status: 'pending', 
+            status: 'pending',
             createdOn: new Date(),
             couponApplied: cart.couponApplied,
         });
 
         if (paymentMethod === 'Online') {
             const options = {
-                amount: finalAmount * 100, 
+                amount: finalAmount * 100,
                 currency: 'INR',
                 receipt: `receipt_${newOrder._id}`,
             };
             const razorpayOrder = await razorpay.orders.create(options);
-            
-            
+
             await newOrder.save();
 
             return res.json({
@@ -196,7 +251,6 @@ const placeOrder = async (req, res) => {
             });
         }
 
-      
         if (paymentMethod === 'Wallet') {
             const wallet = await Wallet.findOne({ userId });
             if (!wallet || wallet.balance < finalAmount) {
@@ -215,11 +269,9 @@ const placeOrder = async (req, res) => {
             await wallet.save();
         }
 
-       
         newOrder.status = 'processing';
         await newOrder.save();
 
-       
         for (const item of cart.items) {
             const product = await Product.findById(item.productId._id);
             if (product) {
@@ -247,7 +299,6 @@ const verifyPayment = async (req, res) => {
             return res.status(401).json({ success: false, message: "User not authenticated" });
         }
 
-       
         const body = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -255,11 +306,10 @@ const verifyPayment = async (req, res) => {
             .digest('hex');
 
         if (expectedSignature !== razorpay_signature) {
-           
-            const order = await Order.findByIdAndUpdate(orderId, { status: 'failed' }, { new: true })
+            const order = await Order.findByIdAndUpdate(orderId, { status: 'Payment Failed' }, { new: true })
                 .populate('orderedItems.product', 'productName salePrice images')
                 .populate('user', 'firstName lastName email');
-            req.session.orderId = order.orderId; 
+            req.session.orderId = order.orderId;
             return res.json({ success: false, message: "Invalid payment signature", redirectUrl: "/payment-failure" });
         }
 
@@ -271,7 +321,6 @@ const verifyPayment = async (req, res) => {
         order.status = 'processing';
         await order.save();
 
-       
         const wallet = await Wallet.findOne({ userId });
         if (wallet) {
             wallet.transactions.push({
@@ -286,10 +335,8 @@ const verifyPayment = async (req, res) => {
             await wallet.save();
         }
 
-       
         await Cart.deleteOne({ userId });
 
-       
         for (const item of order.orderedItems) {
             const product = await Product.findById(item.product);
             if (product) {
@@ -303,11 +350,10 @@ const verifyPayment = async (req, res) => {
         return res.json({ success: true, message: "Payment verified successfully", redirectUrl: "/order-success" });
     } catch (error) {
         console.error("Error in verifyPayment:", error);
-       
-        const order = await Order.findByIdAndUpdate(req.body.orderId, { status: 'failed' }, { new: true })
+        const order = await Order.findByIdAndUpdate(req.body.orderId, { status: 'Payment Failed' }, { new: true })
             .populate('orderedItems.product', 'productName salePrice images')
             .populate('user', 'firstName lastName email');
-        req.session.orderId = order.orderId; 
+        req.session.orderId = order.orderId;
         return res.json({ success: false, message: "Payment verification failed", redirectUrl: "/payment-failure" });
     }
 };
@@ -364,7 +410,12 @@ const paymentFailure = async (req, res) => {
             return res.redirect('/orders?error=Order not found');
         }
 
-        req.session.orderId;
+        // Update order status to Payment Failed
+        order.status = 'Payment Failed';
+        await order.save();
+
+        // Clear orderId from session
+        delete req.session.orderId;
 
         res.render('payment-failure', {
             order,
@@ -383,6 +434,7 @@ const downloadInvoice = async (req, res) => {
 
     try {
         if (!userId) {
+            console.log('No user in session');
             return res.status(401).json({ message: 'User not authenticated' });
         }
 
@@ -391,12 +443,11 @@ const downloadInvoice = async (req, res) => {
             .populate('user', 'firstName lastName email');
 
         if (!order) {
+            console.log(`Order not found for orderId: ${orderId}`);
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        if (order.user._id.toString() !== userId.toString()) {
-            return res.status(403).json({ message: 'Unauthorized access to this order' });
-        }
+       
 
         const invoiceData = {
             orderId: order.orderId,
@@ -468,112 +519,155 @@ const downloadInvoice = async (req, res) => {
 
 const getAvailableCoupons = async (req, res) => {
     try {
-        const userId = req.session.user;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "User not authenticated" });
-        }
-
-        const cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.status(404).json({ success: false, message: "Cart not found" });
-        }
-
-        const subtotal = cart.subtotal || 0;
-        const currentDate = new Date();
         const coupons = await Coupon.find({
             status: 'Active',
-            startDate: { $lte: currentDate },
-            endDate: { $gte: currentDate },
-            minPurchase: { $lte: subtotal },
+            endDate: { $gte: new Date() },
         });
-
-        return res.json({ success: true, coupons });
+        console.log('Fetched coupons:', coupons);
+        if (!coupons || coupons.length === 0) {
+            return res.json({
+                success: true,
+                coupons: [],
+                message: 'No active coupons available',
+            });
+        }
+        res.json({
+            success: true,
+            coupons,
+        });
     } catch (error) {
         console.error('Error fetching available coupons:', error);
-        return res.status(500).json({ success: false, message: "Error fetching coupons" });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch coupons',
+        });
     }
 };
 
 const applyCoupon = async (req, res) => {
     try {
         const { couponCode } = req.body;
+        console.log('Applying coupon:', couponCode);
+        console.log('Logged-in user ID:', req.session.user); 
+        console.log('Request user ID:', req.user ? req.user._id.toString() : 'undefined'); 
+
+      
+        if (!req.session.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login'
+            });
+        }
+
         const userId = req.session.user;
-
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "Please log in to apply coupon", redirect: "/login" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(401).json({ success: false, message: "User not found" });
-        }
-
-        const coupon = await Coupon.findOne({ couponCode, status: "Active" });
+        const coupon = await Coupon.findOne({
+            couponCode,
+            status: 'Active',
+            endDate: { $gte: new Date() },
+        });
         if (!coupon) {
-            return res.status(404).json({ success: false, message: "Invalid or inactive coupon" });
+            console.log('Coupon not found or invalid:', couponCode);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired coupon',
+            });
         }
 
-        if (new Date() < coupon.startDate || new Date() > coupon.endDate) {
-            return res.status(400).json({ success: false, message: "Coupon is expired or not yet active" });
+        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+        console.log('Cart found:', cart);
+        if (!cart) {
+            return res.status(404).json({
+                success: false,
+                message: 'Cart not found',
+            });
         }
 
-        let cart = await Cart.findOne({ userId }).populate("items.productId");
-        if (!cart || !cart.items.length) {
-            return res.status(404).json({ success: false, message: "Cart is empty" });
-        }
-
-        const subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        const subtotal = cart.subtotal || 0;
         if (subtotal < coupon.minPurchase) {
-            return res.status(400).json({ success: false, message: `Minimum purchase of ₹${coupon.minPurchase} required` });
+            console.log('Subtotal:', subtotal, 'Min Purchase:', coupon.minPurchase);
+            return res.status(400).json({
+                success: false,
+                message: `Minimum purchase of ₹${coupon.minPurchase} required`,
+            });
         }
 
         cart.coupon = { code: coupon.couponCode, discount: coupon.discountValue };
-        cart.couponApplied = true;
         cart.discount = coupon.discountValue;
-        cart.subtotal = subtotal;
-        cart.shippingCharge = cart.items.length > 0 ? 50 : 0;
-        cart.total = cart.subtotal - cart.discount + cart.shippingCharge;
+        cart.couponApplied = true;
+        cart.total = subtotal + (cart.shippingCharge || 0) + (cart.tax || 0) - (cart.discount || 0);
         await cart.save();
+        console.log('Cart updated with coupon:', cart);
 
-        return res.json({
+        res.json({
             success: true,
-            message: "Coupon applied successfully",
-            cart
+            message: 'Coupon applied successfully',
+            cart: {
+                subtotal: cart.subtotal || 0,
+                shippingCharge: cart.shippingCharge || 0,
+                tax: cart.tax || 0,
+                discount: cart.discount || 0,
+                total: cart.total || 0,
+                coupon: cart.coupon,
+                couponApplied: cart.couponApplied
+            },
         });
     } catch (error) {
-        console.error("Error in applyCoupon:", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error('Error applying coupon:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to apply coupon',
+        });
     }
 };
-
 const removeCoupon = async (req, res) => {
     try {
         const userId = req.session.user;
+        console.log('Logged-in user ID for remove coupon:', userId);
+
         if (!userId) {
-            return res.status(401).json({ success: false, message: "Please log in", redirect: "/login" });
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated',
+                redirect: '/login'
+            });
         }
 
-        let cart = await Cart.findOne({ userId }).populate("items.productId");
+        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+        console.log('Cart found for coupon removal:', cart);
         if (!cart) {
-            return res.status(404).json({ success: false, message: "Cart not found" });
+            return res.status(404).json({
+                success: false,
+                message: 'Cart not found',
+            });
         }
 
         cart.coupon = { code: null, discount: 0 };
-        cart.couponApplied = false;
         cart.discount = 0;
-        cart.subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        cart.shippingCharge = cart.items.length > 0 ? 50 : 0;
-        cart.total = cart.subtotal + cart.shippingCharge;
+        cart.couponApplied = false;
+        cart.total = (cart.subtotal || 0) + (cart.shippingCharge || 0) + (cart.tax || 0);
         await cart.save();
+        console.log('Cart updated after coupon removal:', cart);
 
-        return res.json({
+        res.json({
             success: true,
-            message: "Coupon removed successfully",
-            cart
+            message: 'Coupon removed successfully',
+            cart: {
+                subtotal: cart.subtotal || 0,
+                shippingCharge: cart.shippingCharge || 0,
+                tax: cart.tax || 0,
+                discount: cart.discount || 0,
+                total: cart.total || 0,
+                coupon: cart.coupon,
+                couponApplied: cart.couponApplied
+            },
         });
     } catch (error) {
-        console.error("Error in removeCoupon:", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error('Error removing coupon:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to remove coupon',
+        });
     }
 };
 
@@ -603,6 +697,112 @@ const updateOrderStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: "Failed to update order status" });
     }
 };
+const retryPayment = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "User not authenticated", redirect: "/login" });
+        }
+
+        const { orderId } = req.body;
+        const order = await Order.findOne({ orderId, user: userId }).populate('orderedItems.product');
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        if (order.status !== 'Payment Failed') {
+            return res.status(400).json({ success: false, message: "Order not eligible for retry payment" });
+        }
+
+        // Restore cart for retry payment
+        let cart = await Cart.findOne({ userId });
+        if (!cart) {
+            cart = new Cart({ userId, items: [] });
+        }
+
+        cart.items = order.orderedItems.map(item => ({
+            productId: item.product._id,
+            quantity: item.quantity,
+            price: item.price,
+            totalPrice: item.price * item.quantity,
+        }));
+
+        cart.subtotal = order.totalPrice;
+        cart.shippingCharge = order.shippingCharge;
+        cart.discount = order.discount || 0;
+        cart.total = order.finalAmount;
+        cart.couponApplied = order.couponApplied;
+        if (order.couponApplied) {
+            cart.coupon = { code: order.coupon?.code, discount: order.discount };
+        }
+
+        await cart.save();
+
+        // Store orderId in session for reference
+        req.session.orderId = order.orderId;
+
+        return res.json({ success: true, redirectUrl: "/checkout" });
+    } catch (error) {
+        console.error("Error in retryPayment:", error);
+        return res.status(500).json({ success: false, message: "Failed to retry payment" });
+    }
+};
+const submitPayment = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.redirect('/login?error=User not authenticated');
+        }
+
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.query;
+
+        if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+            return res.redirect('/payment-failure?error=Missing payment details');
+        }
+
+        // Verify payment signature
+        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(body)
+            .digest('hex');
+
+        if (expectedSignature !== razorpay_signature) {
+            const order = await Order.findOneAndUpdate(
+                { orderId: razorpay_order_id, user: userId },
+                { status: 'Payment Failed' },
+                { new: true }
+            );
+            req.session.orderId = order.orderId;
+            return res.redirect('/payment-failure?error=Invalid payment signature');
+        }
+
+        const order = await Order.findOne({ orderId: razorpay_order_id, user: userId });
+        if (!order) {
+            return res.redirect('/orders?error=Order not found');
+        }
+
+        order.status = 'processing';
+        await order.save();
+
+        // Clear cart and update product quantities
+        await Cart.deleteOne({ userId });
+        for (const item of order.orderedItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.quantity -= item.quantity;
+                await product.save();
+            }
+        }
+
+        req.session.orderId = order.orderId;
+        return res.redirect('/order-success');
+    } catch (error) {
+        console.error('Error in submitPayment:', error);
+        return res.redirect('/payment-failure?error=Payment processing failed');
+    }
+};
 
 module.exports = {
     loadCheckout,
@@ -611,9 +811,11 @@ module.exports = {
     verifyPayment,
     orderSuccess,
     paymentFailure,
+    retryPayment,
     downloadInvoice,
     getAvailableCoupons,
     applyCoupon,
     removeCoupon,
     updateOrderStatus,
+    submitPayment,
 };

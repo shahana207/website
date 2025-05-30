@@ -461,6 +461,7 @@
             box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
         }
         .btn-secondary {
+            text-decoration: none;
             background-color: #f1f5f9;
             color: #475569;
         }
@@ -470,6 +471,7 @@
             background-color: #e2e8f0;
         }
         .btn-tertiary {
+            text-decoration: none;
             background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
             color: white;
         }
@@ -640,61 +642,62 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for error query parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const error = urlParams.get('error');
-            if (error) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error,
+            confirmButtonColor: '#4f46e5',
+            timer: 3000
+        });
+    }
+
+    setTimeout(function() {
+        document.querySelector('.container').classList.add('tracker-loaded');
+    }, 500);
+
+    // Attach event listeners to all download buttons
+    document.querySelectorAll('.download-invoice').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            fetch(`/download-invoice/${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                console.log('Response Status:', response.status); // Debug status
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Failed to download invoice'); });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Invoice_${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error downloading invoice:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: error,
+                    text: error.message || 'Failed to download invoice. Please try again.',
                     confirmButtonColor: '#4f46e5',
-                    timer: 3000
-                });
-            }
-
-            // Animation for progress bar
-            setTimeout(function() {
-                document.querySelector('.container').classList.add('tracker-loaded');
-            }, 500);
-
-            // Handle invoice download
-            document.querySelector('.download-invoice').addEventListener('click', function() {
-                const orderId = this.getAttribute('data-order-id');
-                fetch(`/download-invoice/${orderId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to download invoice');
-                    }
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Invoice_${orderId}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(error => {
-                    console.error('Error downloading invoice:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to download invoice. Please try again.',
-                        confirmButtonColor: '#4f46e5',
-                    });
                 });
             });
         });
+    });
+});
     </script>
 </body>
 </html>

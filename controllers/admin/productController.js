@@ -76,9 +76,9 @@ const getAllProducts = async (req, res) => {
 
 const addProducts = async (req, res) => {
     try {
-        const { productName, description, category, brand, regularPrice, salePrice, quantity, color, sizes } = req.body;
+        const { productName, description, category, brand, regularPrice, salePrice, quantity, color, sizeVariants } = req.body;
 
-        // Server-side validation
+       
         if (!productName?.trim() || !/^[a-zA-Z0-9\s,()\-.]+$/.test(productName.trim())) {
             return res.redirect('/admin/load-add-product?error=Invalid%20product%20name');
         }
@@ -98,10 +98,15 @@ const addProducts = async (req, res) => {
             return res.redirect('/admin/load-add-product?error=Quantity%20must%20be%20non-negative');
         }
 
-        // Process sizes
-        let sizeArray = [];
-        if (sizes && sizes.trim()) {
-            sizeArray = sizes.split(',').map(s => s.trim()).filter(s => s);
+       
+        let sizeVariantsArray = [];
+        if (sizeVariants && Array.isArray(sizeVariants)) {
+            sizeVariantsArray = sizeVariants
+                .filter(variant => variant.size?.trim() && variant.quantity >= 0)
+                .map(variant => ({
+                    size: variant.size.trim(),
+                    quantity: parseInt(variant.quantity)
+                }));
         }
 
         const productExists = await Product.findOne({ productName: productName.trim() });
@@ -122,7 +127,7 @@ const addProducts = async (req, res) => {
             }
         }
 
-        // Process colors
+       
         let colors = [];
         if (color && color.trim()) {
             colors = color.split(',').map(c => c.trim()).filter(c => c);
@@ -155,13 +160,13 @@ const addProducts = async (req, res) => {
             salePrice: parseFloat(salePrice),
             quantity: parseInt(quantity),
             color: colors,
-            sizes: sizeArray, 
+            sizeVariants: sizeVariantsArray, 
             productImage: images,
             status: 'Available'
         });
 
         await newProduct.save();
-        res.redirect('/admin/products');
+        res.redirect('/admin/products?success=Product%20added%20successfully');
     } catch (error) {
         console.error('Error in addProducts:', error);
         let errorMessage = 'Failed%20to%20add%20product';
@@ -175,7 +180,6 @@ const addProducts = async (req, res) => {
         res.redirect(`/admin/load-add-product?error=${errorMessage}`);
     }
 };
-
 const blockProduct = async (req, res) => {
     try {
         let id = req.query.id;
@@ -203,15 +207,11 @@ const getEditProduct = async (req, res) => {
         const id = req.query.id;
 
         const product = await Product.findOne({ _id: id })
-        .populate('category')
-        .populate('brand');
+            .populate('category')
+            .populate('brand');
 
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isBlocked: false });
-
-        console.log(product,'3333333333333')
-        console.log(categories,'444444444444')
-        console.log(brands,'55555555')
 
         res.render('edit-product', {
             product,
@@ -239,14 +239,11 @@ const editProduct = async (req, res) => {
             offerPrice,
             hasOffer,
             color,
-            sizes, 
+            sizeVariants,
             existingImages = [],
             removedImages = []
         } = req.body;
 
-        console.log("the req body---------------------------------------------------- ",req.body)
-
-        console.log(1)
         const product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
@@ -256,7 +253,7 @@ const editProduct = async (req, res) => {
         if (existingProduct) {
             return res.status(400).json({ success: false, message: "Product with this name already exists" });
         }
-       
+
         const categoryDoc = await Category.findById(category);
         if (!categoryDoc) {
             return res.status(400).json({ success: false, message: "Invalid category" });
@@ -270,22 +267,24 @@ const editProduct = async (req, res) => {
             }
         }
 
-        // Process colors
+       
         let colors = [];
         if (color && color.trim()) {
             colors = color.split(',').map(c => c.trim()).filter(c => c);
         }
 
-        // Process sizes
-        let sizeArray = [];
-        if (sizes && sizes.trim()) {
-            sizeArray = sizes.split(',').map(s => s.trim()).filter(s => s);
+       
+        let sizeVariantsArray = [];
+        if (sizeVariants && Array.isArray(sizeVariants)) {
+            sizeVariantsArray = sizeVariants
+                .filter(variant => variant.size?.trim() && variant.quantity >= 0)
+                .map(variant => ({
+                    size: variant.size.trim(),
+                    quantity: parseInt(variant.quantity)
+                }));
         }
 
-        let productImages = [...existingImages];   
-
-    
-
+        let productImages = [...existingImages];
 
         for (const image of removedImages) {
             const imagePath = path.join(__dirname, '..', '..', 'public', 'Uploads', 'product-images', image);
@@ -297,7 +296,6 @@ const editProduct = async (req, res) => {
             productImages = productImages.filter(img => img !== image);
         }
 
-        
         if (req.files && req.files.length > 0) {
             const newImages = req.files;
             if (productImages.length + newImages.length > 4) {
@@ -346,16 +344,14 @@ const editProduct = async (req, res) => {
             description,
             category: categoryDoc._id,
             quantity: quantityNum,
-            regularPrice:regularPriceNum,
+            regularPrice: regularPriceNum,
             salePrice: salePriceNum,
             offerPrice: offerPriceNum,
             hasOffer: hasOffer === 'on',
             color: colors,
-            sizes: sizeArray, 
+            sizeVariants: sizeVariantsArray, 
             productImage: productImages
         };
-
-        console.log("--------------------",updateFields)
 
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
@@ -402,6 +398,42 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+async function migrateSizes() {
+    try {
+        await mongoose.connect('mongodb://localhost:27017/your_database_name', {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        const products = await Product.find({ sizes: { $exists: true } });
+
+        for (const product of products) {
+            if (product.sizes && product.sizes.length > 0) {
+                const sizeVariants = product.sizes.map(size => ({
+                    size: size,
+                    quantity: product.quantity 
+                }));
+                await Product.updateOne(
+                    { _id: product._id },
+                    {
+                        $set: { sizeVariants: sizeVariants },
+                        $unset: { sizes: 1 }
+                    }
+                );
+                console.log(`Migrated product ${product.productName}`);
+            }
+        }
+
+        console.log('Migration completed');
+        mongoose.connection.close();
+    } catch (error) {
+        console.error('Migration error:', error);
+        mongoose.connection.close();
+    }
+}
+
+
+
 module.exports = {
     getAllProducts,
     getProductAddPage,
@@ -411,4 +443,5 @@ module.exports = {
     getEditProduct,
     editProduct,
     deleteProduct,
+    migrateSizes,
 };

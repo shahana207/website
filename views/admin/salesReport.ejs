@@ -295,27 +295,49 @@
                 </div>
             </div>
 
-            <!-- Filter and Search Section -->
-            <div class="flex flex-col md:flex-row gap-4 mb-6 items-end">
-                <div class="flex-1 flex flex-col md:flex-row gap-4">
-                    <input type="date" id="startDate" value="<%= startDate %>" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <input type="date" id="endDate" value="<%= endDate %>" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 Blind">
-                    <select id="statusFilter" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Status</option>
-                        <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
-                        <option value="processing" <%= status === 'processing' ? 'selected' : '' %>>Processing</option>
-                        <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                        <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                        <option value="Cancelled" <%= status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                    </select>
-                    <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Search</button>
-                    <button onclick="clearFilters()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">Clear</button>
-                </div>
-                <div class="flex gap-4">
-                    <button onclick="exportPDF()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">Export PDF</button>
-                    <button onclick="exportExcel()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">Export Excel</button>
-                </div>
-            </div>
+          <!-- Filter and Search Section -->
+<div class="flex flex-col md:flex-row gap-4 mb-6 items-end">
+    <div class="flex-1 flex flex-col md:flex-row gap-4 items-end">
+        <!-- Date Inputs -->
+        <div class="flex flex-col">
+            <label for="startDate" class="text-sm font-medium text-gray-600">Start Date</label>
+            <input type="date" id="startDate" value="<%= startDate %>" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex flex-col">
+            <label for="endDate" class="text-sm font-medium text-gray-600">End Date</label>
+            <input type="date" id="endDate" value="<%= endDate %>" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <!-- Status Filter -->
+        <div class="flex flex-col">
+            <label for="statusFilter" class="text-sm font-medium text-gray-600">Status</label>
+            <select id="statusFilter" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Status</option>
+                <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
+                <option value="processing" <%= status === 'processing' ? 'selected' : '' %>>Processing</option>
+                <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                <option value="Cancelled" <%= status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+            </select>
+        </div>
+        <!-- Quick Date Range Filters -->
+        <div class="flex flex-col">
+            <label for="quickFilter" class="text-sm font-medium text-gray-600">Quick Filters</label>
+            <select id="quickFilter" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="applyQuickFilter()">
+                <option value="">Custom</option>
+                <option value="today">Today</option>
+                <option value="week">Last 7 Days</option>
+                <option value="month">Last 30 Days</option>
+            </select>
+        </div>
+        <!-- Action Buttons -->
+        <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Search</button>
+        <button onclick="clearFilters()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">Clear</button>
+    </div>
+    <div class="flex gap-4">
+        <button onclick="exportPDF()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">Export PDF</button>
+        <button onclick="exportExcel()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">Export Excel</button>
+    </div>
+</div>
 
             <!-- Search Input -->
             <div class="mb-4">
@@ -362,127 +384,198 @@
     </div>
 
     <script>
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            if (window.innerWidth <= 992) {
-                sidebar.classList.toggle('mobile-visible');
-            } else {
-                sidebar.classList.toggle('collapsed');
-                updateLayout();
-            }
-        }
-
-        function updateLayout() {
-            const sidebar = document.querySelector('.sidebar');
-            const adminHeader = document.querySelector('.admin-header');
-            const mainContent = document.querySelector('.main-content');
-
-            if (window.innerWidth <= 992) {
-                adminHeader.style.left = '0';
-                adminHeader.style.width = '100%';
-                mainContent.style.marginLeft = '0';
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.remove('mobile-visible');
-            } else {
-                if (sidebar.classList.contains('collapsed')) {
-                    adminHeader.style.left = '80px';
-                    adminHeader.style.width = 'calc(100% - 80px)';
-                    mainContent.style.marginLeft = '80px';
-                } else {
-                    adminHeader.style.left = '280px';
-                    adminHeader.style.width = 'calc(100% - 280px)';
-                    mainContent.style.marginLeft = '280px';
-                }
-            }
-        }
-
-        function applyFilters() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const status = document.getElementById('statusFilter').value;
-            window.location.href = `/admin/sales-report?page=1&startDate=${startDate}&endDate=${endDate}&status=${status}`;
-        }
-
-        function clearFilters() {
-            window.location.href = '/admin/sales-report?page=1';
-        }
-
-        function exportPDF() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const status = document.getElementById('statusFilter').value;
-            window.location.href = `/admin/export-sales-report/pdf?startDate=${startDate}&endDate=${endDate}&status=${status}`;
-        }
-
-        function exportExcel() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const status = document.getElementById('statusFilter').value;
-            window.location.href = `/admin/export-sales-report/excel?startDate=${startDate}&endDate=${endDate}&status=${status}`;
-        }
-
-        function searchOrders() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const tableBody = document.getElementById('salesTableBody');
-            const rows = tableBody.getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const orderId = rows[i].cells[0].textContent.toLowerCase();
-                const payment = rows[i].cells[4].textContent.toLowerCase();
-                const status = rows[i].cells[6].textContent.toLowerCase();
-
-                if (
-                    orderId.includes(searchInput) ||
-                    payment.includes(searchInput) ||
-                    status.includes(searchInput)
-                ) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarToggle = document.querySelector('.sidebar-toggle');
-            const adminHeader = document.querySelector('.admin-header');
-            const mainContent = document.querySelector('.main-content');
-            const accountBtn = document.getElementById('accountBtn');
-            const accountDropdown = document.getElementById('accountDropdown');
-
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', toggleSidebar);
-            }
-
-            window.addEventListener('resize', updateLayout);
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (window.innerWidth <= 992) {
+            sidebar.classList.toggle('mobile-visible');
+        } else {
+            sidebar.classList.toggle('collapsed');
             updateLayout();
+        }
+    }
 
-            if (accountBtn && accountDropdown) {
-                accountBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    accountDropdown.classList.toggle('show');
-                });
+    function updateLayout() {
+        const sidebar = document.querySelector('.sidebar');
+        const adminHeader = document.querySelector('.admin-header');
+        const mainContent = document.querySelector('.main-content');
 
-                document.addEventListener('click', function(e) {
-                    if (!accountBtn.contains(e.target)) {
-                        accountDropdown.classList.remove('show');
-                    }
-                });
+        if (window.innerWidth <= 992) {
+            adminHeader.style.left = '0';
+            adminHeader.style.width = '100%';
+            mainContent.style.marginLeft = '0';
+            sidebar.classList.remove('collapsed');
+            sidebar.classList.remove('mobile-visible');
+        } else {
+            if (sidebar.classList.contains('collapsed')) {
+                adminHeader.style.left = '80px';
+                adminHeader.style.width = 'calc(100% - 80px)';
+                mainContent.style.marginLeft = '80px';
+            } else {
+                adminHeader.style.left = '280px';
+                adminHeader.style.width = 'calc(100% - 280px)';
+                mainContent.style.marginLeft = '280px';
             }
+        }
+    }
 
-            const currentPath = window.location.pathname;
-            const menuItems = document.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
-                item.classList.remove('active');
+    function applyQuickFilter() {
+        const quickFilter = document.getElementById('quickFilter').value;
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const today = new Date();
+        let startDate, endDate;
+
+        if (quickFilter === 'today') {
+            startDate = new Date(today);
+            endDate = new Date(today);
+        } else if (quickFilter === 'week') {
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 7);
+            endDate = new Date(today);
+        } else if (quickFilter === 'month') {
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 30);
+            endDate = new Date(today);
+        } else {
+            startDateInput.value = '';
+            endDateInput.value = '';
+            return; // Exit if custom is selected
+        }
+
+        // Format dates as YYYY-MM-DD
+        startDateInput.value = startDate.toISOString().split('T')[0];
+        endDateInput.value = endDate.toISOString().split('T')[0];
+
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const status = document.getElementById('statusFilter').value;
+
+        // Validate dates
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            alert('Start date cannot be later than end date.');
+            return;
+        }
+
+        window.location.href = `/admin/sales-report?page=1&startDate=${startDate}&endDate=${endDate}&status=${status}`;
+    }
+
+    function clearFilters() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('quickFilter').value = '';
+        window.location.href = '/admin/sales-report?page=1';
+    }
+
+    function exportPDF() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const status = document.getElementById('statusFilter').value;
+        window.location.href = `/admin/export-sales-report/pdf?startDate=${startDate}&endDate=${endDate}&status=${status}`;
+    }
+
+    function exportExcel() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const status = document.getElementById('statusFilter').value;
+        window.location.href = `/admin/export-sales-report/excel?startDate=${startDate}&endDate=${endDate}&status=${status}`;
+    }
+
+    function searchOrders() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const tableBody = document.getElementById('salesTableBody');
+        const rows = tableBody.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const orderId = rows[i].cells[0].textContent.toLowerCase();
+            const payment = rows[i].cells[4].textContent.toLowerCase();
+            const status = rows[i].cells[6].textContent.toLowerCase();
+
+            if (
+                orderId.includes(searchInput) ||
+                payment.includes(searchInput) ||
+                status.includes(searchInput)
+            ) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const adminHeader = document.querySelector('.admin-header');
+        const mainContent = document.querySelector('.main-content');
+        const accountBtn = document.getElementById('accountBtn');
+        const accountDropdown = document.getElementById('accountDropdown');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+
+        window.addEventListener('resize', updateLayout);
+        updateLayout();
+
+        if (accountBtn && accountDropdown) {
+            accountBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                accountDropdown.classList.toggle('show');
             });
-            menuItems.forEach(item => {
-                const href = item.getAttribute('href');
-                if ((href === '/admin/sales-report' && currentPath.includes('/admin/sales-report'))) {
-                    item.classList.add('active');
+
+            document.addEventListener('click', function(e) {
+                if (!accountBtn.contains(e.target)) {
+                    accountDropdown.classList.remove('show');
                 }
             });
+        }
+
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.classList.remove('active');
+            const href = item.getAttribute('href');
+            if (href === '/admin/sales-report' && currentPath.includes('/admin/sales-report')) {
+                item.classList.add('active');
+            }
         });
-    </script>
+
+        // Initialize date inputs with current values
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        if (startDateInput.value && endDateInput.value) {
+            // Ensure date format is correct
+            startDateInput.value = new Date(startDateInput.value).toISOString().split('T')[0];
+            endDateInput.value = new Date(endDateInput.value).toISOString().split('T')[0];
+        }
+
+        // Set quick filter based on URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const startDate = urlParams.get('startDate');
+        const endDate = urlParams.get('endDate');
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const today = new Date();
+            const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+            const isToday = start.toDateString() === today.toDateString() && end.toDateString() === today.toDateString();
+            const isWeek = diffDays >= 6 && diffDays <= 7 && end.toDateString() === today.toDateString();
+            const isMonth = diffDays >= 29 && diffDays <= 30 && end.toDateString() === today.toDateString();
+
+            if (isToday) {
+                document.getElementById('quickFilter').value = 'today';
+            } else if (isWeek) {
+                document.getElementById('quickFilter').value = 'week';
+            } else if (isMonth) {
+                document.getElementById('quickFilter').value = 'month';
+            }
+        }
+    });
+</script>
 </body>
 </html>

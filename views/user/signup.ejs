@@ -4,31 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create an Account</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Inter", sans-serif;
       }
 
       body {
-        background-color: #f5f5f5;
+        background-color: #f4f7fc;
         display: flex;
+        justify-content: center;
+        align-items: center;
         min-height: 100vh;
+        padding: 20px;
       }
 
       .container {
         display: flex;
+        max-width: 900px;
         width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .container:hover {
+        transform: translateY(-5px);
       }
 
       .form-container {
         flex: 1;
-        background-color: #ffffff;
         padding: 40px;
         display: flex;
         flex-direction: column;
@@ -37,34 +50,40 @@
 
       .image-container {
         flex: 1;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #5b86e5 0%, #36d1dc 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-        overflow: hidden;
       }
 
       .image-container img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.8;
+        opacity: 0.85;
+        transition: opacity 0.3s ease;
+      }
+
+      .image-container img:hover {
+        opacity: 1;
       }
 
       .form-header {
         margin-bottom: 30px;
+        text-align: center;
       }
 
       .form-header h1 {
-        font-size: 32px;
-        color: #333;
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
         margin-bottom: 8px;
       }
 
       .form-header p {
-        color: #666;
         font-size: 16px;
+        color: #6b7280;
       }
 
       .form-group {
@@ -73,23 +92,26 @@
 
       .form-group label {
         display: block;
-        margin-bottom: 8px;
-        color: #555;
+        font-size: 14px;
         font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
       }
 
       .form-control {
         width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
         font-size: 16px;
-        transition: border-color 0.3s;
+        background-color: #f9fafb;
+        transition: all 0.3s ease;
       }
 
       .form-control:focus {
-        border-color: #667eea;
         outline: none;
+        border-color: #5b86e5;
+        box-shadow: 0 0 0 3px rgba(91, 134, 229, 0.2);
       }
 
       .password-container {
@@ -98,37 +120,40 @@
 
       .toggle-password {
         position: absolute;
-        right: 15px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
-        color: #666;
+        color: #6b7280;
+        font-size: 18px;
+      }
+
+      .toggle-password:hover {
+        color: #5b86e5;
       }
 
       .btn {
-        background: linear-gradient(135deg, #00020b 0%, #030006 100%);
+        background: linear-gradient(135deg, #000000 0%, #5f6060 100%);
         color: white;
         border: none;
         padding: 14px;
-        border-radius: 4px;
+        border-radius: 8px;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
         width: 100%;
-        margin-top: 15px;
-        transition: all 0.3s;
+        margin-top: 10px;
+        transition: all 0.3s ease;
       }
 
       .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 5px 15px rgba(91, 134, 229, 0.4);
       }
 
       .alternative-signin {
-        margin-top: 25px;
+        margin-top: 20px;
         text-align: center;
-        display: flex;
-        justify-content: center;
       }
 
       .google-btn {
@@ -137,32 +162,37 @@
         justify-content: center;
         width: 100%;
         padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 15px;
         font-weight: 500;
-        color: #555;
-        background-color: white;
+        color: #374151;
+        background-color: #ffffff;
         cursor: pointer;
-        margin-bottom: 15px;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
+        text-decoration: none;
       }
 
       .google-btn:hover {
-        background-color: #f5f5f5;
+        background-color: #f9fafb;
+        border-color: #5b86e5;
       }
 
       .google-icon {
+        width: 20px;
+        height: 20px;
         margin-right: 10px;
       }
 
       .login-link {
         text-align: center;
         margin-top: 20px;
-        color: #666;
+        font-size: 14px;
+        color: #6b7280;
       }
 
       .login-link a {
-        color: #667eea;
+        color: #5b86e5;
         text-decoration: none;
         font-weight: 500;
       }
@@ -171,25 +201,31 @@
         text-decoration: underline;
       }
 
+      .error-message {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+      }
+
       @media (max-width: 768px) {
         .container {
           flex-direction: column;
+          max-width: 100%;
         }
 
         .image-container {
-          height: 200px;
+          height: 150px;
           order: -1;
         }
 
         .form-container {
-          padding: 30px 20px;
+          padding: 20px;
         }
-      }
 
-      .error-message {
-        color: red;
-        font-size: 0.75rem;
-        display: none;
+        .form-header h1 {
+          font-size: 24px;
+        }
       }
     </style>
   </head>
@@ -197,10 +233,12 @@
     <div class="container">
       <div class="form-container">
         <div class="form-header">
-          <h1>Create an Account</h1>
-          <p>Join us today and start your journey</p>
+          <h1>Create Your Account</h1>
+          <p>Start your journey with us today</p>
           <% if (typeof message !== 'undefined' && message) { %>
-          <p style="color: red; text-align: center;" ><%= message %></p>
+          <p style="color: #ef4444; font-size: 14px; text-align: center;">
+            <%= message %>
+          </p>
           <% } %>
         </div>
 
@@ -290,20 +328,18 @@
               <div id="error5" class="error-message"></div>
             </div>
           </div>
+
           <button type="submit" class="btn">Create Account</button>
         </form>
 
         <div class="alternative-signin">
-          <button class="google-btn">
-            <span class="google-icon"> </span>
-            <a href="/auth/google" class="google-btn">
-              <img
-                src="https://www.google.com/favicon.ico"
-                alt="Google"
-                class="google-icon"
-              />Continue with Google
-            </a>
-          </button>
+          <a href="/auth/google" class="google-btn">
+            <img
+              src="https://www.google.com/favicon.ico"
+              alt="Google"
+              class="google-icon"
+            />Continue with Google
+          </a>
         </div>
 
         <div class="login-link">
@@ -312,7 +348,7 @@
       </div>
 
       <div class="image-container">
-        <img src="/style/img/hero/image18.jpg" alt="Sign up illustration" />
+        <img src="/style/img/hero/image15.jpg" alt="Sign up illustration" />
       </div>
     </div>
 
@@ -328,12 +364,14 @@
       const phoneid = document.getElementById("phone");
       const passid = document.getElementById("password");
       const cpassid = document.getElementById("confirmPassword");
+      const referralCodeid = document.getElementById("referralCode");
 
       const error1 = document.getElementById("error1");
       const error2 = document.getElementById("error2");
       const error3 = document.getElementById("error3");
       const error4 = document.getElementById("error4");
       const error5 = document.getElementById("error5");
+      const error6 = document.getElementById("error6");
 
       const signform = document.getElementById("signform");
 
@@ -366,12 +404,23 @@
 
       function phoneValidateChecking() {
         const phoneval = phoneid.value.trim();
+        const phonePattern = /^[6-9]\d{9}$/;
+        const sequentialNumbers = /^(?:1234567890|0123456789|9876543210|0987654321)$/;
+        const repetitiveNumbers = /^(\d)\1{9}$/;
+
         if (phoneval === "") {
           error3.style.display = "block";
           error3.innerHTML = "Enter a valid phone number";
-        } else if (!/^[6-9]\d{9}$/.test(phoneval)) {
+        } else if (!phonePattern.test(phoneval)) {
           error3.style.display = "block";
-          error3.innerHTML = "Enter a valid 10-digit Indian phone number";
+          error3.innerHTML =
+            "Enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9";
+        } else if (sequentialNumbers.test(phoneval)) {
+          error3.style.display = "block";
+          error3.innerHTML = "Sequential numbers like 1234567890 are not allowed";
+        } else if (repetitiveNumbers.test(phoneval)) {
+          error3.style.display = "block";
+          error3.innerHTML = "Repetitive numbers like 1111111111 are not allowed";
         } else {
           error3.style.display = "none";
           error3.innerHTML = "";
@@ -415,7 +464,8 @@
             error2.innerHTML ||
             error3.innerHTML ||
             error4.innerHTML ||
-            error5.innerHTML
+            error5.innerHTML ||
+            error6.innerHTML
           ) {
             e.preventDefault();
           }

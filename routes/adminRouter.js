@@ -31,6 +31,15 @@ router.get("/dashboard",adminAuth,adminController.loadDashboard);
 
 router.get("/logout",adminController.logout);
 
+
+router.get('/dashboard', adminController.getDashboard);
+
+router.post('/generate-ledger', adminController.generateLedger);
+
+
+router.get('/download-ledger', adminController.downloadLedger);
+
+
 //user management
 router.get("/users",adminAuth,userController.userInfo);
 

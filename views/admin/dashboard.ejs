@@ -3,17 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="\style\css\adminheader.css">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .status-pending { background-color: #f6ad55; }
+        .status-processing { background-color: #ecc94b; }
+        .status-shipped { background-color: #4299e1; }
+        .status-delivered { background-color: #48bb78; }
+        .status-cancelled { background-color: #f56565; }
+        .status-return-request { background-color: #9f7aea; }
+        .status-returned { background-color: #a0aec0; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #ffffff;
+        }
+        .card-highlight {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            transform: scale(1.02);
+        }
+        .progress-bar {
+            background-color: #edf2f7;
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background-color: #3b82f6;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+    </style>
 </head>
-<body>
-    <%-include("../partials/admin/header")%>
+<body class="bg-gray-100">
+    <%- include('../partials/admin/header') %>
+    <div class="ml-0 md:ml-64 p-6 transition-all duration-300">
+        <div class="fixed top-0 left-0 md:left-64 right-0 bg-gradient-to-r from-blue-600 to-indigo-800 shadow-lg p-4 z-10">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">Admin Dashboard <span class="font-light text-lg opacity-80">Control Center</span></h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="https://via.placeholder.com/40" alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white transform hover:scale-110 transition-transform">
+                    <span class="text-white font-medium">Admin User</span>
+                </div>
+            </div>
+        </div>
 
- 
+        <div class="mt-20">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-highlight">
+                    <h3 class="text-sm font-medium text-gray-200">Today's Sales</h3>
+                    <p class="text-3xl font-bold mt-2">₹<%= todaySales.toLocaleString('en-IN') %></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Yesterday's Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= yesterdaySales.toLocaleString('en-IN') %></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Monthly Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= monthlySales.toLocaleString('en-IN') %></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all">
+                    <h3 class="text-sm font-medium text-gray-500">Yearly Sales</h3>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">₹<%= yearlySales.toLocaleString('en-IN') %></p>
+                </div>
+            </div>
+
+            <!-- Sales Overview Chart -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Sales Overview</h2>
+                    <select class="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500" id="timePeriod" onchange="updateChart()">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+                <canvas id="salesChart" class="max-h-96"></canvas>
+            </div>
+
+            <!-- Best Selling Sections -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Best Selling</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Products by Units Sold</h3>
+                        <% if (topProducts && topProducts.length > 0) { %>
+                            <% topProducts.forEach(product => { %>
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-700 mb-1"><%= product.productName %> - <%= product.quantity %> units</p>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: <%= (product.quantity / topProducts[0].quantity) * 100 %>%;"></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-gray-500">No products sold yet.</p>
+                        <% } %>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Categories by Revenue</h3>
+                        <div class="max-w-xs mx-auto">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 10 Brands by Revenue</h3>
+                        <div class="max-w-xs mx-auto">
+                            <canvas id="brandChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Recent Orders</h2>
+                    <select class="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500" id="statusFilter" onchange="filterOrders()">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="return-request">Return Request</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                </div>
+                <% if (recentOrders && recentOrders.length > 0) { %>
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm">
+                                <th class="p-3">Order ID</th>
+                                <th class="p-3">Customer</th>
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <% recentOrders.forEach(order => { %>
+                                <tr class="border-b border-gray-200 text-gray-700">
+                                    <td class="p-3">#<%= order.orderId %></td>
+                                    <td class="p-3"><%= order.user ? order.user.name : 'Unknown' %></td>
+                                    <td class="p-3"><%= order.createdOn.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                                    <td class="p-3">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
+                                    <td class="p-3">
+                                        <span class="status-badge status-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                                            <%= order.status %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <div class="flex justify-between items-center mt-4 text-sm text-gray-600">
+                        <span>Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders</span>
+                        <div class="flex gap-2">
+                            <a href="/admin/dashboard?page=<%= currentPage - 1 > 0 ? currentPage - 1 : 1 %>" class="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 <%= currentPage === 1 ? 'opacity-50 cursor-not-allowed' : '' %>">Previous</a>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="/admin/dashboard?page=<%= i %>" class="px-3 py-1 rounded-md <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>"><%= i %></a>
+                            <% } %>
+                            <a href="/admin/dashboard?page=<%= currentPage + 1 <= totalPages ? currentPage + 1 : totalPages %>" class="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 <%= currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : '' %>">Next</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <p class="text-gray-500">No recent orders available.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sales Chart
+        let salesChart;
+        const salesData = <%- JSON.stringify(salesData) %>;
+
+        function updateChart() {
+            const timePeriod = document.getElementById('timePeriod').value;
+            let labels, data;
+
+            if (timePeriod === 'weekly') {
+                labels = salesData.weekly.labels;
+                data = salesData.weekly.data;
+            } else if (timePeriod === 'monthly') {
+                labels = salesData.monthly.labels;
+                data = salesData.monthly.data;
+            } else {
+                labels = salesData.yearly.labels;
+                data = salesData.yearly.data;
+            }
+
+            if (salesChart) salesChart.destroy();
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: timePeriod === 'weekly' ? 'Date (DD/MM)' : timePeriod === 'monthly' ? 'Month (MMM YY)' : 'Year',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { maxRotation: 45, minRotation: 45, font: { size: 12 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Revenue (₹)', font: { size: 14, weight: 'bold' } },
+                            ticks: { callback: value => '₹' + value.toLocaleString('en-IN'), font: { size: 12 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { font: { size: 14 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Category Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: <%- JSON.stringify(topCategories.map(cat => cat.name)) %>,
+                datasets: [{ data: <%- JSON.stringify(topCategories.map(cat => cat.revenue)) %>, backgroundColor: ['#3b82f6', '#8b5cf6', '#ef4444'] }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } }
+            }
+        });
+
+        // Brand Chart
+        const brandCtx = document.getElementById('brandChart').getContext('2d');
+        new Chart(brandCtx, {
+            type: 'pie',
+            data: {
+                labels: <%- JSON.stringify(topBrands.map(brand => brand.name)) %>,
+                datasets: [{ data: <%- JSON.stringify(topBrands.map(brand => brand.revenue)) %>, backgroundColor: ['#3b82f6', '#8b5cf6', '#ef4444'] }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } }
+            }
+        });
+
+        // Order Filter
+        function filterOrders() {
+            const status = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#ordersTableBody tr');
+            rows.forEach(row => {
+                const statusCell = row.querySelector('.status-badge').textContent.trim().toLowerCase();
+                if (status === 'all' || statusCell === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Initial Chart Load
+        updateChart();
+    </script>
 </body>
 </html>
-
-
-
-
-    

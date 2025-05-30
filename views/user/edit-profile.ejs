@@ -135,7 +135,21 @@
             
             <form action="/updateProfile" method="POST" enctype="multipart/form-data" id="profileForm">
 
-                <div class="form-group">
+<div class="form-group">
+    <label for="profilePicture" class="form-label">Profile Picture</label>
+    <input type="file" id="profilePicture" name="profilePicture" class="form-file" accept="image/*">
+   
+    <% if (profilePicture) { %>
+        <img src="<%= profilePicture %>" class="preview-image" style="display: block;" alt="Current Profile Picture">
+        <button type="button" id="deleteProfilePicture" class="crop-btn" style="background-color: #dc3545; margin-top: 10px;">Delete Profile Picture</button>
+    <% } else { %>
+        <img src="/Uploads/profile-pictures/profile icon.jpeg" class="preview-image" style="display: block;" alt="Placeholder Profile Picture">
+    <% } %>
+     <img id="preview" class="preview-image" alt="Preview" style="display: none;">
+
+    <button type="button" id="cropBtn" class="crop-btn" style="display: none;">Crop Image</button>
+</div>
+                <!-- <div class="form-group">
                     <label for="profilePicture" class="form-label">Profile Picture</label>
                     <input type="file" id="profilePicture" name="profilePicture" class="form-file" accept="image/*">
                     <img id="preview" class="preview-image" alt="Preview">
@@ -143,7 +157,7 @@
                         <img src="<%= profilePicture %>" class="preview-image" style="display: block;" alt="Current Profile Picture">
                     <% } %>
                     <button type="button" id="cropBtn" class="crop-btn" style="display: none;">Crop Image</button>
-                </div>
+                </div> -->
                 
                 <div class="form-group crop-container" id="cropContainer">
                     <img id="cropImage" class="crop-image">
@@ -188,6 +202,7 @@
 
     <script>
         let cropper;
+
 
         // Preview profile picture before upload
         document.getElementById('profilePicture').addEventListener('change', function(event) {
@@ -253,6 +268,36 @@
             }
             document.getElementById('cropContainer').style.display = 'none';
         });
+        document.getElementById('deleteProfilePicture')?.addEventListener('click', async function() {
+    if (confirm('Are you sure you want to delete your profile picture?')) {
+        try {
+            const response = await fetch('/deleteProfilePicture', {
+                method: 'PATCH', // Changed from DELETE to PATCH
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const result = await response.json();
+            if (result.success) {
+                // Remove the current profile picture and show placeholder
+                document.querySelector('.preview-image[alt="Current Profile Picture"]').style.display = 'none';
+                const placeholderImg = document.createElement('img');
+                placeholderImg.src = '/images/placeholder-profile.png';
+                placeholderImg.className = 'preview-image';
+                placeholderImg.alt = 'Placeholder Profile Picture';
+                placeholderImg.style.display = 'block';
+                document.querySelector('.form-group').insertBefore(placeholderImg, document.getElementById('cropBtn'));
+                document.getElementById('deleteProfilePicture').remove();
+                alert('Profile picture deleted successfully.');
+            } else {
+                alert(result.message || 'Failed to delete profile picture.');
+            }
+        } catch (error) {
+            console.error('Error deleting profile picture:', error);
+            alert('An error occurred while deleting the profile picture.');
+        }
+    }
+});
     </script>
 </body>
 </html>
