@@ -416,11 +416,11 @@ const paymentFailure = async (req, res) => {
             return res.redirect('/orders?error=Order not found');
         }console.log("order",order)
 
-        // Update order status to Payment Failed
+       
         order.status = 'Payment Failed';
         await order.save();
 
-        // Clear orderId from session
+        
         delete req.session.orderId;
 
         res.render('payment-failure', {
@@ -721,7 +721,7 @@ const retryPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Order not eligible for retry payment" });
         }
 
-        // Restore cart for retry payment
+       
         let cart = await Cart.findOne({ userId });
         if (!cart) {
             cart = new Cart({ userId, items: [] });
@@ -745,7 +745,7 @@ const retryPayment = async (req, res) => {
 
         await cart.save();
 
-        // Store orderId in session for reference
+    
         req.session.orderId = order.orderId;
 
         return res.json({ success: true, redirectUrl: "/checkout" });
@@ -767,7 +767,7 @@ const submitPayment = async (req, res) => {
             return res.redirect('/payment-failure?error=Missing payment details');
         }
 
-        // Verify payment signature
+       
         const body = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -792,7 +792,7 @@ const submitPayment = async (req, res) => {
         order.status = 'processing';
         await order.save();
 
-        // Clear cart and update product quantities
+       
         await Cart.deleteOne({ userId });
         for (const item of order.orderedItems) {
             const product = await Product.findById(item.product);
