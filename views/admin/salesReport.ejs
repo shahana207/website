@@ -365,7 +365,9 @@
                                 <td class="px-4 py-3 text-sm text-gray-900">₹<%= order.totalPrice.toLocaleString('en-IN') %></td>
                                 <td class="px-4 py-3 text-sm text-gray-900">₹<%= order.discount.toLocaleString('en-IN') %></td>
                                 <td class="px-4 py-3 text-sm text-gray-900">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
-                                <td class="px-4 py-3 text-sm text-gray-900"><%= order.paymentMethod === 'COD' ? 'cod' : 'razorpay' %></td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+    <%= order.paymentMethod ? (order.paymentMethod === 'COD' ? 'cod' : 'razorpay') : 'N/A' %>
+</td>
                                 <td class="px-4 py-3 text-sm text-gray-900"><%= order.createdOn.toLocaleDateString('en-IN') %></td>
                                 <td class="px-4 py-3 text-sm status-<%= order.status.toLowerCase() %>"><%= order.status %></td>
                             </tr>
@@ -486,26 +488,26 @@
     }
 
     function searchOrders() {
-        const searchInput = document.getElementById('searchInput').value.toLowerCase();
-        const tableBody = document.getElementById('salesTableBody');
-        const rows = tableBody.getElementsByTagName('tr');
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const tableBody = document.getElementById('salesTableBody');
+    const rows = tableBody.getElementsByTagName('tr');
 
-        for (let i = 0; i < rows.length; i++) {
-            const orderId = rows[i].cells[0].textContent.toLowerCase();
-            const payment = rows[i].cells[4].textContent.toLowerCase();
-            const status = rows[i].cells[6].textContent.toLowerCase();
+    for (let i = 0; i < rows.length; i++) {
+        const orderId = rows[i].cells[0].textContent.toLowerCase();
+        const payment = rows[i].cells[4].textContent.toLowerCase() || 'n/a';
+        const status = rows[i].cells[6].textContent.toLowerCase();
 
-            if (
-                orderId.includes(searchInput) ||
-                payment.includes(searchInput) ||
-                status.includes(searchInput)
-            ) {
-                rows[i].style.display = '';
-            } else {
-                rows[i].style.display = 'none';
-            }
+        if (
+            orderId.includes(searchInput) ||
+            payment.includes(searchInput) ||
+            status.includes(searchInput)
+        ) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
         }
     }
+}
 
     document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.querySelector('.sidebar');

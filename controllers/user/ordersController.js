@@ -1,6 +1,7 @@
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema');
+const Cart =require('../../models/cartSchema')
 const Wallet = require('../../models/walletSchema')
 const {generateCustomId}  = require("../../utils/helpers")
 const mongoose = require('mongoose');
@@ -408,22 +409,53 @@ const retryPayment = async (req, res) => {
 
         const { orderId } = req.params;
 
-        const response = await fetch('/retry-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            return res.redirect(result.redirectUrl);
-        } else {
-            return res.redirect(`/orders?error=${encodeURIComponent(result.message)}`);
-        }
+       console.log("orderId:",orderId)
+               if (!userId) {
+                   return res.status(401).json({ success: false, message: "User not authenticated", redirect: "/login" });
+               }
+       
+              
+               const order = await Order.findOne({ _id:orderId, user: userId }).populate('orderedItems.product');
+       
+               if (!order) {
+                   return res.status(404).json({ success: false, message: "Order not found" });
+               }
+       
+               if (order.status !== 'Payment Failed') {
+                   return res.status(400).json({ success: false, message: "Order not eligible for retry payment" });
+               }
+       
+               // Restore cart for retry payment
+               let cart = await Cart.findOne({ userId });
+               if (!cart) {
+                   cart = new Cart({ userId, items: [] });
+               }
+       
+               cart.items = order.orderedItems.map(item => ({
+                   productId: item.product._id,
+                   quantity: item.quantity,
+                   price: item.price,
+                   totalPrice: item.price * item.quantity,
+               }));
+       
+               cart.subtotal = order.totalPrice;
+               cart.shippingCharge = order.shippingCharge;
+               cart.discount = order.discount || 0;
+               cart.total = order.finalAmount;
+               cart.couponApplied = order.couponApplied;
+               if (order.couponApplied) {
+                   cart.coupon = { code: order.coupon?.code, discount: order.discount };
+               }
+       
+               await cart.save();
+       
+               // Store orderId in session for reference
+               req.session.orderId = order.orderId;
+       
+               return res.redirect( "/checkout");
     } catch (error) {
-        console.error('Error retrying payment:', error);
-        res.redirect('/orders?error=Failed to retry payment');
+        console.log('Error retrying payment:', error);
+        // res.redirect('/orders?error=Failed to retry payment');
     }
 };
 module.exports = {

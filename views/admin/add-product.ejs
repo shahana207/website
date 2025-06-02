@@ -839,13 +839,13 @@
     }));
     let isValid = true;
 
-    if (name.trim() === "") {
-        displayErrorMessage('productName-error', 'Please enter a product name');
-        isValid = false;
-    } else if (!/^[a-zA-Z0-9\s,()\-.]+$/.test(name.trim())) {
-        displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters, numbers, spaces, commas, parentheses, hyphens, and periods');
-        isValid = false;
-    }
+  if (name.trim() === "") {
+                    displayErrorMessage('productName-error', 'Please enter a product name');
+                    isValid = false;
+                } else if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
+                    displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters and spaces');
+                    isValid = false;
+                }
     if (description.trim() === "") {
         displayErrorMessage('description-error', 'Please enter a product description');
         isValid = false;

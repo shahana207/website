@@ -7,7 +7,7 @@
 <div class="hero-wrap">
   <div class="container">
     <div class="text-center">
-      <p class="breadcrumbs"><span><a href="/">Home</a></span> <span>/ Contact</span></p>
+      
       <h1>Get In Touch</h1>
     </div>
   </div>
@@ -165,7 +165,7 @@
 
   /* Hero Section */
   .hero-wrap {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/fazion-hero.jpg');
+    background-color: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/fazion-hero.jpg');
     background-size: cover;
     background-position: center;
     height: 300px;
@@ -647,71 +647,71 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       });
 
-      // Handle form submission
-      document.getElementById('contact-form').addEventListener('submit', function(event) {
-        event.preventDefault();
+//       // Handle form submission
+//       document.getElementById('contact-form').addEventListener('submit', function(event) {
+//         event.preventDefault();
 
-        if (!validateForm()) {
-          return;
-        }
+//         if (!validateForm()) {
+//           return;
+//         }
 
-        Swal.fire({
-          title: 'Sending...',
-          text: 'Please wait while we send your message',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
+//         Swal.fire({
+//           title: 'Sending...',
+//           text: 'Please wait while we send your message',
+//           allowOutsideClick: false,
+//           didOpen: () => {
+//             Swal.showLoading();
+//           }
+//         });
 
-        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
-          .then(function(response) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Message Sent!',
-              text: 'Thank you for contacting us. We will get back to you shortly.',
-              confirmButtonColor: '#d29759',
-            });
-            document.getElementById('contact-form').reset();
-          }, function(error) {
-            console.error('EmailJS sendForm Error:', JSON.stringify(error, null, 2));
-            const formData = {
-              user_name: document.getElementById('user_name').value,
-              user_email: document.getElementById('user_email').value,
-              subject: document.getElementById('subject').value,
-              message: document.getElementById('message').value
-            };
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData)
-              .then(function(response) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Message Sent!',
-                  text: 'Thank you for contacting us. We will get back to you shortly.',
-                  confirmButtonColor: '#d29759',
-                });
-                document.getElementById('contact-form').reset();
-              }, function(fallbackError) {
-                console.error('EmailJS send Error:', JSON.stringify(fallbackError, null, 2));
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Something went wrong. Please try again!',
-                  confirmButtonColor: '#dc3545',
-                });
-              });
-          });
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching config:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Configuration Error',
-        text: 'There was a problem loading the contact form. Please try again later.',
-        confirmButtonColor: '#dc3545',
-      });
-    });
-});
+//         emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
+//           .then(function(response) {
+//             Swal.fire({
+//               icon: 'success',
+//               title: 'Message Sent!',
+//               text: 'Thank you for contacting us. We will get back to you shortly.',
+//               confirmButtonColor: '#d29759',
+//             });
+//             document.getElementById('contact-form').reset();
+//           }, function(error) {
+//             console.error('EmailJS sendForm Error:', JSON.stringify(error, null, 2));
+//             const formData = {
+//               user_name: document.getElementById('user_name').value,
+//               user_email: document.getElementById('user_email').value,
+//               subject: document.getElementById('subject').value,
+//               message: document.getElementById('message').value
+//             };
+//             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData)
+//               .then(function(response) {
+//                 Swal.fire({
+//                   icon: 'success',
+//                   title: 'Message Sent!',
+//                   text: 'Thank you for contacting us. We will get back to you shortly.',
+//                   confirmButtonColor: '#d29759',
+//                 });
+//                 document.getElementById('contact-form').reset();
+//               }, function(fallbackError) {
+//                 console.error('EmailJS send Error:', JSON.stringify(fallbackError, null, 2));
+//                 Swal.fire({
+//                   icon: 'error',
+//                   title: 'Oops...',
+//                   text: 'Something went wrong. Please try again!',
+//                   confirmButtonColor: '#dc3545',
+//                 });
+//               });
+//           });
+//       });
+//     })
+//     .catch(error => {
+//       console.error('Error fetching config:', error);
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Configuration Error',
+//         text: 'There was a problem loading the contact form. Please try again later.',
+//         confirmButtonColor: '#dc3545',
+//       });
+//     });
+// });
 </script>
 
 <%- include("../partials/user/footer") %>

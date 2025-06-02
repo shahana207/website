@@ -432,7 +432,7 @@
                 View Details
             </button>
             <% if (order.status === 'Payment Failed') { %>
-                <a href="/retry-payment/<%= order.orderId %>" class="fazion-view-details" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" aria-label="Retry payment for order <%= order.orderId %>">
+                <a href="/retry-payment/<%= order._id %>" class="fazion-view-details" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" aria-label="Retry payment for order ">
                     Retry Payment
                 </a>
             <% } %>
@@ -484,12 +484,7 @@
                 const orderId = $(this).data('order-id');
                 console.log('Clicked View Details for orderId:', orderId);
                 if (!orderId || orderId === 'N/A') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Invalid order ID. Please try again.',
-                        confirmButtonColor: '#5b86e5'
-                    });
+                   
                     return;
                 }
                 window.location.href = `/order-details/${orderId}`;

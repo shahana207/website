@@ -310,6 +310,7 @@ const verifyPayment = async (req, res) => {
                 .populate('orderedItems.product', 'productName salePrice images')
                 .populate('user', 'firstName lastName email');
             req.session.orderId = order.orderId;
+            await session .save()
             return res.json({ success: false, message: "Invalid payment signature", redirectUrl: "/payment-failure" });
         }
 
@@ -375,6 +376,8 @@ const orderSuccess = async (req, res) => {
             .populate('user', 'firstName lastName email');
 
         if (!order) {
+            console.log("380")
+
             return res.redirect('/orders?error=Order not found');
         }
 
@@ -397,18 +400,21 @@ const paymentFailure = async (req, res) => {
             return res.redirect('/login?error=User not authenticated');
         }
 
-        const orderId = req.session.orderId;
-        if (!orderId) {
-            return res.redirect('/orders?error=No order ID found in session');
-        }
+        // const orderId = req.session.orderId;
+        // if (!orderId) {
+        //     console.log("407")
 
-        const order = await Order.findOne({ orderId, user: userId })
+        //     // return res.redirect('/orders?error=No order ID found in session');
+        //     return res.render('payment-failure')
+        // }
+
+        const order = await Order.findOne({ user: userId }).sort({createdOn:-1})
             .populate('orderedItems.product', 'productName salePrice images')
             .populate('user', 'firstName lastName email');
 
         if (!order) {
             return res.redirect('/orders?error=Order not found');
-        }
+        }console.log("order",order)
 
         // Update order status to Payment Failed
         order.status = 'Payment Failed';
@@ -705,7 +711,7 @@ const retryPayment = async (req, res) => {
         }
 
         const { orderId } = req.body;
-        const order = await Order.findOne({ orderId, user: userId }).populate('orderedItems.product');
+        const order = await Order.findOne({ _id:orderId, user: userId }).populate('orderedItems.product');
 
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
