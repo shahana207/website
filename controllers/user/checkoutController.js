@@ -413,7 +413,7 @@ const paymentFailure = async (req, res) => {
             .populate('user', 'firstName lastName email');
 
         if (!order) {
-            return res.redirect('/orders?error=Order not found');
+            return res.redirect('/order?error=Order not found');
         }console.log("order",order)
 
        
@@ -622,7 +622,7 @@ const applyCoupon = async (req, res) => {
         console.error('Error applying coupon:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to apply coupon',
+            message: 'Coupon criteria is not fulfilled,',
         });
     }
 };
