@@ -400,13 +400,7 @@ const paymentFailure = async (req, res) => {
             return res.redirect('/login?error=User not authenticated');
         }
         
-        // const orderId = req.session.orderId;
-        // if (!orderId) {
-        //     console.log("407")
-
-        //     // return res.redirect('/orders?error=No order ID found in session');
-        //     return res.render('payment-failure')
-        // }
+     
 
         const order = await Order.findOne({ user: userId }).sort({createdOn:-1})
             .populate('orderedItems.product', 'productName salePrice images')
