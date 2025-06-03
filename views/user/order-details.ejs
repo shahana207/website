@@ -381,7 +381,7 @@
             <button class="zz-action-btn cancel zz-cancel-order-btn" data-order-id="<%= order.orderId %>" aria-label="Cancel order">Cancel Order</button>
         <% } %>
         <% if (order.status === 'Payment Failed') { %>
-            <a href="/retry-payment/<%= order.orderId %>" class="zz-action-btn retry-payment" aria-label="Retry payment">Retry Payment</a>
+            <a href="/retry-payment/<%= order._id %>" class="zz-action-btn retry-payment" aria-label="Retry payment">Retry Payment</a>
         <% } %>
     </div>
 </div>
