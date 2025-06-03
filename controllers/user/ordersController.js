@@ -425,7 +425,7 @@ const retryPayment = async (req, res) => {
                    return res.status(400).json({ success: false, message: "Order not eligible for retry payment" });
                }
        
-               // Restore cart for retry payment
+               
                let cart = await Cart.findOne({ userId });
                if (!cart) {
                    cart = new Cart({ userId, items: [] });
@@ -449,13 +449,13 @@ const retryPayment = async (req, res) => {
        
                await cart.save();
        
-               // Store orderId in session for reference
+              
                req.session.orderId = order.orderId;
        
                return res.redirect( "/checkout");
     } catch (error) {
         console.log('Error retrying payment:', error);
-        // res.redirect('/orders?error=Failed to retry payment');
+        
     }
 };
 module.exports = {

@@ -99,12 +99,12 @@ const signup = async (req, res) => {
   try {
     const { name, phone, email, password, confirmPassword, referralCode } = req.body;
 
-    // Validate password match
+   
     if (password !== confirmPassword) {
       return res.render("signup", { message: "Passwords do not match", referralCode });
     }
 
-    // Validate phone number
+    
     const phonePattern = /^[6-9]\d{9}$/;
     const sequentialNumbers = /^(?:1234567890|0123456789|9876543210|0987654321)$/;
     const repetitiveNumbers = /^(\d)\1{9}$/;
@@ -130,7 +130,7 @@ const signup = async (req, res) => {
       });
     }
 
-    // Check for duplicate phone number
+   
     const findPhone = await User.findOne({ phone });
     if (findPhone) {
       return res.render("signup", {
@@ -139,7 +139,7 @@ const signup = async (req, res) => {
       });
     }
 
-    // Check for duplicate email
+    
     const findUser = await User.findOne({ email });
     if (findUser) {
       return res.render("signup", {
@@ -148,7 +148,6 @@ const signup = async (req, res) => {
       });
     }
 
-    // Validate referral code if provided
     if (referralCode) {
       const validReferral = await User.findOne({ referralCode });
       if (!validReferral) {
@@ -159,14 +158,13 @@ const signup = async (req, res) => {
       }
     }
 
-    // Generate and send OTP
+   
     const otp = generateOtp();
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
       return res.json("email-error");
     }
 
-    // Store user data and OTP in session
     req.session.userOtp = otp;
     req.session.otpExpires = Date.now() + 30 * 1000;
     req.session.userData = { name, phone, email, password, referralCode };
