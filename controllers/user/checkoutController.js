@@ -399,7 +399,7 @@ const paymentFailure = async (req, res) => {
         if (!userId) {
             return res.redirect('/login?error=User not authenticated');
         }
-
+        
         // const orderId = req.session.orderId;
         // if (!orderId) {
         //     console.log("407")
@@ -416,7 +416,6 @@ const paymentFailure = async (req, res) => {
             return res.redirect('/order?error=Order not found');
         }console.log("order",order)
 
-       
         order.status = 'Payment Failed';
         await order.save();
 
@@ -427,6 +426,7 @@ const paymentFailure = async (req, res) => {
             order,
             userId,
         });
+        
     } catch (error) {
         console.log(error);
         res.redirect('/pageNotFound?error=Failed to load payment failure page');
